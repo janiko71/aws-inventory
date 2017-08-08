@@ -25,14 +25,15 @@ session = boto3.Session(
 )
 
 #Find current owner ID
-sts = boto3.client('sts')
+sts = session.client('sts')
 identity = sts.get_caller_identity()
 ownerId = identity['Account']
+pprint.pprint("OwnerID : "+ownerId)
 
 #EC2 connection beginning
-ec = boto3.client('ec2')
+#ec = boto3.client('ec2')
 #S3 connection beginning
-s3 = boto3.resource('s3')
+#s3 = boto3.resource('s3')
 
 #Environment Variables & File handling
 S3_INVENTORY_BUCKET="xx"
@@ -219,7 +220,7 @@ for region in regions:
         VPCs = ec2con.describe_vpcs().get('Vpcs')
         if len(VPCs) > 0:
             csv_file.write("%s,%s,%s,%s,%s\n"%('','','','',''))
-            csv_file.write("%s,%s\n"%('VPC ',regname))
+            csv_file.write("%s,%s\n"%('VPC',regname))
             csv_file.write("%s,%s,%s,%s,%s\n"%('VpcId','InstanceTenancy','State','CidrBlock','Tags'))
             csv_file.flush()
             for vpc in VPCs:
