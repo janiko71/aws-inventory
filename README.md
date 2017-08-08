@@ -1,1 +1,1 @@
-# aws-inventory-
+# aws-inventory
