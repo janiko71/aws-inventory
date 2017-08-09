@@ -48,6 +48,7 @@
             "Action": [
                 "s3:ListAllMyBuckets",
                 "s3:ListBucket",
+                "s3:GetBucketWebsite",
                 "s3:PutObject"
             ],
             "Resource": [
