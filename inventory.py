@@ -9,10 +9,11 @@ import smtplib
 #from email.MIMEBase import MIMEBase
 #from email.MIMEText import MIMEText
 #from email import Encoders
-import os
+import os, hmac, hashlib
 import pprint
 from sys import exit
 from botocore import exceptions
+from botocore.exceptions import ClientError
 
 # AWS Regions 
 with open('aws_regions.json') as json_file:
@@ -309,23 +310,29 @@ listbuckets = s3i.list_buckets().get('Buckets')
 if len(listbuckets) > 0:
     csv_file.write("%s,%s,%s,%s\n" % ('','','',''))
     csv_file.write("%s :%s\n"%('S3 BUCKETS',regname))
-    csv_file.write("%s,%s,%s\n" % ('Name','Nb objects','Size'))
+    csv_file.write("%s,%s,%s,%s\n" % ('Name','Nb objects','Size','Has Website'))
     csv_file.flush()
     for bucket in listbuckets:
         #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.list_objects_v2
         bucketname = bucket['Name']
+        # Check if a website if configured; if yes, it could lead to a DLP issue
+        has_website = 'unknown'
+        try:
+            website = s3i.get_bucket_website(Bucket=bucketname)
+            has_website = 'yes'
+        except ClientError as ce:
+            if 'NoSuchWebsiteConfiguration' in ce.args[0]:
+                has_website = 'no'
+        # Summarize nb of objets and total size (for the current bucket)
         paginator = s3i.get_paginator('list_objects_v2')
         nbobj = 0
         size = 0
         page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
-        #pprint.pprint(page_objects)
         for objects in page_objects:
-            #pprint.pprint(len(objects['Contents']))
             nbobj += len(objects['Contents'])
             for obj in objects['Contents']:
-                #pprint.pprint(obj)
                 size += obj['Size']
-        csv_file.write("%s,%s,%s\n" % (bucketname,nbobj,size))
+        csv_file.write("%s,%s,%s,%s\n" % (bucketname,nbobj,size,has_website))
         csv_file.flush()
 
 #
@@ -334,19 +341,30 @@ if len(listbuckets) > 0:
 iam = session.client('iam')
 #http://boto3.readthedocs.io/en/latest/reference/services/iam.html
 listusers = iam.list_users().get('Users')
+csv_file.write("%s,%s,%s,%s\n" % ('','','',''))
+csv_file.write("%s :%s\n"%('IAM USERS',regname))
+csv_file.write("%s,%s\n" % ('Name','Groups'))
+csv_file.flush()
 for user in listusers:
-    print(user)
+    username = user['UserName']
     #http://boto3.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_groups_for_user
     groups = iam.list_groups_for_user(UserName=user['UserName'])
+    user_groups = []
     for group in groups.get('Groups'):
-        pprint.pprint(group.get('Arn'))
+        user_groups.append(group.get('Arn'))
+    csv_file.write("%s,%s\n" % (username, user_groups))
+    csv_file.flush()
+
         
 #http://boto3.readthedocs.io/en/latest/reference/services/iam.html#role    
 roles = iam.list_roles()
+csv_file.write("%s,%s,%s,%s\n" % ('','','',''))
+csv_file.write("%s :%s\n"%('IAM ROLES',regname))
+csv_file.write("%s\n" % ('RoleName'))
+csv_file.flush()
 #pprint.pprint(roles)
 for role in roles.get('Roles'):
-    pprint.pprint(role)    
-
+    csv_file.write("%s\n" % (role['RoleName']))
             
 # Results
 csv_file.close()
