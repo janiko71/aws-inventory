@@ -327,7 +327,7 @@ if len(listbuckets) > 0:
         paginator = s3i.get_paginator('list_objects_v2')
         nbobj = 0
         size = 0
-        page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
+        page_objects = paginator.paginate(Bucket=bucketname)
         for objects in page_objects:
             nbobj += len(objects['Contents'])
             for obj in objects['Contents']:
