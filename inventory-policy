@@ -1,0 +1,318 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1502268180000",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeAccountAttributes",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeCustomerGateways",
+                "ec2:DescribeDhcpOptions",
+                "ec2:DescribeHosts",
+                "ec2:DescribeHostReservations",
+                "ec2:DescribeImages",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeNatGateways",
+                "ec2:DescribeRegions",
+                "ec2:DescribeReservedInstances",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSnapshots",
+                "ec2:DescribeSpotFleetInstances",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeVpcPeeringConnections",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeVpnGateways"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268326000",
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268393000",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268523000",
+            "Effect": "Allow",
+            "Action": [
+                "rds:DescribeDBClusters",
+                "rds:DescribeDBInstances",
+                "rds:DescribeReservedDBInstances"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268561000",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:ListTables",
+                "dynamodb:DescribeTable"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268592000",
+            "Effect": "Allow",
+            "Action": [
+                "cloudtrail:GetTrailStatus",
+                "cloudtrail:DescribeTrails"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268612000",
+            "Effect": "Allow",
+            "Action": [
+                "directconnect:DescribeConnections",
+                "directconnect:DescribeConnectionsOnInterconnect",
+                "directconnect:DescribeInterconnects",
+                "directconnect:DescribeLocations",
+                "directconnect:DescribeVirtualGateways",
+                "directconnect:DescribeVirtualInterfaces"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268646000",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListAccessKeys",
+                "iam:ListGroups",
+                "iam:ListRoles",
+                "iam:ListOpenIDConnectProviders",
+                "iam:ListSAMLProviders",
+                "iam:ListUsers",
+                "iam:GetAccountAuthorizationDetails",
+                "iam:GetAccountSummary",
+                "iam:GetGroupPolicy",
+                "iam:GetInstanceProfile",
+                "iam:ListAttachedGroupPolicies",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListAttachedUserPolicies",
+                "iam:ListGroupsForUser",
+                "iam:ListPolicies",
+                "iam:ListPoliciesGrantingServiceAccess",
+                "iam:ListRolePolicies",
+                "iam:ListUserPolicies"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268717000",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:ListFunctions"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268759000",
+            "Effect": "Allow",
+            "Action": [
+                "ecs:ListClusters",
+                "ecs:ListContainerInstances",
+                "ecs:ListServices"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268825000",
+            "Effect": "Allow",
+            "Action": [
+                "elasticfilesystem:DescribeFileSystems"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268862000",
+            "Effect": "Allow",
+            "Action": [
+                "glacier:DescribeVault",
+                "glacier:ListVaults"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268891000",
+            "Effect": "Allow",
+            "Action": [
+                "lightsail:GetInstances"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268960000",
+            "Effect": "Allow",
+            "Action": [
+                "route53:ListHostedZones",
+                "route53:ListHostedZonesByName"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502268987000",
+            "Effect": "Allow",
+            "Action": [
+                "route53domains:ListDomains",
+                "route53domains:ListOperations"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502269012000",
+            "Effect": "Allow",
+            "Action": [
+                "sdb:ListDomains"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502269552000",
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:DescribeLoadBalancers"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270383000",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:DescribeStacks"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270412000",
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270458000",
+            "Effect": "Allow",
+            "Action": [
+                "kms:ListKeys"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270497000",
+            "Effect": "Allow",
+            "Action": [
+                "cloudhsm:DescribeHsm",
+                "cloudhsm:ListHsms"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270541000",
+            "Effect": "Allow",
+            "Action": [
+                "organizations:DescribeOrganization",
+                "organizations:ListAccounts",
+                "organizations:ListAccountsForParent",
+                "organizations:ListChildren",
+                "organizations:ListParents",
+                "organizations:ListRoots"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270587000",
+            "Effect": "Allow",
+            "Action": [
+                "ses:ListIdentities"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270607000",
+            "Effect": "Allow",
+            "Action": [
+                "sns:ListSubscriptions",
+                "sns:ListSubscriptionsByTopic",
+                "sns:ListTopics"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Stmt1502270635000",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:ListQueues"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
