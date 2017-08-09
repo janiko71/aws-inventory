@@ -233,7 +233,7 @@ for region in regions:
                 csv_file.flush()
 
         #
-        # RDS Connection beginning
+        # RDS and other databases
         #
         rdscon = session.client('rds',region_name=reg)
 
@@ -260,10 +260,24 @@ for region in regions:
             csv_file.write("%s,%s,%s,%s\n" %(DBInstanceIdentifier,DBInstanceStatus,DBName,DBInstanceClass))
             csv_file.flush()
 
+        #boto3 library dynamoDB API describe_table page
+        #http://boto3.readthedocs.io/en/latest/reference/services/dynamodb.html#DynamoDB.Client.describe_table
+        dynamodb = session.client('dynamodb',region_name=reg)
+        ddblist = dynamodb.list_tables().get('TableNames', [])
+        if len(ddblist) > 0:
+            csv_file.write("%s,%s,%s,%s\n" %('','','',''))
+            csv_file.write("%s,%s\n"%('DYNAMODB TABLES',regname))
+            csv_file.write("%s,%s,%s\n" %('TableName','TableSizeBytes','ItemCount'))
+            csv_file.flush()
+            for table in ddblist:
+                desctable = dynamodb.describe_table(TableName=table)['Table']
+                csv_file.write("%s,%s,%s\n" %(desctable['TableName'],desctable['TableSizeBytes'],desctable['ItemCount']))
+                csv_file.flush()                
+
         #ELB connection beginning
         elbcon = session.client('elb',region_name=reg)
 
-        #boto3 library ELB API describe db instances page
+        #boto3 library ELB API describe load balancer instances page
         #http://boto3.readthedocs.org/en/latest/reference/services/elb.html#ElasticLoadBalancing.Client.describe_load_balancers
         loadbalancer = elbcon.describe_load_balancers().get('LoadBalancerDescriptions',[])
         loadbalancerlist = len(loadbalancer)
@@ -280,6 +294,58 @@ for region in regions:
             CanonicalHostedZoneNameID=load['CanonicalHostedZoneNameID']
             csv_file.write("%s,%s,%s,%s\n" % (LoadBalancerName,DNSName,CanonicalHostedZoneName,CanonicalHostedZoneNameID))
             csv_file.flush()
+
+#
+# International Resources (no region)
+#
+regname='global'
+
+#
+# S3 quick inventory
+#
+s3i = session.client('s3')
+#http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
+listbuckets = s3i.list_buckets().get('Buckets')
+if len(listbuckets) > 0:
+    csv_file.write("%s,%s,%s,%s\n" % ('','','',''))
+    csv_file.write("%s :%s\n"%('S3 BUCKETS',regname))
+    csv_file.write("%s,%s,%s\n" % ('Name','Nb objects','Size'))
+    csv_file.flush()
+    for bucket in listbuckets:
+        #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.list_objects_v2
+        bucketname = bucket['Name']
+        paginator = s3i.get_paginator('list_objects_v2')
+        nbobj = 0
+        size = 0
+        page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
+        #pprint.pprint(page_objects)
+        for objects in page_objects:
+            #pprint.pprint(len(objects['Contents']))
+            nbobj += len(objects['Contents'])
+            for obj in objects['Contents']:
+                #pprint.pprint(obj)
+                size += obj['Size']
+        csv_file.write("%s,%s,%s\n" % (bucketname,nbobj,size))
+        csv_file.flush()
+
+#
+# IAM inventory
+#
+iam = session.client('iam')
+#http://boto3.readthedocs.io/en/latest/reference/services/iam.html
+listusers = iam.list_users().get('Users')
+for user in listusers:
+    print(user)
+    #http://boto3.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_groups_for_user
+    groups = iam.list_groups_for_user(UserName=user['UserName'])
+    for group in groups.get('Groups'):
+        pprint.pprint(group.get('Arn'))
+        
+#http://boto3.readthedocs.io/en/latest/reference/services/iam.html#role    
+roles = iam.list_roles()
+#pprint.pprint(roles)
+for role in roles.get('Roles'):
+    pprint.pprint(role)    
 
             
 # Results
