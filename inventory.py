@@ -217,7 +217,7 @@ for region in regions:
                     groupType = 'egress'
                     printSecGroup (groupType, ipPermissionEgress)
 
-        #boto3 library ec2 API descrive VPC
+        #boto3 library ec2 API describe VPC
         VPCs = ec2con.describe_vpcs().get('Vpcs')
         if len(VPCs) > 0:
             csv_file.write("%s,%s,%s,%s,%s\n"%('','','','',''))
@@ -233,6 +233,32 @@ for region in regions:
                 csv_file.write("%s,%s,%s,%s,%s\n"%(vpcid,instancetenancy,state,cidr,tags))
                 csv_file.flush()
 
+        # Autoscaling
+        #http://boto3.readthedocs.io/en/latest/reference/services/autoscaling.html#AutoScaling.Client.describe_auto_scaling_groups
+        autoscale = session.client('autoscaling',region_name=reg)
+        asg = autoscale.describe_auto_scaling_groups().get('AutoScalingGroups')
+        if len(asg) > 0:
+            csv_file.write("%s,%s,%s,%s\n" %('','','',''))
+            csv_file.write("%s :%s\n"%('Autoscaling',regname))
+            csv_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n" %(
+                    'AutoScalingGroupName','AvailabilityZones','DesiredCapacity','Instances',
+                    'LaunchConfigurationName','MaxSize','MinSize','LoadBalancerNames','VPCZoneIdentifier'))
+            csv_file.flush()
+            for group in asg:
+                AutoScalingGroupName    = group['AutoScalingGroupName']
+                AvailabilityZones       = group['AvailabilityZones']
+                DesiredCapacity         = group['DesiredCapacity']
+                Instances               = group['Instances']
+                LaunchConfigurationName = group['LaunchConfigurationName']
+                MaxSize                 = group['MaxSize']
+                MinSize                 = group['MinSize']
+                LoadBalancerNames       = group['LoadBalancerNames']
+                VPCZoneIdentifier       = group['VPCZoneIdentifier']
+                csv_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n" %(
+                        AutoScalingGroupName,AvailabilityZones,DesiredCapacity,Instances,
+                        LaunchConfigurationName,MaxSize,MinSize,LoadBalancerNames,VPCZoneIdentifier))
+
+
         #
         # RDS and other databases
         #
@@ -246,14 +272,14 @@ for region in regions:
         rdblist = len(rdb)
         if rdblist > 0:
             csv_file.write("%s,%s,%s,%s\n" %('','','',''))
-            csv_file.write("%s,%s\n"%('RDS INSTANCE',regname))
+            csv_file.write("%s :%s\n"%('RDS INSTANCE',regname))
             csv_file.write("%s,%s,%s,%s\n" %('DBInstanceIdentifier','DBInstanceStatus','DBName','DBInstanceClass'))
             csv_file.flush()
 
         for dbinstance in rdb:
             DBInstanceIdentifier = dbinstance['DBInstanceIdentifier']
-            DBInstanceClass = dbinstance['DBInstanceClass']
-            DBInstanceStatus = dbinstance['DBInstanceStatus']
+            DBInstanceClass      = dbinstance['DBInstanceClass']
+            DBInstanceStatus     = dbinstance['DBInstanceStatus']
             try:
                 DBName = dbinstance['DBName']
             except:
@@ -276,24 +302,27 @@ for region in regions:
                 csv_file.flush()                
 
         #ELB connection beginning
-        elbcon = session.client('elb',region_name=reg)
+        elbcon = session.client('elbv2',region_name=reg)
 
         #boto3 library ELB API describe load balancer instances page
         #http://boto3.readthedocs.org/en/latest/reference/services/elb.html#ElasticLoadBalancing.Client.describe_load_balancers
-        loadbalancer = elbcon.describe_load_balancers().get('LoadBalancerDescriptions',[])
+        loadbalancer = elbcon.describe_load_balancers().get('LoadBalancers',[])
+        pprint.pprint(loadbalancer)
         loadbalancerlist = len(loadbalancer)
         if loadbalancerlist > 0:
             csv_file.write("%s,%s,%s,%s\n" % ('','','',''))
             csv_file.write("%s,%s\n"%('ELB INSTANCE',regname))
-            csv_file.write("%s,%s,%s,%s\n" % ('LoadBalancerName','DNSName','CanonicalHostedZoneName','CanonicalHostedZoneNameID'))
+            csv_file.write("%s,%s,%s,%s,%s,%s\n" % ('LoadBalancerName','DNSName','VpcId','CanonicalHostedZoneId','State','SecurityGroups'))
             csv_file.flush()
 
         for load in loadbalancer:
             LoadBalancerName=load['LoadBalancerName']
             DNSName=load['DNSName']
-            CanonicalHostedZoneName=load['CanonicalHostedZoneName']
-            CanonicalHostedZoneNameID=load['CanonicalHostedZoneNameID']
-            csv_file.write("%s,%s,%s,%s\n" % (LoadBalancerName,DNSName,CanonicalHostedZoneName,CanonicalHostedZoneNameID))
+            VpcId=load['VpcId']
+            CanonicalHostedZoneId=load['CanonicalHostedZoneId']
+            State=load['State'].get('Code','unknow state')
+            SecurityGroups=load['SecurityGroups']
+            csv_file.write("%s,%s,%s,%s,%s,%s\n" % (LoadBalancerName,DNSName,VpcId,CanonicalHostedZoneId,State,SecurityGroups))
             csv_file.flush()
 
 #
@@ -327,7 +356,7 @@ if len(listbuckets) > 0:
         paginator = s3i.get_paginator('list_objects_v2')
         nbobj = 0
         size = 0
-        page_objects = paginator.paginate(Bucket=bucketname)
+        page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
         for objects in page_objects:
             nbobj += len(objects['Contents'])
             for obj in objects['Contents']:
