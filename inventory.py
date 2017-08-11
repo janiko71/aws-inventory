@@ -307,7 +307,6 @@ for region in regions:
         #boto3 library ELB API describe load balancer instances page
         #http://boto3.readthedocs.org/en/latest/reference/services/elb.html#ElasticLoadBalancing.Client.describe_load_balancers
         loadbalancer = elbcon.describe_load_balancers().get('LoadBalancers',[])
-        pprint.pprint(loadbalancer)
         loadbalancerlist = len(loadbalancer)
         if loadbalancerlist > 0:
             csv_file.write("%s,%s,%s,%s\n" % ('','','',''))
@@ -356,7 +355,7 @@ if len(listbuckets) > 0:
         paginator = s3i.get_paginator('list_objects_v2')
         nbobj = 0
         size = 0
-        page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
+        page_objects = paginator.paginate(Bucket=bucketname)
         for objects in page_objects:
             nbobj += len(objects['Contents'])
             for obj in objects['Contents']:
