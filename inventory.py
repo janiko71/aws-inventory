@@ -5,10 +5,6 @@ import csv
 import json
 from time import gmtime, strftime
 import smtplib
-#from email.MIMEMultipart import MIMEMultipart
-#from email.MIMEBase import MIMEBase
-#from email.MIMEText import MIMEText
-#from email import Encoders
 import os, hmac, hashlib
 import pprint
 from sys import exit
@@ -31,11 +27,6 @@ identity = sts.get_caller_identity()
 ownerId = identity['Account']
 pprint.pprint("OwnerID : "+ownerId)
 
-#EC2 connection beginning
-#ec = boto3.client('ec2')
-#S3 connection beginning
-#s3 = boto3.resource('s3')
-
 #Environment Variables & File handling
 S3_INVENTORY_BUCKET="xx"
 
@@ -54,84 +45,86 @@ regions = aws_regions.get('Regions',[] )
 for region in regions:
     
         reg=region['RegionName']
-        regname='REGION :' + reg
+        regname='REGION : ' + reg
         pprint.pprint(regname)
 
+        def write_inventory(file,res,owner,region,resid,restype,state,tags,addcat,details):
+            file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n"%(res,owner,region,resid,restype,state,tags,addcat,details))
+            csv_file.flush()
+
+        write_inventory(
+            csv_file,
+            'ResourceType',
+            'OwnerId',
+            'Region',
+            'ResourceId',
+            'ResourceType',
+            'State',
+            'Tags',
+            'AdditionalCategory',
+            'Details')
+        
         #
-        # EC2 connection beginning
+        # EC2 connection 
         #
         ec2con = session.client('ec2',region_name=reg)
         #boto3 library ec2 API describe instance page
         #http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_instances
-        reservations = ec2con.describe_instances().get(
-        'Reservations',[]
-        )
-        instances = sum(
-            [
-                [i for i in r['Instances']]
-                for r in reservations
-            ], [])
-        instanceslist = len(instances)
-        if instanceslist > 0:
-            csv_file.write("%s,%s,%s,%s,%s,%s\n"%('','','','','',''))
-            csv_file.write("%s,%s\n"%('EC2 INSTANCE',regname))
-            csv_file.write("%s,%s,%s,%s,%s,%s,%s\n"%('InstanceID','Instance_State','InstanceName','Instance_Type','LaunchTime','Instance_Placement', 'SecurityGroupsStr'))
-            csv_file.flush()
+        inventory    = ec2con.describe_instances()
+        reservations = inventory.get('Reservations',[])
+        for reservation in reservations:
+            ownerId       = reservation['OwnerId']
+            reservationId = reservation['ReservationId']
+            instances     = sum(
+                [
+                    [i for i in r['Instances']]
+                    for r in reservations
+                ], [])
 
-        for instance in instances:
-            state=instance['State']['Name']
-            if state =='running':
-                #for tags in instance['InstanceId']:
-                #    Instancename= tags
-                #    key= tags['Key']
-                #    if key == 'Name' :
-                Instancename=instance.get('Name','none')
-                instanceid=instance['InstanceId']
-                instancetype=instance['InstanceType']
-                launchtime =instance['LaunchTime']
-                Placement=instance['Placement']['AvailabilityZone']
-                securityGroups = instance['SecurityGroups']
-                securityGroupsStr = ''
-                for idx, securityGroup in enumerate(securityGroups):
-                    if idx > 0:
-                        securityGroupsStr += '; '
-                    securityGroupsStr += securityGroup['GroupName']
-                csv_file.write("%s,%s,%s,%s,%s,%s,%s\n"% (instanceid,state,Instancename,instancetype,launchtime,Placement,securityGroupsStr))
-                csv_file.flush()
+            for instance in instances:
+                securityGroupsStr = ""
+                state=instance['State']['Name']
+                if state =='running':
+                    securityGroups = instance['SecurityGroups']
+                    securityGroupsStr = ''
+                    for idx, securityGroup in enumerate(securityGroups):
+                        if idx > 0:
+                            securityGroupsStr += '; '
+                        securityGroupsStr += securityGroup['GroupName']
+                write_inventory(csv_file,
+                        'ec2',
+                        ownerId,
+                        reg,
+                        instance['InstanceId'],
+                        instance['InstanceType'],
+                        state,
+                        instance.get('Tags',[]),
+                        reservationId,
+                        instance)
 
-        for instance in instances:
-            state=instance['State']['Name']
-            if state =='stopped':
-                Instancename=instance.get('Name','noname')
-                instanceid=instance['InstanceId']
-                instancetype=instance['InstanceType']
-                launchtime =instance['LaunchTime']
-                Placement=instance['Placement']['AvailabilityZone']
-                csv_file.write("%s,%s,%s,%s,%s,%s\n"%(instanceid,state,Instancename,instancetype,launchtime,Placement))
-                csv_file.flush()
 
         #boto3 library ec2 API describe volumes page
         #http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_volumes
-        ec2volumes = ec2con.describe_volumes().get('Volumes',[])
+        inventory  = ec2con.describe_volumes()
+        ec2volumes = inventory.get('Volumes',[])
+        volumeType = inventory.get('VolumeType')
         volumes = sum(
             [
                 [i for i in r['Attachments']]
                 for r in ec2volumes
             ], [])
-        volumeslist = len(volumes)
-        if volumeslist > 0:
-            csv_file.write("%s,%s,%s,%s\n"%('','','',''))
-            csv_file.write("%s,%s\n"%('EBS Volume',regname))
-            csv_file.write("%s,%s,%s,%s\n"%('VolumeId','InstanceId','AttachTime','State'))
-            csv_file.flush()
 
         for volume in volumes:
-            VolumeId=volume['VolumeId']
-            InstanceId=volume['InstanceId']
-            State=volume['State']
-            AttachTime=volume['AttachTime']
-            csv_file.write("%s,%s,%s,%s\n" % (VolumeId,InstanceId,AttachTime,State))
-            csv_file.flush()
+            write_inventory(csv_file,
+                            'ebsvolumes',
+                            ownerId,
+                            reg,
+                            volume['VolumeId'],
+                            volumeType,
+                            volume['State'],
+                            volume.get('Tags',[]),
+                            volume['InstanceId'],
+                            volume)
             
         #boto3 library ec2 API describe snapshots page
         #http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_snapshots
@@ -355,6 +348,7 @@ if len(listbuckets) > 0:
         paginator = s3i.get_paginator('list_objects_v2')
         nbobj = 0
         size = 0
+        #page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
         page_objects = paginator.paginate(Bucket=bucketname)
         for objects in page_objects:
             nbobj += len(objects['Contents'])
