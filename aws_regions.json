@@ -5,9 +5,13 @@
             "Endpoint": "ec2.ap-south-1.amazonaws.com"
         },
         {
+            "RegionName": "eu-west-3",
+            "Endpoint": "ec2.eu-west-3.amazonaws.com"
+        },
+        {
             "RegionName": "eu-west-2",
             "Endpoint": "ec2.eu-west-2.amazonaws.com"
-        },
+        },		
         {
             "RegionName": "eu-west-1",
             "Endpoint": "ec2.eu-west-1.amazonaws.com"
