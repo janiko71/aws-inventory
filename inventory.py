@@ -1,8 +1,10 @@
 # Python imports
 import boto3
+from botocore.exceptions import ClientError
 import botocore
 import collections
 import datetime
+import time
 import dateutil
 from dateutil.tz import tzutc
 import csv
@@ -15,6 +17,7 @@ from sys import exit
 
 # AWS Services imports 
 import res.ec2 as ec2
+import res.s3 as s3
 
 # AWS Regions 
 with open('aws_regions.json') as json_file:
@@ -24,16 +27,12 @@ with open('aws_regions.json') as json_file:
 S3_INVENTORY_BUCKET="xx"
 
 # Initial values for inventory files
-date_fmt = strftime("%Y_%m_%d", gmtime())
+t = gmtime()
+date_fmt = strftime("%Y%m%d%H%M%S", t)
 filepath ='./'
 filename_csv ='AWS_Resources_' + date_fmt + '.csv'
 filename_json ='AWS_Resources_' + date_fmt + '.json'
 #csv_file = open(filepath+filename,'w+')
-
-def write_inventory(file,res,owner,region,resid,restype,state,tags,addcat,details):
-    file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n"%(res,owner,region,resid,restype,state,tags,addcat,details))
-    csv_file.flush()
-    return
 
 def write_json(file, info):
     file.write(info)
@@ -48,7 +47,7 @@ def json_datetime_converter(json_text):
 
 def get_ownerID():
     """
-        Get owner ID 
+        Get owner ID of the AWS account we are working on
 
         :return: owner ID
         :rtype: string
@@ -58,32 +57,50 @@ def get_ownerID():
     ownerId = identity['Account']
     return ownerId
 
+ownerId = get_ownerID()
+regions = aws_regions.get('Regions',[] ) 
+
+# 
+# ----------------- EC2
+#
+
+inventory = {"ec2" : []}
+
+# Lookup in every AWS Region
+
+for current_region in regions:
+    
+    current_region_name = current_region['RegionName']
+    print('OwnerID : {}, EC2 inventory, Region : {}'.format(ownerId, current_region_name))
+
+    # EC2
+    ec2_inventory = ec2.get_ec2_inventory(current_region_name)
+    for instance in ec2_inventory:
+        inventory["ec2"].append(json.loads(json_datetime_converter(instance)))
+
+#
+# International Resources (no region)
+#
+
+current_region_name = 'global'
+
+#
+# ----------------- S3 quick inventory
+#
+
+print('OwnerID : {}, S3 inventory, Region : {}'.format(ownerId, current_region_name))
+inventory["s3"] = s3.get_s3_inventory(current_region_name)
+
+#
+# ----------------- Final inventory
+#
+
 try:
     json_file = open(filepath+filename_json,'w+')
 except IOError as e:
     print ("I/O error({0}): {1}".format(e.errno, e.strerror))
 
-ownerId = get_ownerID()
-regions = aws_regions.get('Regions',[] )
-
-#
-# Lookup in every AWS Region
-# 
-
-ec2_json = {"ec2" : []}
-
-for current_region in regions:
-    
-    current_region_name = current_region['RegionName']
-    disp = 'OwnerID : {}, Region : {}'.format(ownerId, current_region_name)
-    pprint.pprint(disp)
-
-    # EC2
-    ec2_inventory = ec2.get_ec2_inventory(current_region_name)
-    for instance in ec2_inventory:
-        ec2_json["ec2"].append(json.loads(json_datetime_converter(instance)))
-
-json_file.write(json.JSONEncoder().encode(ec2_json))
+json_file.write(json.JSONEncoder().encode(inventory))
 
 #
 # EOF
