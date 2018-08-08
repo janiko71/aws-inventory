@@ -13,19 +13,16 @@ from time import gmtime, strftime
 import smtplib
 import os, hmac, hashlib
 import pprint
+import logging
 from sys import exit
 
 # AWS Services imports 
 import res.ec2 as ec2
 import res.s3 as s3
 
-# AWS Regions 
-with open('aws_regions.json') as json_file:
-    aws_regions = json.load(json_file)
-
-# Environment Variables & File handling
-S3_INVENTORY_BUCKET="xx"
-
+#
+#  Useful functions
+#
 def write_json(file, info):
     file.write(info)
     return
@@ -49,28 +46,68 @@ def get_ownerID():
     ownerId = identity['Account']
     return ownerId
 
+#
+# Environment Variables & File handling & logging
+#
+
+# --- AWS basic information
 ownerId = get_ownerID()
+
+# --- AWS Regions 
+with open('aws_regions.json') as json_file:
+    aws_regions = json.load(json_file)
 regions = aws_regions.get('Regions',[] ) 
+
+# --- Initial values for inventory files names
+t = gmtime()
+timestamp = strftime("%Y%m%d%H%M%S", t)
+filepath = './output/'
+filename_json = 'AWS_{}_{}.json'.format(ownerId, timestamp)
+# --- logging variables
+log_filepath = './log/'
+logger       = logging.getLogger('aws-inventory')
+hdlr         = logging.FileHandler(log_filepath+'inventory.log')
+formatter    = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+# --- Log handler
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr) 
+logger.setLevel(logging.WARNING)
+# --- csv_file = open(filepath+filename,'w+')logging.basicConfig(filename='example.log',level=logging.DEBUG)
+S3_INVENTORY_BUCKET="xx"
+
 
 # 
 # ----------------- EC2
 #
 
-inventory = {"ec2" : []}
-
 # Lookup in every AWS Region
 
+# Initialization for some variables
+inventory = {}
+ec2_inventory = []
+interfaces_inventory = interfaces_analysis = []
+
 for current_region in regions:
-    
+   
     current_region_name = current_region['RegionName']
     print('OwnerID : {}, EC2 inventory, Region : {}'.format(ownerId, current_region_name))
 
     # EC2
-    ec2_inventory = ec2.get_ec2_inventory(current_region_name)
-    ec2_analysis = []
-    for instance in ec2_inventory:
-        inventory["ec2"].append(json.loads(json_datetime_converter(instance)))
-        ec2_analysis.append(ec2.get_ec2_analysis(instance))
+    instances = ec2.get_ec2_inventory(current_region_name)
+    for instance in instances:
+        json_ec2_desc = json.loads(json_datetime_converter(instance))
+        ec2_inventory.append(ec2.get_ec2_analysis(json_ec2_desc, current_region_name))
+
+    # Network
+    for ifc in ec2.get_interfaces_inventory(current_region_name):
+        interfaces_inventory.append(json.loads(json_datetime_converter(ifc)))
+
+    # VPCs
+
+    # EBS
+
+inventory["ec2"] = ec2_inventory
+inventory["ec2-interfaces"] = interfaces_inventory
 
 #
 # International Resources (no region)
@@ -89,18 +126,10 @@ inventory["s3"] = s3.get_s3_inventory(current_region_name)
 # ----------------- Final inventory
 #
 
-# Initial values for inventory files names
-t = gmtime()
-timestamp = strftime("%Y%m%d%H%M%S", t)
-filepath = './tests/'
-filename_csv = 'AWS_{}_{}.csv'.format(ownerId, timestamp)
-filename_json = 'AWS_{}_{}.json'.format(ownerId, timestamp)
-#csv_file = open(filepath+filename,'w+')
-
 try:
     json_file = open(filepath+filename_json,'w+')
 except IOError as e:
-    print ("I/O error({0}): {1}".format(e.errno, e.strerror))
+    logging.error("I/O error({0}): {1}".format(e.errno, e.strerror))
 
 json_file.write(json.JSONEncoder().encode(inventory))
 

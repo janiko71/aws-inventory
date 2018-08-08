@@ -6,12 +6,13 @@ def get_ec2_inventory(region):
     inventory = ec2.describe_instances().get('Reservations')
     return inventory
 
-def get_ec2_analysis(instance):
+def get_ec2_analysis(instance, region_name):
     analysis = {}
     reservation_id = instance['ReservationId']
     groups = instance['Groups']
     for inst in instance.get('Instances'):
         analysis['Groups'] = groups
+        analysis['Region'] = region_name
         analysis['ReservationId'] = reservation_id
         analysis['StateCode'] = inst.get('State').get('Code')
         analysis['StateName'] = inst.get('State').get('Name')
@@ -44,25 +45,41 @@ def get_ec2_analysis(instance):
             analysis['Tags'] = []
         analysis['RootDeviceType'] = inst.get('RootDeviceType')
         analysis['RootDeviceName'] = inst.get('RootDeviceName')
+
         # devices (disks). Only EBS ?
         disks = inst.get('BlockDeviceMappings')
         disks_list = []
         for disk in disks:
-            device = (disk['DeviceName'], disk['Ebs'].get('VolumeId'), disk['Ebs'].get('Status'))
+            device = {'DeviceName': disk['DeviceName'], 'VolumeId': disk['Ebs'].get('VolumeId'), 'Status': disk['Ebs'].get('Status')}
             disks_list.append(device)
         analysis['Devices'] = disks_list
-        '''
-        analysis['InstanceId'] = inst.get('InstanceId')
-        analysis['InstanceId'] = inst.get('InstanceId')
-        analysis['InstanceId'] = inst.get('InstanceId')
-        analysis['InstanceId'] = inst.get('InstanceId')
-        analysis['InstanceId'] = inst.get('InstanceId')
-        analysis['InstanceId'] = inst.get('InstanceId')
-        analysis['InstanceId'] = inst.get('InstanceId')
-        '''
 
-    print(analysis)
+        # Networking interfaces
+        analysis['NetworkInterfaces'] = []
+        interfaces = inst.get('NetworkInterfaces')
+        for ifc in interfaces:
+            desc_ifc = {
+                'MacAddress': ifc['MacAddress'],
+                'Status': ifc['Status'],
+                'VpcId': ifc['VpcId'],
+                'SubnetId': ifc['SubnetId'],
+                'NetworkInterfaceId': ifc['NetworkInterfaceId'],
+                'PrivateIpAddresses': ifc['PrivateIpAddresses'],
+            }                
+        analysis['NetworkInterfaces'].append(desc_ifc)
 
+       
+    return analysis
+
+def get_interfaces_inventory(region):
+    ec2 = boto3.client('ec2', region)
+    inventory = ec2.describe_network_interfaces().get('NetworkInterfaces')
+    return inventory
+
+def get_vpc_inventory(region):
+    ec2 = boto3.client('ec2', region)
+    inventory = ec2.describe_network_interfaces().get('NetworkInterfaces')
+    return inventory
 
 if (__name__ == '__main__'):
     print('Module => Do not execute')
