@@ -73,12 +73,27 @@ def get_ec2_analysis(instance, region_name):
 
 def get_interfaces_inventory(region):
     ec2 = boto3.client('ec2', region)
-    inventory = ec2.describe_network_interfaces().get('NetworkInterfaces')
+    inventory = []
+    for ifc in ec2.describe_network_interfaces().get('NetworkInterfaces'):
+        ifc['Region'] = region
+        inventory.append(ifc)
+
     return inventory
 
 def get_vpc_inventory(region):
     ec2 = boto3.client('ec2', region)
-    inventory = ec2.describe_network_interfaces().get('NetworkInterfaces')
+    inventory = []
+    for vpc in ec2.describe_vpcs().get('Vpcs'):
+        vpc['Region'] = region
+        inventory.append(vpc)
+    return inventory
+
+def get_ebs_inventory(region):
+    ec2 = boto3.client('ec2', region)
+    inventory = []
+    for ebs in ec2.describe_volumes().get('Volumes'):
+        ebs['Region'] = region
+        inventory.append(ebs)
     return inventory
 
 if (__name__ == '__main__'):

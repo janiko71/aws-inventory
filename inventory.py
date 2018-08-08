@@ -84,8 +84,10 @@ S3_INVENTORY_BUCKET="xx"
 
 # Initialization for some variables
 inventory = {}
-ec2_inventory = []
-interfaces_inventory = interfaces_analysis = []
+ec2_inventory        = []
+interfaces_inventory = []
+vpcs_inventory       = []
+ebs_inventory        = []
 
 for current_region in regions:
    
@@ -103,11 +105,24 @@ for current_region in regions:
         interfaces_inventory.append(json.loads(json_datetime_converter(ifc)))
 
     # VPCs
+    vpcs_inventory.append(ec2.get_vpc_inventory(current_region_name))
 
     # EBS
+    ebs_list = ec2.get_ebs_inventory(current_region_name)
+    if len(ebs_list) > 0:
+        ebs_inventory.append(json.loads(json_datetime_converter(ebs_list)))
 
-inventory["ec2"] = ec2_inventory
+    # EBS, snapshot
+    # describe_nat_gateways()
+    # describe_internet_gateways()
+    # describe_reserved_instances()
+    # describe_snapshots()
+    # describe_subnets()
+
+inventory["ec2"]            = ec2_inventory
 inventory["ec2-interfaces"] = interfaces_inventory
+inventory["ec2-vpcs"]       = vpcs_inventory
+inventory["ec2-ebs"]        = ebs_inventory
 
 #
 # International Resources (no region)
@@ -129,7 +144,7 @@ inventory["s3"] = s3.get_s3_inventory(current_region_name)
 try:
     json_file = open(filepath+filename_json,'w+')
 except IOError as e:
-    logging.error("I/O error({0}): {1}".format(e.errno, e.strerror))
+    logger.error("I/O error({0}): {1}".format(e.errno, e.strerror))
 
 json_file.write(json.JSONEncoder().encode(inventory))
 
