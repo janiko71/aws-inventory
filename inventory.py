@@ -26,14 +26,6 @@ with open('aws_regions.json') as json_file:
 # Environment Variables & File handling
 S3_INVENTORY_BUCKET="xx"
 
-# Initial values for inventory files
-t = gmtime()
-date_fmt = strftime("%Y%m%d%H%M%S", t)
-filepath ='./'
-filename_csv ='AWS_Resources_' + date_fmt + '.csv'
-filename_json ='AWS_Resources_' + date_fmt + '.json'
-#csv_file = open(filepath+filename,'w+')
-
 def write_json(file, info):
     file.write(info)
     return
@@ -75,8 +67,10 @@ for current_region in regions:
 
     # EC2
     ec2_inventory = ec2.get_ec2_inventory(current_region_name)
+    ec2_analysis = []
     for instance in ec2_inventory:
         inventory["ec2"].append(json.loads(json_datetime_converter(instance)))
+        ec2_analysis.append(ec2.get_ec2_analysis(instance))
 
 #
 # International Resources (no region)
@@ -95,6 +89,14 @@ inventory["s3"] = s3.get_s3_inventory(current_region_name)
 # ----------------- Final inventory
 #
 
+# Initial values for inventory files names
+t = gmtime()
+timestamp = strftime("%Y%m%d%H%M%S", t)
+filepath = './tests/'
+filename_csv = 'AWS_{}_{}.csv'.format(ownerId, timestamp)
+filename_json = 'AWS_{}_{}.json'.format(ownerId, timestamp)
+#csv_file = open(filepath+filename,'w+')
+
 try:
     json_file = open(filepath+filename_json,'w+')
 except IOError as e:
@@ -106,3 +108,4 @@ json_file.write(json.JSONEncoder().encode(inventory))
 # EOF
 #
 json_file.close()
+
