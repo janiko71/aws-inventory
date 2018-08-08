@@ -19,20 +19,39 @@ from sys import exit
 # AWS Services imports 
 import res.ec2 as ec2
 import res.s3 as s3
+import res.eks as eks
+import res.awslambda as awslambda
 
 #
 #  Useful functions
 #
-def write_json(file, info):
-    file.write(info)
-    return
 
 def datetime_converter(dt):
+    """
+        Converts a python datetime object (returned by AWS SDK) into a readable and SERIALIZABLE string
+
+        :param dt: datetime
+        :type region: datetime
+
+        :return: datetime in a good format
+        :rtype: str
+    """
     if isinstance(dt, datetime.datetime):
         return dt.__str__()  
 
+
 def json_datetime_converter(json_text):
+    """
+        Parses a json object and converts all datetime objects (returned by AWS SDK) into str objects
+
+        :param json_text: json with datetime objects
+        :type json_text: json
+
+        :return: json with date in string format
+        :rtype: json
+    """
     return json.dumps(json_text, default = datetime_converter)      
+
 
 def get_ownerID():
     """
@@ -76,29 +95,32 @@ logger.setLevel(logging.WARNING)
 S3_INVENTORY_BUCKET="xx"
 
 
-# 
-# ----------------- EC2
-#
-
-# Lookup in every AWS Region
-
 # Initialization for some variables
 inventory = {}
 ec2_inventory        = []
 interfaces_inventory = []
 vpcs_inventory       = []
 ebs_inventory        = []
+lambda_inventory     = []
 
+# 
+# ----------------- EC2
+#
+
+# Lookup in every AWS Region
 for current_region in regions:
    
     current_region_name = current_region['RegionName']
     print('OwnerID : {}, EC2 inventory, Region : {}'.format(ownerId, current_region_name))
 
+    # Lambda
+    lambda_list = awslambda.get_lambda_inventory(ownerId, current_region_name)
+
     # EC2
     instances = ec2.get_ec2_inventory(current_region_name)
     for instance in instances:
-        json_ec2_desc = json.loads(json_datetime_converter(instance))
-        ec2_inventory.append(ec2.get_ec2_analysis(json_ec2_desc, current_region_name))
+       json_ec2_desc = json.loads(json_datetime_converter(instance))
+       ec2_inventory.append(ec2.get_ec2_analysis(json_ec2_desc, current_region_name))
 
     # Network
     for ifc in ec2.get_interfaces_inventory(current_region_name):
@@ -123,6 +145,18 @@ inventory["ec2"]            = ec2_inventory
 inventory["ec2-interfaces"] = interfaces_inventory
 inventory["ec2-vpcs"]       = vpcs_inventory
 inventory["ec2-ebs"]        = ebs_inventory
+
+
+#
+# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK
+#
+#for current_region in regions:
+#    current_region_name = current_region['RegionName']
+#    eks_list = eks.get_eks_inventory(ownerId, current_region_name)
+#    #print(eks_list)
+# Other non implemented services:
+#  - alexaforbusiness
+
 
 #
 # International Resources (no region)

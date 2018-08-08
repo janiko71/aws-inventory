@@ -2,11 +2,32 @@ import boto3
 import botocore
 
 def get_ec2_inventory(region):
+    """
+        Returns ec2 inventory, without any analysis or any formatting
+
+        :param region: region name
+        :type region: string
+
+        :return: ec2 inventory
+        :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ec2.html
+    """
     ec2 = boto3.client('ec2', region)
     inventory = ec2.describe_instances().get('Reservations')
     return inventory
 
+
 def get_ec2_analysis(instance, region_name):
+    """
+        Returns ec2 inventory with significant attributes only
+
+        :param region: region name
+        :type region: string
+
+        :return: ec2 inventory
+        :rtype: json
+    """
     analysis = {}
     reservation_id = instance['ReservationId']
     groups = instance['Groups']
@@ -71,7 +92,17 @@ def get_ec2_analysis(instance, region_name):
        
     return analysis
 
+
 def get_interfaces_inventory(region):
+    """
+        Returns network interfaces detailed inventory
+
+        :param region: region name
+        :type region: string
+
+        :return: network interfaces inventory
+        :rtype: json
+    """
     ec2 = boto3.client('ec2', region)
     inventory = []
     for ifc in ec2.describe_network_interfaces().get('NetworkInterfaces'):
@@ -80,7 +111,17 @@ def get_interfaces_inventory(region):
 
     return inventory
 
+
 def get_vpc_inventory(region):
+    """
+        Returns VPC detailed inventory
+
+        :param region: region name
+        :type region: string
+
+        :return: VPC inventory
+        :rtype: json
+    """
     ec2 = boto3.client('ec2', region)
     inventory = []
     for vpc in ec2.describe_vpcs().get('Vpcs'):
@@ -88,7 +129,17 @@ def get_vpc_inventory(region):
         inventory.append(vpc)
     return inventory
 
+
 def get_ebs_inventory(region):
+    """
+        Returns EBS detailed inventory
+
+        :param region: region name
+        :type region: string
+
+        :return: EBS inventory
+        :rtype: json
+    """
     ec2 = boto3.client('ec2', region)
     inventory = []
     for ebs in ec2.describe_volumes().get('Volumes'):
@@ -96,5 +147,7 @@ def get_ebs_inventory(region):
         inventory.append(ebs)
     return inventory
 
+
+# Hey, doc: we're in a module!
 if (__name__ == '__main__'):
     print('Module => Do not execute')

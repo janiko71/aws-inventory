@@ -4,11 +4,20 @@ from botocore.exceptions import ClientError
 import pprint
 
 def get_s3_inventory(region_name):
+    """
+        Returns S3 quick inventory
 
+        :param region: region name
+        :type region: string
+
+        :return: S3 inventory
+        :rtype: json
+
+        ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
+    """
     inventory = []
     s3 = boto3.client('s3')
-    #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
-
+    
     listbuckets = s3.list_buckets().get('Buckets')
     
     if len(listbuckets) > 0:
@@ -41,5 +50,7 @@ def get_s3_inventory(region_name):
     
     return inventory
 
+
+# Hey, doc: we're in a module!
 if (__name__ == '__main__'):
     print('Module => Do not execute')
