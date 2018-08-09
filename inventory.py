@@ -78,12 +78,13 @@ if ('ec2' in arguments):
             interfaces_inventory.append(json.loads(utils.json_datetime_converter(ifc)))
 
         # VPCs
-        vpcs_inventory.append(compute.get_vpc_inventory(current_region_name))
+        for vpc in compute.get_vpc_inventory(current_region_name):
+            vpcs_inventory.append(vpc)
 
         # EBS
         ebs_list = compute.get_ebs_inventory(current_region_name)
-        if len(ebs_list) > 0:
-            ebs_inventory.append(json.loads(utils.json_datetime_converter(ebs_list)))
+        for ebs in ebs_list:
+            ebs_inventory.append(json.loads(utils.json_datetime_converter(ebs)))
 
         # EBS, snapshot
         # describe_nat_gateways()
@@ -121,8 +122,8 @@ if ('efs' in arguments):
     efs_inventory = []
     for current_region in regions:
         efs_list = storage.get_efs_inventory(ownerId, current_region['RegionName'])
-        if len(efs_list) > 0:
-            efs_inventory.append(json.loads(utils.json_datetime_converter(efs_list)))
+        for efs in efs_list:
+            efs_inventory.append(json.loads(utils.json_datetime_converter(efs)))
     inventory['efs'] = efs_inventory
 
 
@@ -133,8 +134,8 @@ if ('glacier' in arguments):
     glacier_inventory = []
     for current_region in regions:
         glacier_list = storage.get_glacier_inventory(ownerId, current_region['RegionName'])
-        if len(glacier_list) > 0:
-            glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier_list)))
+        for glacier in glacier_list:
+            glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier)))
     inventory['glacier'] = glacier_inventory
 
 #

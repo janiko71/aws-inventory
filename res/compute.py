@@ -4,6 +4,7 @@ import json
 import config
 import res.utils as utils
 
+# to do : autoscaling, security groups
 
 #  ------------------------------------------------------------------------
 #
@@ -45,7 +46,7 @@ def get_ec2_analysis(instance, region_name):
     groups = instance['Groups']
     for inst in instance.get('Instances'):
         analysis['Groups'] = groups
-        analysis['Region'] = region_name
+        analysis['RegionName'] = region_name
         analysis['ReservationId'] = reservation_id
         analysis['StateCode'] = inst.get('State').get('Code')
         analysis['StateName'] = inst.get('State').get('Name')
@@ -119,7 +120,7 @@ def get_interfaces_inventory(region_name):
     ec2 = boto3.client('ec2', region_name)
     inventory = []
     for ifc in ec2.describe_network_interfaces().get('NetworkInterfaces'):
-        ifc['Region'] = region_name
+        ifc['RegionName'] = region_name
         inventory.append(ifc)
 
     return inventory
@@ -139,7 +140,7 @@ def get_vpc_inventory(region_name):
     ec2 = boto3.client('ec2', region_name)
     inventory = []
     for vpc in ec2.describe_vpcs().get('Vpcs'):
-        vpc['Region'] = region_name
+        vpc['RegionName'] = region_name
         inventory.append(vpc)
     return inventory
 
@@ -158,7 +159,7 @@ def get_ebs_inventory(region_name):
     ec2 = boto3.client('ec2', region_name)
     inventory = []
     for ebs in ec2.describe_volumes().get('Volumes'):
-        ebs['Region'] = region_name
+        ebs['RegionName'] = region_name
         inventory.append(ebs)
     return inventory
 
@@ -242,13 +243,16 @@ def get_lightsail_inventory():
     if (len(lightsail_instances_inventory) > 0):
         lightsail_inventory['lightsail-instances'] = lightsail_instances_inventory
 
-    lb_inventory = []
-    config.logger.info('lightsail Load Balancer inventory, region {}, get_lightsail_inventory'.format(region_name))
-    lb_list = lightsail.get_load_balancers().get("loadBalancers")
-    for lb in lb_list:
-        lb_inventory.append(lb)
-    if (len(lb_inventory) > 0):
-        lightsail_inventory['lightsail-loadbalancers'] = lb_inventory
+    try:
+        lb_inventory = []
+        config.logger.info('lightsail Load Balancer inventory, region {}, get_lightsail_inventory'.format(region_name))
+        lb_list = lightsail.get_load_balancers().get("loadBalancers")
+        for lb in lb_list:
+            lb_inventory.append(lb)
+        if (len(lb_inventory) > 0):
+            lightsail_inventory['lightsail-loadbalancers'] = lb_inventory
+    except AttributeError:
+        config.logger.error('lightsail Load Balancer inventory failed for region {}'.format(region_name))                    
 
     ip_inventory = []
     config.logger.info('lightsail IP inventory, region {}, get_lightsail_inventory'.format(region_name))
