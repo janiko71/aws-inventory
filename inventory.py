@@ -110,8 +110,8 @@ if ('lambda' in arguments):
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
-    utils.display(ownerId, "all regions", "lightsail inventory")
-    inventory["lightsail"] = compute.get_lightsail_inventory()
+    
+    inventory['lightsail'] = json.loads(utils.json_datetime_converter(compute.get_lightsail_inventory()))
 
 
 #
@@ -120,19 +120,19 @@ if ('lightsail' in arguments):
 if ('efs' in arguments):
     efs_inventory = []
     for current_region in regions:
-        current_region_name = current_region['RegionName']
-        efs_list = storage.get_efs_inventory(ownerId, current_region_name)
+        efs_list = storage.get_efs_inventory(ownerId, current_region['RegionName'])
         if len(efs_list) > 0:
             efs_inventory.append(json.loads(utils.json_datetime_converter(efs_list)))
     inventory['efs'] = efs_inventory
+
+
 #
 # ----------------- Glacier inventory
 #
 if ('glacier' in arguments):
     glacier_inventory = []
     for current_region in regions:
-        current_region_name = current_region['RegionName']
-        glacier_list = storage.get_glacier_inventory(ownerId, current_region_name)
+        glacier_list = storage.get_glacier_inventory(ownerId, current_region['RegionName'])
         if len(glacier_list) > 0:
             glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier_list)))
     inventory['glacier'] = glacier_inventory

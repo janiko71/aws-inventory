@@ -1,6 +1,8 @@
 import boto3
 import botocore
+import json
 import config
+import res.utils as utils
 
 
 #  ------------------------------------------------------------------------
@@ -217,7 +219,6 @@ def get_lambda_inventory():
 #    Lightsail
 #
 #  ------------------------------------------------------------------------
-
 def get_lightsail_inventory():
     """
         Returns lightsail inventory. 
@@ -227,11 +228,39 @@ def get_lightsail_inventory():
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lightsail.html
     """
-    config.logger.info('lightsail inventory, region {}, get_lightsail_inventory'.format('all regions'))
+    lightsail_inventory = {}
+    region_name = 'all regions'
+    config.logger.info('lightsail inventory, region {}, get_lightsail_inventory'.format(region_name))
+
     lightsail = boto3.client('lightsail')
-    lightsail_list = lightsail.get_instances().get('instances')
-   
-    return lightsail_list
+
+    lightsail_instances_inventory = []
+    lightsail_instances_list = lightsail.get_instances().get('instances')
+    config.logger.info('lightsail instances inventory, region {}, get_lightsail_inventory'.format(region_name))
+    for li in lightsail_instances_list:
+        lightsail_instances_inventory.append(json.loads(utils.json_datetime_converter(li)))
+    if (len(lightsail_instances_inventory) > 0):
+        lightsail_inventory['lightsail-instances'] = lightsail_instances_inventory
+
+    lb_inventory = []
+    config.logger.info('lightsail Load Balancer inventory, region {}, get_lightsail_inventory'.format(region_name))
+    lb_list = lightsail.get_load_balancers().get("loadBalancers")
+    for lb in lb_list:
+        lb_inventory.append(lb)
+    if (len(lb_inventory) > 0):
+        lightsail_inventory['lightsail-loadbalancers'] = lb_inventory
+
+    ip_inventory = []
+    config.logger.info('lightsail IP inventory, region {}, get_lightsail_inventory'.format(region_name))
+    ip_list = lightsail.get_static_ips().get('staticIps')
+    for ip in ip_list:
+        ip_inventory.append(ip)
+    if (len(ip_inventory) > 0):
+        lightsail_inventory['lightsail-ip'] = ip_inventory
+
+    return lightsail_inventory
+
+
 
 #
 # Hey, doc: we're in a module!
