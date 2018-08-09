@@ -3,9 +3,9 @@ import botocore
 from botocore.exceptions import ClientError
 import pprint
 
-def get_lambda_inventory(ownerId, region_name):
+def get_lambda_inventory(ownerId):
     """
-        Returns lambda inventory (if the region is avalaible)
+        Returns lambda inventory.
 
         :param region: region name
         :type region: string
@@ -15,15 +15,11 @@ def get_lambda_inventory(ownerId, region_name):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
     """
-    inventory = []
-    try:
-        awslambda = boto3.client('lambda')
-        print('OwnerID : {}, lambda inventory, Region : {}'.format(ownerId, region_name))
-        inventory.append(awslambda.list_functions())
-    except:
-        print('OwnerID : {}, lambda not supported in region : {}'.format(ownerId, region_name))
-    
-    return inventory
+    awslambda = boto3.client('lambda')
+    print('OwnerID : {}, lambda inventory, Region : {}'.format(ownerId, 'all regions'))
+    lambda_list = awslambda.list_functions().get('Functions')
+   
+    return lambda_list
 
 
 # Hey, doc: we're in a module!
