@@ -20,7 +20,10 @@ formatter       = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 # --- Log handler
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.WARNING)
 
 # --- If needed: S3 bucket name to write inventory
 S3_INVENTORY_BUCKET="xx"
+
+# --- Arguments/Supported commands
+SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs']

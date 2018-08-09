@@ -1,15 +1,23 @@
 import boto3
 import botocore
-from botocore.exceptions import ClientError
+from botocore.exceptions import *
 import pprint
 import config
+import res.utils as utils
+
+
+#  ------------------------------------------------------------------------
+#
+#    S3
+#
+#  ------------------------------------------------------------------------
 
 def get_s3_inventory(region_name):
     """
         Returns S3 quick inventory
 
-        :param region: region name
-        :type region: string
+        :param region_name: region name
+        :type region_name: string
 
         :return: S3 inventory
         :rtype: json
@@ -50,10 +58,47 @@ def get_s3_inventory(region_name):
             this_bucket['number_of_objects'] = nbobj
             this_bucket['total_size'] = size
             inventory.append(this_bucket)
+
+    return inventory
+
+#  ------------------------------------------------------------------------
+#
+#    EFS (Elastic File System)
+#
+#  ------------------------------------------------------------------------
+
+def get_efs_inventory(ownerId, region_name):
+    """
+        Returns EF inventory
+
+        :param region_name: region name
+        :type region_name: string
+
+        :return: EFS inventory
+        :rtype: json
+
+        ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/efs.html
+                 if the region is not supported, an exception is raised (EndpointConnectionError 
+                 or AccessDeniedException)
+    """
+    config.logger.info('EFS inventory, region {}, get_efs_inventory'.format(region_name))
     
+    inventory = []
+    try:
+        efs = boto3.client('efs', region_name)
+        efs_list = efs.describe_file_systems().get('FileSystems')
+        utils.display(ownerId, region_name, "EFS inventory")
+        for fs in efs_list:
+            inventory.append(fs)
+    except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
+        # unsupported region for efs
+        config.logger.warning(region_name + ' is an unsupported region for EFS')
+
     return inventory
 
 
+#
 # Hey, doc: we're in a module!
+#
 if (__name__ == '__main__'):
     print('Module => Do not execute')

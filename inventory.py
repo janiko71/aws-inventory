@@ -1,13 +1,13 @@
 # Python imports
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import *
 import botocore
 import collections
 import csv
 import json
 
 import smtplib
-import os, hmac, hashlib
+import os, hmac, hashlib, sys
 import pprint
 import logging
 from sys import exit
@@ -18,15 +18,7 @@ import config
 
 # AWS Services imports 
 import res.compute as compute
-import res.s3 as s3
-
-#
-#  Useful local functions
-#
-def display(ownerId, function, region_name):
-    print(config.display.format(ownerId, function, region_name))
-    return
-
+import res.storage as storage
 
 #
 # Let's rock'n roll
@@ -46,62 +38,90 @@ regions = aws_regions.get('Regions',[] )
 # Initialization
 inventory = {}
 
+# Argumentation
+nb_arg = len(sys.argv) - 1
+if (nb_arg == 0):
+    arguments = config.SUPPORTED_COMMANDS
+    nb_arg = len(arguments)
+else:
+    arguments = sys.argv[1:]
+    utils.check_arguments(arguments)
+print('-'*100)
+print ('Number of arguments:', nb_arg, 'arguments.')
+print ('Argument List:', str(arguments))
+print('-'*100)
+
 # 
 # ----------------- EC2
 #
 
-ec2_inventory        = []
-interfaces_inventory = []
-vpcs_inventory       = []
-ebs_inventory        = []
+if ('ec2' in arguments):
+    ec2_inventory        = []
+    interfaces_inventory = []
+    vpcs_inventory       = []
+    ebs_inventory        = []
 
-# Lookup in every AWS Region
-for current_region in regions:
-   
-    current_region_name = current_region['RegionName']
-    display(ownerId, current_region_name, "ec2 inventory")
+    # Lookup in every AWS Region
+    for current_region in regions:
+    
+        current_region_name = current_region['RegionName']
+        utils.display(ownerId, current_region_name, "ec2 inventory")
 
-    # EC2 instances
-    instances = compute.get_ec2_inventory(current_region_name)
-    for instance in instances:
-       json_ec2_desc = json.loads(utils.json_datetime_converter(instance))
-       ec2_inventory.append(compute.get_ec2_analysis(json_ec2_desc, current_region_name))
+        # EC2 instances
+        instances = compute.get_ec2_inventory(current_region_name)
+        for instance in instances:
+            json_ec2_desc = json.loads(utils.json_datetime_converter(instance))
+            ec2_inventory.append(compute.get_ec2_analysis(json_ec2_desc, current_region_name))
 
-    # Network
-    for ifc in compute.get_interfaces_inventory(current_region_name):
-        interfaces_inventory.append(json.loads(utils.json_datetime_converter(ifc)))
+        # Network
+        for ifc in compute.get_interfaces_inventory(current_region_name):
+            interfaces_inventory.append(json.loads(utils.json_datetime_converter(ifc)))
 
-    # VPCs
-    vpcs_inventory.append(compute.get_vpc_inventory(current_region_name))
+        # VPCs
+        vpcs_inventory.append(compute.get_vpc_inventory(current_region_name))
 
-    # EBS
-    ebs_list = compute.get_ebs_inventory(current_region_name)
-    if len(ebs_list) > 0:
-        ebs_inventory.append(json.loads(utils.json_datetime_converter(ebs_list)))
+        # EBS
+        ebs_list = compute.get_ebs_inventory(current_region_name)
+        if len(ebs_list) > 0:
+            ebs_inventory.append(json.loads(utils.json_datetime_converter(ebs_list)))
 
-    # EBS, snapshot
-    # describe_nat_gateways()
-    # describe_internet_gateways()
-    # describe_reserved_instances()
-    # describe_snapshots()
-    # describe_subnets()
+        # EBS, snapshot
+        # describe_nat_gateways()
+        # describe_internet_gateways()
+        # describe_reserved_instances()
+        # describe_snapshots()
+        # describe_subnets()
 
-inventory["ec2"]            = ec2_inventory
-inventory["ec2-interfaces"] = interfaces_inventory
-inventory["ec2-vpcs"]       = vpcs_inventory
-inventory["ec2-ebs"]        = ebs_inventory
+    inventory["ec2"]            = ec2_inventory
+    inventory["ec2-interfaces"] = interfaces_inventory
+    inventory["ec2-vpcs"]       = vpcs_inventory
+    inventory["ec2-ebs"]        = ebs_inventory
 
 # 
 # ----------------- Lambda functions
 #
-display(ownerId, "all regions", "lambda inventory")
-inventory["lambda"] = compute.get_lambda_inventory()
+if ('lambda' in arguments):
+    utils.display(ownerId, "all regions", "lambda inventory")
+    inventory["lambda"] = compute.get_lambda_inventory()
 
 # 
 # ----------------- Lighstail instances
 #
-display(ownerId, "all regions", "lightsail inventory")
-inventory["lightsail"] = compute.get_lightsail_inventory()
+if ('lightsail' in arguments):
+    utils.display(ownerId, "all regions", "lightsail inventory")
+    inventory["lightsail"] = compute.get_lightsail_inventory()
+
+#
+# ----------------- EFS inventory
+#
+if ('efs' in arguments):
+    efs_inventory = []
+    for current_region in regions:
+        current_region_name = current_region['RegionName']
+        efs_list = storage.get_efs_inventory(ownerId, current_region_name)
+        if len(efs_list) > 0:
+            efs_inventory.append(json.loads(utils.json_datetime_converter(efs_list)))
+    inventory['efs'] = efs_inventory
 
 
 #
@@ -124,8 +144,9 @@ current_region_name = 'global'
 #
 # ----------------- S3 quick inventory
 #
-display(ownerId, current_region_name, "S3 quick inventory")
-inventory["s3"] = s3.get_s3_inventory(current_region_name)
+if ('s3' in arguments):
+    utils.display(ownerId, current_region_name, "S3 quick inventory")
+    inventory["s3"] = storage.get_s3_inventory(current_region_name)
 
 #
 # ----------------- Final inventory
