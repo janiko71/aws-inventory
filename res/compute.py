@@ -1,19 +1,28 @@
 import boto3
 import botocore
+import config
 
-def get_ec2_inventory(region):
+
+#  ------------------------------------------------------------------------
+#
+#    EC2 
+#
+#  ------------------------------------------------------------------------
+
+def get_ec2_inventory(region_name):
     """
         Returns ec2 inventory, without any analysis or any formatting
 
-        :param region: region name
-        :type region: string
+        :param region_name: region name
+        :type region_name: string
 
         :return: ec2 inventory
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ec2.html
     """
-    ec2 = boto3.client('ec2', region)
+    ec2 = boto3.client('ec2', region_name)
+    config.logger.info('ec2 inventory, region {}, get_ec2_inventory'.format(region_name))
     inventory = ec2.describe_instances().get('Reservations')
     return inventory
 
@@ -28,6 +37,7 @@ def get_ec2_analysis(instance, region_name):
         :return: ec2 inventory
         :rtype: json
     """
+    config.logger.info('ec2 inventory, region {}, get_ec2_analysis'.format(region_name))
     analysis = {}
     reservation_id = instance['ReservationId']
     groups = instance['Groups']
@@ -93,7 +103,7 @@ def get_ec2_analysis(instance, region_name):
     return analysis
 
 
-def get_interfaces_inventory(region):
+def get_interfaces_inventory(region_name):
     """
         Returns network interfaces detailed inventory
 
@@ -103,16 +113,17 @@ def get_interfaces_inventory(region):
         :return: network interfaces inventory
         :rtype: json
     """
-    ec2 = boto3.client('ec2', region)
+    config.logger.info('ec2 inventory, region {}, get_interfaces_inventory'.format(region_name))
+    ec2 = boto3.client('ec2', region_name)
     inventory = []
     for ifc in ec2.describe_network_interfaces().get('NetworkInterfaces'):
-        ifc['Region'] = region
+        ifc['Region'] = region_name
         inventory.append(ifc)
 
     return inventory
 
 
-def get_vpc_inventory(region):
+def get_vpc_inventory(region_name):
     """
         Returns VPC detailed inventory
 
@@ -122,15 +133,16 @@ def get_vpc_inventory(region):
         :return: VPC inventory
         :rtype: json
     """
-    ec2 = boto3.client('ec2', region)
+    config.logger.info('ec2 inventory, region {}, get_vpc_inventory'.format(region_name))
+    ec2 = boto3.client('ec2', region_name)
     inventory = []
     for vpc in ec2.describe_vpcs().get('Vpcs'):
-        vpc['Region'] = region
+        vpc['Region'] = region_name
         inventory.append(vpc)
     return inventory
 
 
-def get_ebs_inventory(region):
+def get_ebs_inventory(region_name):
     """
         Returns EBS detailed inventory
 
@@ -140,14 +152,89 @@ def get_ebs_inventory(region):
         :return: EBS inventory
         :rtype: json
     """
-    ec2 = boto3.client('ec2', region)
+    config.logger.info('ec2 inventory, region {}, get_vpc_inventory'.format(region_name))
+    ec2 = boto3.client('ec2', region_name)
     inventory = []
     for ebs in ec2.describe_volumes().get('Volumes'):
-        ebs['Region'] = region
+        ebs['Region'] = region_name
         inventory.append(ebs)
     return inventory
 
 
+#  ------------------------------------------------------------------------
+#
+#    EKS
+#
+#  ------------------------------------------------------------------------
+
+def get_eks_inventory(ownerId, region_name):
+    """
+        Returns eks inventory (if the region is avalaible)
+
+        :param region: region name
+        :type region: string
+
+        :return: S3 inventory
+        :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
+    """
+    inventory = []
+    try:
+        eks = boto3.client('eks')
+        print('OwnerID : {}, EKS inventory, Region : {}'.format(ownerId, region_name))
+        inventory.append(eks.list_clusters())
+    except:
+        print('OwnerID : {}, EKS not supported in region : {}'.format(ownerId, region_name))
+    
+    return inventory
+
+
+#  ------------------------------------------------------------------------
+#
+#    Lambda
+#
+#  ------------------------------------------------------------------------
+
+def get_lambda_inventory():
+    """
+        Returns lambda inventory.
+
+        :return: S3 inventory
+        :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
+    """
+    config.logger.info('lambda inventory, region {}, get_lambda_inventory'.format('all regions'))
+    awslambda = boto3.client('lambda')
+    lambda_list = awslambda.list_functions().get('Functions')
+   
+    return lambda_list
+
+
+#  ------------------------------------------------------------------------
+#
+#    Lightsail
+#
+#  ------------------------------------------------------------------------
+
+def get_lightsail_inventory():
+    """
+        Returns lightsail inventory. 
+
+        :return: lightsail inventory
+        :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lightsail.html
+    """
+    config.logger.info('lightsail inventory, region {}, get_lightsail_inventory'.format('all regions'))
+    lightsail = boto3.client('lightsail')
+    lightsail_list = lightsail.get_instances().get('instances')
+   
+    return lightsail_list
+
+#
 # Hey, doc: we're in a module!
+#
 if (__name__ == '__main__'):
     print('Module => Do not execute')

@@ -2,6 +2,7 @@ import boto3
 import botocore
 from botocore.exceptions import ClientError
 import pprint
+import config
 
 def get_s3_inventory(region_name):
     """
@@ -15,6 +16,8 @@ def get_s3_inventory(region_name):
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
     """
+    config.logger.info('s3 inventory, region {}, get_s3_inventory'.format(region_name))
+    
     inventory = []
     s3 = boto3.client('s3')
     
