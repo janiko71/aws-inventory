@@ -19,6 +19,7 @@ import config
 # AWS Services imports 
 import res.compute as compute
 import res.storage as storage
+import res.db      as db
 
 #
 # Let's rock'n roll
@@ -137,6 +138,21 @@ if ('glacier' in arguments):
         for glacier in glacier_list:
             glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier)))
     inventory['glacier'] = glacier_inventory
+
+
+#
+# ----------------- RDS inventory
+#
+if ('rds' in arguments):
+    rds_inventory = []
+    for current_region in regions:
+        current_region_name = current_region['RegionName']
+        utils.display(ownerId, current_region_name, "rds inventory")
+        rds_list = db.get_rds_inventory(ownerId, current_region_name)
+        for rds in rds_list:
+            rds_inventory.append(json.loads(utils.json_datetime_converter(rds)))
+    inventory['rds'] = rds_inventory
+
 
 #
 # ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK
