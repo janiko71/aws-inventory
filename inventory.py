@@ -97,6 +97,7 @@ if ('ec2' in arguments):
     inventory["ec2-vpcs"]       = vpcs_inventory
     inventory["ec2-ebs"]        = ebs_inventory
 
+
 # 
 # ----------------- Lambda functions
 #
@@ -104,12 +105,14 @@ if ('lambda' in arguments):
     utils.display(ownerId, "all regions", "lambda inventory")
     inventory["lambda"] = compute.get_lambda_inventory()
 
+
 # 
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
     utils.display(ownerId, "all regions", "lightsail inventory")
     inventory["lightsail"] = compute.get_lightsail_inventory()
+
 
 #
 # ----------------- EFS inventory
@@ -122,7 +125,17 @@ if ('efs' in arguments):
         if len(efs_list) > 0:
             efs_inventory.append(json.loads(utils.json_datetime_converter(efs_list)))
     inventory['efs'] = efs_inventory
-
+#
+# ----------------- Glacier inventory
+#
+if ('glacier' in arguments):
+    glacier_inventory = []
+    for current_region in regions:
+        current_region_name = current_region['RegionName']
+        glacier_list = storage.get_glacier_inventory(ownerId, current_region_name)
+        if len(glacier_list) > 0:
+            glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier_list)))
+    inventory['glacier'] = glacier_inventory
 
 #
 # ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK

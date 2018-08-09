@@ -61,6 +61,7 @@ def get_s3_inventory(region_name):
 
     return inventory
 
+
 #  ------------------------------------------------------------------------
 #
 #    EFS (Elastic File System)
@@ -69,8 +70,10 @@ def get_s3_inventory(region_name):
 
 def get_efs_inventory(ownerId, region_name):
     """
-        Returns EF inventory
+        Returns EFS inventory
 
+        :param ownerId: ownerId (AWS account)
+        :type ownerId: string
         :param region_name: region name
         :type region_name: string
 
@@ -96,6 +99,43 @@ def get_efs_inventory(ownerId, region_name):
 
     return inventory
 
+
+#  ------------------------------------------------------------------------
+#
+#    Glacier
+#
+#  ------------------------------------------------------------------------
+
+def get_glacier_inventory(ownerId, region_name):
+    """
+        Returns Glacier inventory
+
+        :param ownerId: ownerId (AWS account)
+        :type ownerId: string
+        :param region_name: region name
+        :type region_name: string
+
+        :return: Glacier inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/glacier.html
+                 if the region is not supported, an exception is raised (EndpointConnectionError 
+                 or AccessDeniedException)
+    """
+    config.logger.info('Glacier inventory, region {}, get_glacier_inventory'.format(region_name))
+    
+    inventory = []
+    try:
+        glacier = boto3.client('glacier', region_name)
+        glacier_list = glacier.list_vaults().get('VaultList')
+        utils.display(ownerId, region_name, "glacier inventory")
+        for g in glacier_list:
+            inventory.append(g)
+    except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
+        # unsupported region for efs
+        config.logger.warning(region_name + ' is an unsupported region for Glacier')
+
+    return inventory
 
 #
 # Hey, doc: we're in a module!
