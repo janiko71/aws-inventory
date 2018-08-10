@@ -18,7 +18,7 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_apigateway_inventory(ownerId, region_name):
+def get_apigateway_inventory(ownerId):
     """
         Returns API Gateway inventory
 
@@ -33,12 +33,21 @@ def get_apigateway_inventory(ownerId, region_name):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
     """
+    apigateway_inventory = []
+    
+    for region in config.regions:
+
+        region_name = region['RegionName']
+        utils.display(ownerId, region_name, "apigateway inventory")
+
+        client = boto3.client('apigateway', region_name)
+
+        for apigateway in client.get_rest_apis().get('items'):
+            apigateway_inventory.append(json.loads(utils.json_datetime_converter(apigateway)))
+
     config.logger.info('API Gateway inventory, region {}, get_api_inventory'.format(region_name))
 
-    client = boto3.client('apigateway', region_name)
-    rds_list = client.get_rest_apis().get('items')
-
-    return rds_list
+    return apigateway_inventory
 
 
 #

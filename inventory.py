@@ -17,12 +17,13 @@ import res.utils as utils
 import config
 
 # AWS Services imports 
+import res.glob    as glob
 import res.compute as compute
 import res.storage as storage
 import res.db      as db
-import res.glob    as glob
 import res.iam     as iam
 import res.network as net
+import res.fact    as fact
 
 #
 # Let's rock'n roll
@@ -123,12 +124,7 @@ if ('lightsail' in arguments):
 # ----------------- EFS inventory
 #
 if ('efs' in arguments):
-    efs_inventory = []
-    for current_region in regions:
-        efs_list = storage.get_efs_inventory(ownerId, current_region['RegionName'])
-        for efs in efs_list:
-            efs_inventory.append(json.loads(utils.json_datetime_converter(efs)))
-    inventory['efs'] = efs_inventory
+    inventory['efs'] = storage.get_efs_inventory(ownerId)
 
 
 #
@@ -175,31 +171,23 @@ if ('dynamodb' in arguments):
 # ----------------- KMS inventory
 #
 if ('kms' in arguments):
-    kms_inventory = []
+    '''kms_inventory = []
     for current_region in regions:
         current_region_name = current_region['RegionName']
         utils.display(ownerId, current_region_name, "kms inventory")
         kms_list = iam.get_kms_inventory(ownerId, current_region_name)
         for kms in kms_list:
             kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
-    inventory['kms'] = kms_inventory
+    inventory['kms'] = kms_inventory'''
+    inventory['kms'] = iam.get_kms_inventory()
 
 
 #
 # ----------------- API Gateway inventory
 #
 if ('apigateway' in arguments):
-    apigateway_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "apigateway inventory")
-        apigateway_list = net.get_apigateway_inventory(ownerId, current_region_name)
-        for apigateway in apigateway_list:
-            apigateway_inventory.append(json.loads(utils.json_datetime_converter(apigateway)))
-    inventory['apigateway'] = apigateway_inventory
+    inventory['apigateway'] = net.get_apigateway_inventory(ownerId)
 
-
-#
 
 #
 # ----------------- Cost Explorer (experimental)
@@ -207,11 +195,11 @@ if ('apigateway' in arguments):
 if ('ce' in arguments):
     ce_inventory = []
     utils.display(ownerId, 'global', "cost explorer inventory")
-    list_ce = glob.get_ce_inventory(ownerId, None).get('ResultsByTime')
+    list_ce = fact.get_ce_inventory(ownerId, None).get('ResultsByTime')
     for item in list_ce:
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
     print(ce_inventory)
-    inventory['ce'] = ce_inventory
+    inventory['cost-explorer'] = ce_inventory
 
 #
 # ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK
@@ -228,14 +216,13 @@ if ('ce' in arguments):
 # International Resources (no region)
 #
 
-current_region_name = 'global'
+region_name = 'global'
 
 #
 # ----------------- S3 quick inventory
 #
 if ('s3' in arguments):
-    utils.display(ownerId, current_region_name, "S3 quick inventory")
-    inventory["s3"] = storage.get_s3_inventory(current_region_name)
+    inventory["s3"] = storage.get_s3_inventory(ownerId, region_name)
 
 #
 # ----------------- Final inventory

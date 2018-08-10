@@ -7,41 +7,45 @@ import res.utils as utils
 
 #  ------------------------------------------------------------------------
 #
-#    Cost explorer (ce) ==> Still experimental!
+#     The MOST important function of that project: generic inventory
 #
 #  ------------------------------------------------------------------------
 
-def get_ce_inventory(ownerId, values):
-    """
-        Returns cost inventory, for a period (1 month ?)
+def get_inventory(aws_service, aws_region, function_name, param, key_get):
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+    # aws_region = all, global
 
-        :return: RDS inventory
-        :rtype: json
+    inventory = []
+    config.logger.info('{} inventory ({})'.format(aws_service, aws_region))
 
-        :Example:
+    if (aws_region == 'all'):
 
-        b.get_cost_and_usage(TimePeriod={'Start': '2018-07-01','End': '2018-07-31'},Granularity='DAILY',Metrics=('AmortizedCost' , 'BlendedCost' , 'UnblendedCost' , 'UsageQuantity'))
-        b.get_cost_and_usage(TimePeriod={'Start': '2018-01-01','End': '2018-08-31'},Granularity='MONTHLY',Metrics=('AmortizedCost' , 'BlendedCost' , 'UnblendedCost' , 'UsageQuantity')
+        # inventory must be processed region by region
+        for region in config.regions:
+            region_name = region['RegionName']
+            config.logger.info('{} inventory for region {}'.format(aws_service, region_name))
+            utils.display("", region_name, aws_service)
+            client = boto3.client(aws_service, region_name)
+            inv_list = client.__getattribute__(function_name)().get(key_get)
+            for inv in inv_list:
+                inventory.append(json.loads(utils.json_datetime_converter(inv)))
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/rds.html
-                 if the region is not supported, an exception is raised (EndpointConnectionError 
-                 or AccessDeniedException)
-    """
-    config.logger.info('RDS inventory, all regions, get_rds_inventory')
+    elif (aws_region == 'global'):
 
-    client = boto3.client('ce')
-    ce_list = client.get_cost_and_usage(
-        TimePeriod={'Start': '2018-01-01','End': '2018-08-31'},
-        Granularity='MONTHLY',
-        Metrics=('AmortizedCost' , 'BlendedCost' , 'UnblendedCost' , 'UsageQuantity')
-    )
+        # inventory can be globalized
+        client = boto3.client(aws_service)
+        config.logger.info('{} inventory for region \'{}\''.format(aws_service, aws_region))
+        utils.display("", region_name, aws_service)
+        inv_list = client.__getattribute__(function_name)().get(key_get)
+        for inv in inv_list.get(key_get):
+            inventory.append(json.loads(utils.json_datetime_converter(inv)))
 
-    return ce_list
+    else:
+
+        # arghhhhh
+        config.logging.error('Very bad trip: get_inventory called with improper arguments (aws_region={}).'.format(aws_region))
+
+    return inventory
 
 
 #

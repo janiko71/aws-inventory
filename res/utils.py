@@ -73,4 +73,3 @@ def json_datetime_converter(json_text):
         :rtype: json
     """
     return json.dumps(json_text, default = datetime_converter)      
-
