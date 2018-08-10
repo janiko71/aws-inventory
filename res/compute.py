@@ -174,6 +174,8 @@ def get_eks_inventory(ownerId, region_name):
     """
         Returns eks inventory (if the region is avalaible)
 
+        :param ownerId: ownerId (AWS account)
+        :type ownerId: string
         :param region: region name
         :type region: string
 

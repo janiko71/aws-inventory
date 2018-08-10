@@ -11,12 +11,14 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_kms_inventory(ownerId):
+def get_kms_inventory(ownerId, region_name):
     """
         Returns keys managed by KMS (global)
 
         :param ownerId: ownerId (AWS account)
         :type ownerId: string
+        :param region: region name
+        :type region: string
 
         :return: KMS inventory
         :rtype: json
@@ -25,8 +27,10 @@ def get_kms_inventory(ownerId):
     """
     config.logger.info('KMS inventory, all regions, get_kds_inventory')
 
-    client = boto3.client('kms')
-    kms_list = client.list_keys().get('Keys')
+    client = boto3.client('kms', region_name)
+    kms_list = []
+    for kms in client.list_keys().get('Keys'):
+        kms_list.append(client.describe_key(KeyId=kms['KeyId']).get('KeyMetadata'))
     return kms_list
 
 

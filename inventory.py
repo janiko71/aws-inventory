@@ -160,11 +160,13 @@ if ('rds' in arguments):
 # ----------------- KMS inventory
 #
 if ('kms' in arguments):
-    utils.display(ownerId, 'global', "kms inventory")
     kms_inventory = []
-    kms_list = iam.get_kms_inventory(ownerId)
-    for kms in kms_list:
-        kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
+    for current_region in regions:
+        current_region_name = current_region['RegionName']
+        utils.display(ownerId, current_region_name, "kms inventory")
+        kms_list = iam.get_kms_inventory(ownerId, current_region_name)
+        for kms in kms_list:
+            kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
     inventory['kms'] = kms_inventory
 
 
