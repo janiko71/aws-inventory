@@ -25,7 +25,7 @@ def get_kms_inventory(ownerId, region_name):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
     """
-    config.logger.info('KMS inventory, all regions, get_kds_inventory')
+    config.logger.info('KMS inventory, {}, get_kds_inventory'.format(region_name))
 
     client = boto3.client('kms', region_name)
     kms_list = []

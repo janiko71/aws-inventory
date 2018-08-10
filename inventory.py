@@ -157,6 +157,20 @@ if ('rds' in arguments):
 
 
 #
+# ----------------- dynamodb inventory
+#
+if ('dynamodb' in arguments):
+    dynamodb_inventory = []
+    for current_region in regions:
+        current_region_name = current_region['RegionName']
+        utils.display(ownerId, current_region_name, "dynamodb inventory")
+        dynamodb_list = db.get_dynamodb_inventory(ownerId, current_region_name)
+        for dynamodb in dynamodb_list:
+            dynamodb_inventory.append(json.loads(utils.json_datetime_converter(dynamodb)))
+    inventory['dynamodb'] = dynamodb_inventory
+
+
+#
 # ----------------- KMS inventory
 #
 if ('kms' in arguments):
