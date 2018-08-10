@@ -7,9 +7,7 @@ import res.utils as utils
 
 #  ------------------------------------------------------------------------
 #
-#    Cost explorer (ce) 
-#
-#    Still experimental
+#    Cost explorer (ce) ==> Still experimental!
 #
 #  ------------------------------------------------------------------------
 

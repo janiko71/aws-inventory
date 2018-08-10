@@ -4,10 +4,17 @@ import json
 import config
 import res.utils as utils
 
+# =======================================================================================================================
+#
+#  Supported services   : API Gateway (simple), VPC (in 'compute' module)
+#  Unsupported services : Route 53, Cloud Front, Direct Connect
+#
+# =======================================================================================================================
+
 
 #  ------------------------------------------------------------------------
 #
-#    RDS 
+#    API Gateway (simple) 
 #
 #  ------------------------------------------------------------------------
 
@@ -24,6 +31,7 @@ def get_apigateway_inventory(ownerId, region_name):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
+        ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
     """
     config.logger.info('API Gateway inventory, region {}, get_api_inventory'.format(region_name))
 

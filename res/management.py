@@ -6,19 +6,10 @@ import res.utils as utils
 
 # =======================================================================================================================
 #
-#  Supported services   : None. IAM has its own module
-#  Unsupported services : Cognito, Secrets Manager, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, Directory Service, WAF & Shield, Artifact
+#  Supported services   : None
+#  Unsupported services : CloudTrail, CloudWtach, AWS Auto Scaling, CloudFormation, Config, OpsWork, Service Catalog, Systems Manager, Trusted Advisor, Managed Services
 #
 # =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    ??? 
-#
-#  ------------------------------------------------------------------------
-
-
-
 
 
 #
