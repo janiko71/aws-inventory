@@ -20,6 +20,8 @@ import config
 import res.compute as compute
 import res.storage as storage
 import res.db      as db
+import res.glob    as glob
+import res.iam     as iam
 
 #
 # Let's rock'n roll
@@ -112,7 +114,7 @@ if ('lambda' in arguments):
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
-    
+    utils.display(ownerId, "all regions", "lightsail inventory")
     inventory['lightsail'] = json.loads(utils.json_datetime_converter(compute.get_lightsail_inventory()))
 
 
@@ -153,6 +155,30 @@ if ('rds' in arguments):
             rds_inventory.append(json.loads(utils.json_datetime_converter(rds)))
     inventory['rds'] = rds_inventory
 
+
+#
+# ----------------- KMS inventory
+#
+if ('kms' in arguments):
+    utils.display(ownerId, 'global', "kms inventory")
+    kms_inventory = []
+    kms_list = iam.get_kms_inventory(ownerId)
+    for kms in kms_list:
+        kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
+    inventory['kms'] = kms_inventory
+
+
+#
+# ----------------- Cost Explorer (experimental)
+#
+if ('ce' in arguments):
+    ce_inventory = []
+    utils.display(ownerId, 'global', "cost explorer inventory")
+    list_ce = glob.get_ce_inventory(ownerId, None).get('ResultsByTime')
+    for item in list_ce:
+        ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
+    print(ce_inventory)
+    inventory['ce'] = ce_inventory
 
 #
 # ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK
