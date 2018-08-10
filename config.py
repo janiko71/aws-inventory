@@ -26,4 +26,4 @@ logger.setLevel(logging.WARNING)
 S3_INVENTORY_BUCKET="xx"
 
 # --- Arguments/Supported commands
-SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs','glacier','rds','ce','kms','dynamodb']
+SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs','glacier','rds','ce','kms','dynamodb','apigateway']

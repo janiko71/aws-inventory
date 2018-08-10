@@ -2,318 +2,181 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "Stmt1502268180000",
+            "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
-                "ec2:DescribeAccountAttributes",
-                "ec2:DescribeAddresses",
-                "ec2:DescribeAvailabilityZones",
-                "ec2:DescribeCustomerGateways",
-                "ec2:DescribeDhcpOptions",
-                "ec2:DescribeHosts",
-                "ec2:DescribeHostReservations",
-                "ec2:DescribeImages",
                 "ec2:DescribeInstances",
-                "ec2:DescribeInternetGateways",
-                "ec2:DescribeKeyPairs",
-                "ec2:DescribeNatGateways",
-                "ec2:DescribeRegions",
-                "ec2:DescribeReservedInstances",
-                "ec2:DescribeSecurityGroups",
-                "ec2:DescribeSnapshots",
-                "ec2:DescribeSpotFleetInstances",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeVolumes",
-                "ec2:DescribeVpcPeeringConnections",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeVpnGateways"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268326000",
-            "Effect": "Allow",
-            "Action": [
-                "sts:AssumeRole"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268393000",
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListAllMyBuckets",
-                "s3:ListBucket",
-                "s3:GetBucketWebsite",
-                "s3:PutObject"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268523000",
-            "Effect": "Allow",
-            "Action": [
-                "rds:DescribeDBClusters",
-                "rds:DescribeDBInstances",
-                "rds:DescribeReservedDBInstances"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268561000",
-            "Effect": "Allow",
-            "Action": [
-                "dynamodb:ListTables",
-                "dynamodb:DescribeTable"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268592000",
-            "Effect": "Allow",
-            "Action": [
+                "lightsail:GetKeyPair",
                 "cloudtrail:GetTrailStatus",
-                "cloudtrail:DescribeTrails"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268612000",
-            "Effect": "Allow",
-            "Action": [
-                "directconnect:DescribeConnections",
-                "directconnect:DescribeConnectionsOnInterconnect",
-                "directconnect:DescribeInterconnects",
-                "directconnect:DescribeLocations",
+                "ec2:DescribeSnapshots",
+                "route53:ListHostedZonesByName",
+                "lightsail:GetInstanceAccessDetails",
+                "ec2:DescribeVolumeStatus",
+                "ec2:DescribeVolumes",
                 "directconnect:DescribeVirtualGateways",
-                "directconnect:DescribeVirtualInterfaces"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268646000",
-            "Effect": "Allow",
-            "Action": [
-                "iam:ListAccessKeys",
-                "iam:ListGroups",
-                "iam:ListRoles",
-                "iam:ListOpenIDConnectProviders",
-                "iam:ListSAMLProviders",
-                "iam:ListUsers",
-                "iam:GetAccountAuthorizationDetails",
-                "iam:GetAccountSummary",
-                "iam:GetGroupPolicy",
-                "iam:GetInstanceProfile",
-                "iam:ListAttachedGroupPolicies",
-                "iam:ListAttachedRolePolicies",
-                "iam:ListAttachedUserPolicies",
-                "iam:ListGroupsForUser",
-                "iam:ListPolicies",
-                "iam:ListPoliciesGrantingServiceAccess",
+                "ec2:DescribeKeyPairs",
                 "iam:ListRolePolicies",
-                "iam:ListUserPolicies"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268717000",
-            "Effect": "Allow",
-            "Action": [
-                "lambda:ListFunctions"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268759000",
-            "Effect": "Allow",
-            "Action": [
-                "ecs:ListClusters",
-                "ecs:ListContainerInstances",
-                "ecs:ListServices"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268825000",
-            "Effect": "Allow",
-            "Action": [
-                "elasticfilesystem:DescribeFileSystems"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268862000",
-            "Effect": "Allow",
-            "Action": [
-                "glacier:DescribeVault",
-                "glacier:ListVaults"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268891000",
-            "Effect": "Allow",
-            "Action": [
-                "lightsail:GetInstances"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268960000",
-            "Effect": "Allow",
-            "Action": [
-                "route53:ListHostedZones",
-                "route53:ListHostedZonesByName"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502268987000",
-            "Effect": "Allow",
-            "Action": [
-                "route53domains:ListDomains",
-                "route53domains:ListOperations"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502269012000",
-            "Effect": "Allow",
-            "Action": [
-                "sdb:ListDomains"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502269552000",
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:DescribeLoadBalancers"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270383000",
-            "Effect": "Allow",
-            "Action": [
-                "cloudformation:DescribeStacks"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270412000",
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeAutoScalingInstances"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270458000",
-            "Effect": "Allow",
-            "Action": [
-                "kms:ListKeys"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270497000",
-            "Effect": "Allow",
-            "Action": [
-                "cloudhsm:DescribeHsm",
-                "cloudhsm:ListHsms"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270541000",
-            "Effect": "Allow",
-            "Action": [
-                "organizations:DescribeOrganization",
-                "organizations:ListAccounts",
-                "organizations:ListAccountsForParent",
-                "organizations:ListChildren",
-                "organizations:ListParents",
-                "organizations:ListRoots"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270587000",
-            "Effect": "Allow",
-            "Action": [
-                "ses:ListIdentities"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270607000",
-            "Effect": "Allow",
-            "Action": [
-                "sns:ListSubscriptions",
+                "lightsail:GetOperationsForResource",
+                "iam:ListPolicies",
                 "sns:ListSubscriptionsByTopic",
-                "sns:ListTopics"
+                "s3:GetBucketWebsite",
+                "lambda:ListFunctions",
+                "iam:ListSAMLProviders",
+                "lightsail:GetInstances",
+                "lightsail:GetStaticIp",
+                "ec2:DescribeVolumeAttribute",
+                "cloudtrail:DescribeTrails",
+                "directconnect:DescribeConnections",
+                "organizations:ListAccountsForParent",
+                "s3:PutObject",
+                "rds:DescribeReservedDBInstances",
+                "ec2:DescribeScheduledInstances",
+                "elasticloadbalancing:DescribeAccountLimits",
+                "ecs:ListContainerInstances",
+                "ec2:DescribeSubnets",
+                "ce:*",
+                "glacier:ListVaults",
+                "lightsail:GetKeyPairs",
+                "cur:DescribeReportDefinitions",
+                "autoscaling:DescribeAutoScalingInstances",
+                "dynamodb:ListTables",
+                "glacier:DescribeVault",
+                "ec2:DescribeRegions",
+                "sns:ListTopics",
+                "s3:ListBucket",
+                "kms:ListResourceTags",
+                "ec2:DescribeSpotInstanceRequests",
+                "ec2:DescribeVpcAttribute",
+                "rds:DescribeReservedDBInstancesOfferings",
+                "ecs:ListServices",
+                "lightsail:Get*",
+                "route53domains:ListDomains",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeNetworkInterfaceAttribute",
+                "lightsail:GetStaticIps",
+                "lightsail:GetRegions",
+                "rds:DescribeDBInstances",
+                "rds:DescribeEngineDefaultClusterParameters",
+                "lightsail:GetDomains",
+                "elasticloadbalancing:DescribeListenerCertificates",
+                "iam:ListAttachedGroupPolicies",
+                "rds:DescribeEventCategories",
+                "ses:ListIdentities",
+                "ec2:DescribeInstanceStatus",
+                "rds:DescribeEvents",
+                "iam:ListAccessKeys",
+                "lightsail:GetOperations",
+                "ec2:DescribeHostReservations",
+                "route53:ListHostedZones",
+                "kms:GetKeyPolicy",
+                "iam:ListRoles",
+                "sns:ListSubscriptions",
+                "ec2:DescribeSecurityGroups",
+                "rds:DescribeDBSnapshotAttributes",
+                "s3:ListAllMyBuckets",
+                "lightsail:DownloadDefaultKeyPair",
+                "ec2:DescribeVpcs",
+                "route53domains:ListOperations",
+                "lightsail:IsVpcPeered",
+                "kms:ListAliases",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "organizations:ListParents",
+                "lightsail:GetInstanceSnapshots",
+                "iam:ListGroups",
+                "ec2:DescribeStaleSecurityGroups",
+                "organizations:ListRoots",
+                "elasticloadbalancing:DescribeLoadBalancerPolicyTypes",
+                "rds:DescribeEngineDefaultParameters",
+                "ec2:DescribePlacementGroups",
+                "organizations:ListChildren",
+                "ec2:DescribeInternetGateways",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "organizations:DescribeOrganization",
+                "dynamodb:DescribeTable",
+                "kms:GetKeyRotationStatus",
+                "autoscaling:DescribeAutoScalingGroups",
+                "iam:ListAttachedRolePolicies",
+                "elasticloadbalancing:DescribeLoadBalancerPolicies",
+                "directconnect:DescribeLocations",
+                "ec2:DescribeAccountAttributes",
+                "lightsail:GetDomain",
+                "ec2:DescribeReservedInstances",
+                "elasticloadbalancing:DescribeInstanceHealth",
+                "iam:GetAccountAuthorizationDetails",
+                "cloudhsm:ListHsms",
+                "lightsail:GetInstanceState",
+                "rds:DescribeDBSnapshots",
+                "kms:ListRetirableGrants",
+                "ec2:DescribeVpcPeeringConnections",
+                "rds:DescribeDBSecurityGroups",
+                "cloudformation:DescribeStacks",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "sts:AssumeRole",
+                "elasticloadbalancing:DescribeTargetGroupAttributes",
+                "lightsail:GetInstancePortStates",
+                "iam:ListGroupsForUser",
+                "rds:DescribeOrderableDBInstanceOptions",
+                "ec2:DescribeElasticGpus",
+                "elasticloadbalancing:DescribeRules",
+                "rds:DescribeCertificates",
+                "iam:GetGroupPolicy",
+                "ec2:DescribeVpnGateways",
+                "cloudhsm:DescribeHsm",
+                "rds:DescribeOptionGroups",
+                "iam:GetAccountSummary",
+                "ec2:DescribeAddresses",
+                "rds:DescribeDBEngineVersions",
+                "rds:DescribeDBSubnetGroups",
+                "iam:ListPoliciesGrantingServiceAccess",
+                "ec2:DescribeDhcpOptions",
+                "rds:DescribePendingMaintenanceActions",
+                "rds:DescribeDBParameterGroups",
+                "lightsail:GetInstance",
+                "directconnect:DescribeVirtualInterfaces",
+                "ec2:DescribeNetworkInterfaces",
+                "elasticloadbalancing:DescribeListeners",
+                "iam:ListAttachedUserPolicies",
+                "lightsail:GetOperation",
+                "kms:DescribeKey",
+                "rds:DescribeDBParameters",
+                "lightsail:GetInstanceMetricData",
+                "elasticfilesystem:DescribeFileSystems",
+                "ecs:ListClusters",
+                "elasticloadbalancing:DescribeSSLPolicies",
+                "rds:DescribeDBClusterSnapshotAttributes",
+                "rds:DescribeDBClusterParameters",
+                "lightsail:GetActiveNames",
+                "lightsail:GetInstanceSnapshot",
+                "sqs:ListQueues",
+                "rds:DescribeEventSubscriptions",
+                "lightsail:GetBlueprints",
+                "kms:ListKeyPolicies",
+                "directconnect:DescribeInterconnects",
+                "iam:GetInstanceProfile",
+                "ec2:DescribeTags",
+                "elasticloadbalancing:DescribeTags",
+                "rds:DescribeDBLogFiles",
+                "directconnect:DescribeConnectionsOnInterconnect",
+                "ec2:DescribeNatGateways",
+                "iam:ListUserPolicies",
+                "ec2:DescribeCustomerGateways",
+                "sdb:ListDomains",
+                "kms:ListGrants",
+                "ec2:DescribeSpotFleetRequests",
+                "ec2:DescribeHosts",
+                "ec2:DescribeImages",
+                "kms:ListKeys",
+                "ec2:DescribeSpotFleetInstances",
+                "organizations:ListAccounts",
+                "iam:ListOpenIDConnectProviders",
+                "elasticloadbalancing:DescribeTargetHealth",
+                "rds:DescribeOptionGroupOptions",
+                "iam:ListUsers",
+                "rds:DescribeDBClusters",
+                "rds:DescribeAccountAttributes",
+                "rds:DescribeDBClusterParameterGroups"
             ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Sid": "Stmt1502270635000",
-            "Effect": "Allow",
-            "Action": [
-                "sqs:ListQueues"
-            ],
-            "Resource": [
-                "*"
-            ]
+            "Resource": "*"
         }
     ]
 }

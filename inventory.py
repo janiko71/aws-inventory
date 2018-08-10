@@ -22,6 +22,7 @@ import res.storage as storage
 import res.db      as db
 import res.glob    as glob
 import res.iam     as iam
+import res.network as net
 
 #
 # Let's rock'n roll
@@ -183,6 +184,22 @@ if ('kms' in arguments):
             kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
     inventory['kms'] = kms_inventory
 
+
+#
+# ----------------- API Gateway inventory
+#
+if ('apigateway' in arguments):
+    apigateway_inventory = []
+    for current_region in regions:
+        current_region_name = current_region['RegionName']
+        utils.display(ownerId, current_region_name, "apigateway inventory")
+        apigateway_list = net.get_apigateway_inventory(ownerId, current_region_name)
+        for apigateway in apigateway_list:
+            apigateway_inventory.append(json.loads(utils.json_datetime_converter(apigateway)))
+    inventory['apigateway'] = apigateway_inventory
+
+
+#
 
 #
 # ----------------- Cost Explorer (experimental)
