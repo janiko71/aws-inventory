@@ -8,8 +8,8 @@ import res.glob  as glob
 # to do : autoscaling, security groups
 # =======================================================================================================================
 #
-#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full)
-#  Unsupported services : EKS (not supported in SDK), Batch, Elastic Container Service (ECS), Elastic Beanstalk
+#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), Elastic Container Service (ECS), Elastic Beanstalk
+#  Unsupported services : EKS (not supported in SDK), Batch
 #
 # =======================================================================================================================
 

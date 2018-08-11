@@ -17,13 +17,15 @@ import res.utils as utils
 import config
 
 # AWS Services imports 
-import res.glob    as glob
-import res.compute as compute
-import res.storage as storage
-import res.db      as db
-import res.iam     as iam
-import res.network as net
-import res.fact    as fact
+import res.glob       as glob
+import res.compute    as compute
+import res.storage    as storage
+import res.db         as db
+import res.iam        as iam
+import res.network    as net
+import res.fact       as fact
+import res.security   as security
+import res.management as mgn
 
 #
 # Let's rock'n roll
@@ -56,6 +58,9 @@ print ('Number of arguments:', nb_arg, 'arguments.')
 print ('Argument List:', str(arguments))
 print('-'*100)
 
+#################################################################
+#                           COMPUTE                             #
+#################################################################
 # 
 # ----------------- EC2
 #
@@ -140,6 +145,9 @@ if ('lightsail' in arguments):
     inventory['lightsail'] = json.loads(utils.json_datetime_converter(compute.get_lightsail_inventory()))
 
 
+#################################################################
+#                           STORAGE                             #
+#################################################################
 #
 # ----------------- EFS inventory
 #
@@ -154,6 +162,9 @@ if ('glacier' in arguments):
     inventory['glacier'] = storage.get_glacier_inventory(ownerId)
 
 
+#################################################################
+#                          DATABASES                            #
+#################################################################
 #
 # ----------------- RDS inventory
 #
@@ -168,6 +179,9 @@ if ('dynamodb' in arguments):
     inventory['dynamodb'] = db.get_dynamodb_inventory(ownerId)
 
 
+#################################################################
+#                      SECURITY & IAM                           #
+#################################################################
 #
 # ----------------- KMS inventory
 #
@@ -175,6 +189,19 @@ if ('kms' in arguments):
     inventory['kms'] = iam.get_kms_inventory(ownerId)
 
 
+#################################################################
+#                         MANAGEMENT                            #
+#################################################################
+#
+# ----------------- Cloud directory
+#
+if ('clouddirectory' in arguments):
+    inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
+
+
+#################################################################
+#                          NETWORK                              #
+#################################################################
 #
 # ----------------- API Gateway inventory
 #
