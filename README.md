@@ -1,5 +1,7 @@
 # aws-inventory
-This python script lists all the main resources of your AWS account. This inventory may not be complete, but it should help you to find what I call "main" resources that are, in my mind, resources that could affect billing and/or security.
+Did your never forget to stop an EC2 instance? Or to delete some unusued AWS resource? I'm sure you did. And only remembering it when getting the bill. I know, [AWS Config](https://aws.amazon.com/config) may help you, but did you ever try? It's prohibitive!
+
+This python script lists all the main resources of your AWS account. This inventory may not be complete, but it should help you to find what I call "main" resources that are, in my mind, resources that should affect billing and/or security.
 
 Intended for personal use (even if I added some professional features like logging), and for only one account. For more information on multiple accounts, read the [wiki](https://github.com/janiko71/aws-inventory/wiki).
 
