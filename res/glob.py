@@ -11,7 +11,7 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_inventory(ownerId, aws_service, aws_region, function_name, key_get):
+def get_inventory(ownerId, aws_service, aws_region, function_name, key_get, detail_function, key_get_detail, key_selector):
 
     # aws_region = all, global
 
@@ -28,7 +28,8 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get):
             client = boto3.client(aws_service, region_name)
             inv_list = client.__getattribute__(function_name)().get(key_get)
             for inv in inv_list:
-                inventory.append(json.loads(utils.json_datetime_converter(inv)))
+                detailed_inv = get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector)
+                inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
     elif (aws_region == 'global'):
 
@@ -38,6 +39,7 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get):
         utils.display(ownerId, region_name, aws_service)
         inv_list = client.__getattribute__(function_name)().get(key_get)
         for inv in inv_list.get(key_get):
+            #detailed_inv = ???
             inventory.append(json.loads(utils.json_datetime_converter(inv)))
 
     else:
@@ -46,6 +48,14 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get):
         config.logging.error('Very bad trip: get_inventory called with improper arguments (aws_region={}).'.format(aws_region))
 
     return inventory
+
+
+def get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector):
+
+    detailed_inv = client.__getattribute__(detail_function)(KeyId=inv['KeyId']).get(key_get_detail)
+    if ('RegionName' not in detailed_inv):
+        detailed_inv['RegionName'] = region_name
+    return detailed_inv
 
 
 #

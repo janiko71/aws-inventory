@@ -56,13 +56,23 @@ def get_kms_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
     """ 
-    return glob.get_inventory(
-        ownerId=oId,
-        aws_service="kms", 
-        aws_region="all", 
-        function_name="list_keys", 
-        key_get="Keys"
+    kms_inventory = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "kms", 
+        aws_region = "all", 
+        function_name = "list_keys", 
+        key_get = "Keys",
+        detail_function = "describe_key", 
+        key_get_detail = "KeyMetadata",
+        key_selector = "KeyId=kms['KeyId']"
     )
+
+    ''' client = boto3.client("kms")
+    for kms in tmp_inventory:
+        print("------",kms['KeyId'])
+        kms_inventory.append(client.describe_key(KeyId=kms['KeyId']).get('KeyMetadata'))'''
+
+    return kms_inventory
 
 
 
