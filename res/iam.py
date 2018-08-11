@@ -44,13 +44,23 @@ def get_kms_inventory2(ownerId, region_name):
     return kms_list
 
 
-def get_kms_inventory():
-    
+def get_kms_inventory(oId):
+    """
+        Returns keys managed by KMS (global)
+
+        :param ownerId: ownerId (AWS account)
+        :type ownerId: string
+
+        :return: KMS inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+    """ 
     return glob.get_inventory(
+        ownerId=oId,
         aws_service="kms", 
         aws_region="all", 
         function_name="list_keys", 
-        param="KeyId=kms['KeyId']",
         key_get="Keys"
     )
 

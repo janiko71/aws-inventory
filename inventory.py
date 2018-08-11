@@ -179,7 +179,7 @@ if ('kms' in arguments):
         for kms in kms_list:
             kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
     inventory['kms'] = kms_inventory'''
-    inventory['kms'] = iam.get_kms_inventory()
+    inventory['kms'] = iam.get_kms_inventory(ownerId)
 
 
 #

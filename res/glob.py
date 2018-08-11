@@ -11,20 +11,20 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_inventory(aws_service, aws_region, function_name, param, key_get):
+def get_inventory(ownerId, aws_service, aws_region, function_name, key_get):
 
     # aws_region = all, global
 
     inventory = []
-    config.logger.info('{} inventory ({})'.format(aws_service, aws_region))
+    config.logger.info('Account {}, {} inventory ({})'.format(ownerId, aws_service, aws_region))
 
     if (aws_region == 'all'):
 
         # inventory must be processed region by region
         for region in config.regions:
             region_name = region['RegionName']
-            config.logger.info('{} inventory for region {}'.format(aws_service, region_name))
-            utils.display("", region_name, aws_service)
+            config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
+            utils.display(ownerId, region_name, aws_service)
             client = boto3.client(aws_service, region_name)
             inv_list = client.__getattribute__(function_name)().get(key_get)
             for inv in inv_list:
@@ -34,8 +34,8 @@ def get_inventory(aws_service, aws_region, function_name, param, key_get):
 
         # inventory can be globalized
         client = boto3.client(aws_service)
-        config.logger.info('{} inventory for region \'{}\''.format(aws_service, aws_region))
-        utils.display("", region_name, aws_service)
+        config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
+        utils.display(ownerId, region_name, aws_service)
         inv_list = client.__getattribute__(function_name)().get(key_get)
         for inv in inv_list.get(key_get):
             inventory.append(json.loads(utils.json_datetime_converter(inv)))
