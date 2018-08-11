@@ -33,18 +33,22 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get, deta
                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
             except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
                 # unsupported region for efs
-                config.logger.warning("{} is not avaliable (not supported?) in region {}.".format(aws_service, aws_region))
+                config.logger.warning("{} is not available (not supported?) in region {}.".format(aws_service, aws_region))
 
     elif (aws_region == 'global'):
 
         # inventory can be globalized
-        client = boto3.client(aws_service)
-        config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
-        utils.display(ownerId, region_name, aws_service)
-        inv_list = client.__getattribute__(function_name)().get(key_get)
-        for inv in inv_list.get(key_get):
-            #detailed_inv = ???
-            inventory.append(json.loads(utils.json_datetime_converter(inv)))
+        try:
+            client = boto3.client(aws_service)
+            config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
+            utils.display(ownerId, region_name, aws_service)
+            inv_list = client.__getattribute__(function_name)().get(key_get)
+            for inv in inv_list.get(key_get):
+                detailed_inv = get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector)
+                inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+        except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
+            # unsupported region for efs
+            config.logger.warning("A problem occurred or {} is not not supported.".format(aws_service))        
 
     else:
 

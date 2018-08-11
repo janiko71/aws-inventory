@@ -3,6 +3,7 @@ import botocore
 import json
 import config
 import res.utils as utils
+import res.glob  as glob
 
 # to do : autoscaling, security groups
 # =======================================================================================================================
@@ -207,7 +208,7 @@ def get_eks_inventory(ownerId, region_name):
 #
 #  ------------------------------------------------------------------------
 
-def get_lambda_inventory():
+def get_lambda_inventory(oId):
     """
         Returns lambda inventory.
 
@@ -216,6 +217,16 @@ def get_lambda_inventory():
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
     """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "lambda", 
+        aws_region = "all", 
+        function_name = "list_functions", 
+        key_get = "Functions",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
     config.logger.info('lambda inventory, region {}, get_lambda_inventory'.format('all regions'))
     awslambda = boto3.client('lambda')
     lambda_list = awslambda.list_functions().get('Functions')

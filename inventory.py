@@ -108,8 +108,7 @@ if ('ec2' in arguments):
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
-    utils.display(ownerId, "all regions", "lambda inventory")
-    inventory["lambda"] = compute.get_lambda_inventory()
+    inventory["lambda"] = compute.get_lambda_inventory(ownerId)
 
 
 # 
@@ -175,7 +174,7 @@ if ('ce' in arguments):
     inventory['cost-explorer'] = ce_inventory
 
 #
-# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK
+# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS CLI
 #
 #for current_region in regions:
 #    current_region_name = current_region['RegionName']
