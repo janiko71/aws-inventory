@@ -5,6 +5,7 @@ import pprint
 import config
 import json
 import res.utils as utils
+import res.glob as glob
 
 # =======================================================================================================================
 #
@@ -79,7 +80,7 @@ def get_s3_inventory(ownerId, region_name):
 #
 #  ------------------------------------------------------------------------
 
-def get_efs_inventory(ownerId):
+def get_efs_inventory(oId):
     """
         Returns EFS inventory
 
@@ -95,23 +96,16 @@ def get_efs_inventory(ownerId):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
-    
-    efs_inventory = []
-    for region in config.regions:
-
-        region_name = region['RegionName']        
-        config.logger.info('EFS inventory, region {}, get_efs_inventory'.format(region_name))
-        try:
-            efs = boto3.client('efs', region_name)
-            efs_list = efs.describe_file_systems().get('FileSystems')
-            utils.display(ownerId, region_name, "EFS inventory")
-            for fs in efs_list:
-                efs_inventory.append(json.loads(utils.json_datetime_converter(fs)))
-        except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
-            # unsupported region for efs
-            config.logger.warning(region_name + ' is an unsupported region for EFS')
-
-    return efs_inventory
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "efs", 
+        aws_region = "all", 
+        function_name = "describe_file_systems", 
+        key_get = "FileSystems",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
 
 
 #  ------------------------------------------------------------------------
@@ -120,14 +114,12 @@ def get_efs_inventory(ownerId):
 #
 #  ------------------------------------------------------------------------
 
-def get_glacier_inventory(ownerId, region_name):
+def get_glacier_inventory(oId):
     """
         Returns Glacier inventory
 
         :param ownerId: ownerId (AWS account)
         :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
 
         :return: Glacier inventory
         :rtype: json
@@ -136,20 +128,16 @@ def get_glacier_inventory(ownerId, region_name):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
-    config.logger.info('Glacier inventory, region {}, get_glacier_inventory'.format(region_name))
-    
-    inventory = []
-    try:
-        glacier = boto3.client('glacier', region_name)
-        glacier_list = glacier.list_vaults().get('VaultList')
-        utils.display(ownerId, region_name, "glacier inventory")
-        for g in glacier_list:
-            inventory.append(g)
-    except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
-        # unsupported region for efs
-        config.logger.warning(region_name + ' is an unsupported region for Glacier')
-
-    return inventory
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "glacier", 
+        aws_region = "all", 
+        function_name = "list_vaults", 
+        key_get = "VaultList",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
 
 
 #

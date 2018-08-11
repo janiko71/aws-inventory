@@ -22,14 +22,18 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get, deta
 
         # inventory must be processed region by region
         for region in config.regions:
-            region_name = region['RegionName']
-            config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
-            utils.display(ownerId, region_name, aws_service)
-            client = boto3.client(aws_service, region_name)
-            inv_list = client.__getattribute__(function_name)().get(key_get)
-            for inv in inv_list:
-                detailed_inv = get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector)
-                inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+            try:
+                region_name = region['RegionName']
+                config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
+                utils.display(ownerId, region_name, aws_service)
+                client = boto3.client(aws_service, region_name)
+                inv_list = client.__getattribute__(function_name)().get(key_get)
+                for inv in inv_list:
+                    detailed_inv = get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector)
+                    inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+            except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
+                # unsupported region for efs
+                config.logger.warning("{} is not avaliable (not supported?) in region {}.".format(aws_service, aws_region))
 
     elif (aws_region == 'global'):
 
@@ -52,9 +56,19 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get, deta
 
 def get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector):
 
-    detailed_inv = client.__getattribute__(detail_function)(KeyId=inv['KeyId']).get(key_get_detail)
+    if (detail_function != ""):
+        if (isinstance(inv, str)):
+            key = inv
+        else:
+            key = inv.get(key_selector)
+        param = {key_selector: key}
+        detailed_inv = client.__getattribute__(detail_function)(**param).get(key_get_detail)
+    else:
+        detailed_inv = inv
+
     if ('RegionName' not in detailed_inv):
         detailed_inv['RegionName'] = region_name
+
     return detailed_inv
 
 

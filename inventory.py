@@ -131,40 +131,21 @@ if ('efs' in arguments):
 # ----------------- Glacier inventory
 #
 if ('glacier' in arguments):
-    glacier_inventory = []
-    for current_region in regions:
-        glacier_list = storage.get_glacier_inventory(ownerId, current_region['RegionName'])
-        for glacier in glacier_list:
-            glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier)))
-    inventory['glacier'] = glacier_inventory
+    inventory['glacier'] = storage.get_glacier_inventory(ownerId)
 
 
 #
 # ----------------- RDS inventory
 #
 if ('rds' in arguments):
-    rds_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "rds inventory")
-        rds_list = db.get_rds_inventory(ownerId, current_region_name)
-        for rds in rds_list:
-            rds_inventory.append(json.loads(utils.json_datetime_converter(rds)))
-    inventory['rds'] = rds_inventory
+    inventory['rds'] = db.get_rds_inventory(ownerId)
 
 
 #
 # ----------------- dynamodb inventory
 #
 if ('dynamodb' in arguments):
-    dynamodb_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "dynamodb inventory")
-        dynamodb_list = db.get_dynamodb_inventory(ownerId, current_region_name)
-        for dynamodb in dynamodb_list:
-            dynamodb_inventory.append(json.loads(utils.json_datetime_converter(dynamodb)))
-    inventory['dynamodb'] = dynamodb_inventory
+    inventory['dynamodb'] = db.get_dynamodb_inventory(ownerId)
 
 
 #

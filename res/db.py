@@ -3,6 +3,7 @@ import botocore
 import json
 import config
 import res.utils as utils
+import res.glob  as glob
 
 # =======================================================================================================================
 #
@@ -17,7 +18,7 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_rds_inventory(ownerId, region_name):
+def get_rds_inventory(oId):
     """
         Returns RDS inventory
 
@@ -33,12 +34,16 @@ def get_rds_inventory(ownerId, region_name):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
-    config.logger.info('RDS inventory, region {}, get_rds_inventory'.format(region_name))
-
-    client = boto3.client('rds', region_name)
-    rds_list = client.describe_db_instances().get('DBInstances')
-
-    return rds_list
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "rds", 
+        aws_region = "all", 
+        function_name = "describe_db_instances", 
+        key_get = "DBInstances",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
 
 
 #  ------------------------------------------------------------------------
@@ -47,7 +52,7 @@ def get_rds_inventory(ownerId, region_name):
 #
 #  ------------------------------------------------------------------------
 
-def get_dynamodb_inventory(ownerId, region_name):
+def get_dynamodb_inventory(oId):
     """
         Returns dynamoDB inventory
 
@@ -63,15 +68,17 @@ def get_dynamodb_inventory(ownerId, region_name):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
-    config.logger.info('dynamoDB inventory, region {}, get_rds_inventory'.format(region_name))
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "dynamodb", 
+        aws_region = "all", 
+        function_name = "list_tables", 
+        key_get = "TableNames",
+        detail_function = "describe_table", 
+        key_get_detail = "Table",
+        key_selector = "TableName"
+    )
 
-    client = boto3.client('dynamodb', region_name)
-    ddb_list = client.list_tables().get('TableNames')
-    ddb_inventory = []
-    for ddb in ddb_list:
-        ddb_inventory.append(client.describe_table(TableName=ddb).get('Table'))
-
-    return ddb_inventory
 
 #
 # Hey, doc: we're in a module!
