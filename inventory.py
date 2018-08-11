@@ -67,7 +67,7 @@ if ('ec2' in arguments):
     ebs_inventory        = []
 
     # Lookup in every AWS Region
-    for current_region in regions:
+    '''for current_region in regions:
     
         current_region_name = current_region['RegionName']
         utils.display(ownerId, current_region_name, "ec2 inventory")
@@ -101,7 +101,12 @@ if ('ec2' in arguments):
     inventory["ec2"]            = ec2_inventory
     inventory["ec2-interfaces"] = interfaces_inventory
     inventory["ec2-vpcs"]       = vpcs_inventory
-    inventory["ec2-ebs"]        = ebs_inventory
+    inventory["ec2-ebs"]        = ebs_inventory'''
+
+    inventory["ec2"] = compute.get_ec2_inventory(ownerId)
+    inventory["ec2-network-interfaces"] = compute.get_interfaces_inventory(ownerId)
+    inventory["ec2-vpcs"] = compute.get_vpc_inventory(ownerId)
+    inventory["ec2-ebs"] = compute.get_ebs_inventory(ownerId)
 
 
 # 
@@ -109,6 +114,22 @@ if ('ec2' in arguments):
 #
 if ('lambda' in arguments):
     inventory["lambda"] = compute.get_lambda_inventory(ownerId)
+
+
+# 
+# ----------------- Elastic beanstalk
+#
+if ('elasticbeanstalk' in arguments):
+    inventory["elasticbeanstalk-environments"] = compute.get_elasticbeanstalk_environments_inventory(ownerId)
+    inventory["elasticbeanstalk-applications"] = compute.get_elasticbeanstalk_applications_inventory(ownerId)
+
+
+# 
+# ----------------- ECS
+#
+if ('ecs' in arguments):
+    inventory["ecs"] = compute.get_ecs_inventory(ownerId)
+    #inventory["ecs-tasks"] = compute.get_ecs_tasks_inventory(ownerId) see prb with arrays
 
 
 # 

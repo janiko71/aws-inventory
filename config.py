@@ -6,7 +6,7 @@ from time import gmtime, strftime
 #
 # Environment Variables & File handling & logging
 #
-display = 'OwnerID : {} ! Region : {:16} ! {}'
+display = 'OwnerID : {} ! Region : {:16} ! {} ({})'
 # --- Initial values for inventory files names
 t = gmtime()
 timestamp = strftime("%Y%m%d%H%M%S", t)
@@ -27,7 +27,7 @@ logger.setLevel(logging.WARNING)
 S3_INVENTORY_BUCKET="xx"
 
 # --- Arguments/Supported commands
-SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs','glacier','rds','ce','kms','dynamodb','apigateway']
+SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs','glacier','rds','ce','kms','dynamodb','apigateway','ecs','elasticbeanstalk']
 
 # --- AWS Regions 
 with open('aws_regions.json') as json_file:

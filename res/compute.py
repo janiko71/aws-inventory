@@ -19,7 +19,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_ec2_inventory(region_name):
+def get_ec2_inventory(oId):
     """
         Returns ec2 inventory, without any analysis or any formatting
 
@@ -31,10 +31,16 @@ def get_ec2_inventory(region_name):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ec2.html
     """
-    ec2 = boto3.client('ec2', region_name)
-    config.logger.info('ec2 inventory, region {}, get_ec2_inventory'.format(region_name))
-    inventory = ec2.describe_instances().get('Reservations')
-    return inventory
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_instances", 
+        key_get = "Reservations",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
 
 
 def get_ec2_analysis(instance, region_name):
@@ -113,7 +119,7 @@ def get_ec2_analysis(instance, region_name):
     return analysis
 
 
-def get_interfaces_inventory(region_name):
+def get_interfaces_inventory(oId):
     """
         Returns network interfaces detailed inventory
 
@@ -123,17 +129,19 @@ def get_interfaces_inventory(region_name):
         :return: network interfaces inventory
         :rtype: json
     """
-    config.logger.info('ec2 inventory, region {}, get_interfaces_inventory'.format(region_name))
-    ec2 = boto3.client('ec2', region_name)
-    inventory = []
-    for ifc in ec2.describe_network_interfaces().get('NetworkInterfaces'):
-        ifc['RegionName'] = region_name
-        inventory.append(ifc)
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_network_interfaces", 
+        key_get = "NetworkInterfaces",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
 
-    return inventory
 
-
-def get_vpc_inventory(region_name):
+def get_vpc_inventory(oId):
     """
         Returns VPC detailed inventory
 
@@ -143,16 +151,19 @@ def get_vpc_inventory(region_name):
         :return: VPC inventory
         :rtype: json
     """
-    config.logger.info('ec2 inventory, region {}, get_vpc_inventory'.format(region_name))
-    ec2 = boto3.client('ec2', region_name)
-    inventory = []
-    for vpc in ec2.describe_vpcs().get('Vpcs'):
-        vpc['RegionName'] = region_name
-        inventory.append(vpc)
-    return inventory
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_vpcs", 
+        key_get = "Vpcs",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
 
 
-def get_ebs_inventory(region_name):
+def get_ebs_inventory(oId):
     """
         Returns EBS detailed inventory
 
@@ -162,13 +173,115 @@ def get_ebs_inventory(region_name):
         :return: EBS inventory
         :rtype: json
     """
-    config.logger.info('ec2 inventory, region {}, get_vpc_inventory'.format(region_name))
-    ec2 = boto3.client('ec2', region_name)
-    inventory = []
-    for ebs in ec2.describe_volumes().get('Volumes'):
-        ebs['RegionName'] = region_name
-        inventory.append(ebs)
-    return inventory
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_volumes", 
+        key_get = "Volumes",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Elastic Beanstalk /!\ Not sure it works well (often returns empty responses!!!)
+#
+#  ------------------------------------------------------------------------
+
+def get_elasticbeanstalk_environments_inventory(oId):
+    """
+        Returns Elastic Beanstalk detailed inventory
+
+        :param region: region name
+        :type region: string
+
+        :return: Elastic Beanstalk inventory (environments)
+        :rtype: json
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "elasticbeanstalk", 
+        aws_region = "all", 
+        function_name = "describe_environments", 
+        key_get = "Environments",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
+
+
+def get_elasticbeanstalk_applications_inventory(oId):
+    """
+        Returns Elastic Beanstalk detailed inventory
+
+        :param region: region name
+        :type region: string
+
+        :return: Elastic Beanstalk inventory (applications)
+        :rtype: json
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "elasticbeanstalk", 
+        aws_region = "all", 
+        function_name = "describe_applications", 
+        key_get = "Applications",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    EC2 Container Service (ECS)
+#
+#  ------------------------------------------------------------------------
+
+def get_ecs_inventory(oId):
+    """
+        Returns ECS detailed inventory
+
+        :param region: region name
+        :type region: string
+
+        :return: ECS inventory
+        :rtype: json
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ecs", 
+        aws_region = "all", 
+        function_name = "describe_clusters", 
+        key_get = "clusters",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
+
+def get_ecs_tasks_inventory(oId):
+    """
+        Returns ECS tasks inventory /!\ NOT WORKING YET
+
+        :param region: region name
+        :type region: string
+
+        :return: ECS inventory
+        :rtype: json
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ecs", 
+        aws_region = "all", 
+        function_name = "list_tasks", 
+        key_get = "taskArns",
+        detail_function = "describe_tasks", 
+        key_get_detail = "tasks",
+        key_selector = "tasks"
+    )
 
 
 #  ------------------------------------------------------------------------
@@ -227,11 +340,6 @@ def get_lambda_inventory(oId):
         key_get_detail = "",
         key_selector = ""
     )
-    config.logger.info('lambda inventory, region {}, get_lambda_inventory'.format('all regions'))
-    awslambda = boto3.client('lambda')
-    lambda_list = awslambda.list_functions().get('Functions')
-   
-    return lambda_list
 
 
 #  ------------------------------------------------------------------------

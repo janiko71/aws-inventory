@@ -19,7 +19,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_apigateway_inventory(ownerId):
+def get_apigateway_inventory(oId):
     """
         Returns API Gateway inventory
 
@@ -34,7 +34,18 @@ def get_apigateway_inventory(ownerId):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
     """
-    apigateway_inventory = []
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "apigateway", 
+        aws_region = "all", 
+        function_name = "get_rest_apis", 
+        key_get = "items",
+        detail_function = "", 
+        key_get_detail = "",
+        key_selector = ""
+    )
+
+    '''apigateway_inventory = []
     
     for region in config.regions:
 
@@ -48,7 +59,7 @@ def get_apigateway_inventory(ownerId):
 
     config.logger.info('API Gateway inventory, region {}, get_api_inventory'.format(region_name))
 
-    return apigateway_inventory
+    return apigateway_inventory'''
 
 
 #
