@@ -60,16 +60,21 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get, deta
 
 def get_inventory_detail(client, region_name, inv, detail_function, key_get_detail, key_selector):
 
+    # a revoir à cause des paramètres à rajouter, pour la sélection (param) et pour le get (qui poeut être nul ou différent de ce qui a été utilisé)
+    # tests : KMS, codestar
+
     if (detail_function != ""):
         if (isinstance(inv, str)):
             key = inv
         else:
-            key = inv.get(key_selector)
+            key = inv.get(key_get_detail)
         param = {key_selector: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
+        print('---------', param)
         detailed_inv = client.__getattribute__(detail_function)(**param).get(key_get_detail)
     else:
         detailed_inv = inv
 
+    print("===>",detailed_inv)
     if ('RegionName' not in detailed_inv):
         detailed_inv['RegionName'] = region_name
 

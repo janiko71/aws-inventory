@@ -21,6 +21,7 @@ import res.glob       as glob
 import res.compute    as compute
 import res.storage    as storage
 import res.db         as db
+import res.dev        as dev
 import res.iam        as iam
 import res.network    as net
 import res.fact       as fact
@@ -141,7 +142,7 @@ if ('ecs' in arguments):
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
-    utils.display(ownerId, "all regions", "lightsail inventory")
+    utils.display(ownerId, "all regions", "lightsail inventory", "")
     inventory['lightsail'] = json.loads(utils.json_datetime_converter(compute.get_lightsail_inventory()))
 
 
@@ -187,6 +188,16 @@ if ('dynamodb' in arguments):
 #
 if ('kms' in arguments):
     inventory['kms'] = iam.get_kms_inventory(ownerId)
+
+
+#################################################################
+#                      DEVELOPER TOOLS                          #
+#################################################################
+#
+# ----------------- CodeStar inventory
+#
+if ('codestar' in arguments):
+    inventory['codestar'] = dev.get_codestar_inventory(ownerId)
 
 
 #################################################################
