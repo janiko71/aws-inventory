@@ -1,4 +1,3 @@
-# Temporary version (some services are not ok)
 # aws-inventory
 Did your never forget to stop an EC2 instance? Or to delete some unusued AWS resource? I'm sure you did. And only remembering it when getting the bill. I know, [AWS Config](https://aws.amazon.com/config) may help you, but did you ever try? It's prohibitive!
 
