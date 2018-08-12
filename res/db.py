@@ -99,13 +99,26 @@ def get_neptune_inventory(oId):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/neptune.html
 
     """
-    return glob.get_inventory(
+    neptune_inventory = {}
+
+    neptune_inventory['instances'] = glob.get_inventory(
         ownerId = oId,
         aws_service = "neptune", 
         aws_region = "all", 
         function_name = "describe_db_instances", 
         key_get = "DBInstances"
     )
+
+    neptune_inventory['clusters'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "neptune", 
+        aws_region = "all", 
+        function_name = "describe_db_clusters", 
+        key_get = "DBClusters"
+    )
+
+    return neptune_inventory
+    
 
 #
 # Hey, doc: we're in a module!
