@@ -22,10 +22,9 @@ def get_rds_inventory(oId):
     """
         Returns RDS inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
 
         :return: RDS inventory
         :rtype: json
@@ -53,10 +52,8 @@ def get_dynamodb_inventory(oId):
     """
         Returns dynamoDB inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: dynamoDB inventory
         :rtype: json
@@ -86,12 +83,10 @@ def get_dynamodb_inventory(oId):
 
 def get_neptune_inventory(oId):
     """
-        Returns neptune inventory
+        Returns neptune inventory (instances & clusters)
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: neptune inventory
         :rtype: json

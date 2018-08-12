@@ -23,13 +23,13 @@ def get_alexa_inventory(oId):
     """
         Returns alexa skills
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: alexa skills inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/alexaforbusiness.html
     """ 
     return glob.get_inventory(
         ownerId = oId,
@@ -46,7 +46,7 @@ def get_alexa_inventory(oId):
 
 #  ------------------------------------------------------------------------
 #
-#   WorkDocs
+#   WorkDocs (to be continued...)
 #
 #  ------------------------------------------------------------------------
 
@@ -54,13 +54,13 @@ def get_workdocs_inventory(oId):
     """
         Returns workdocs inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: workdocs inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/workdocs.html
     """ 
     return glob.get_inventory(
         ownerId = oId,
@@ -81,13 +81,13 @@ def get_workmail_inventory(oId):
     """
         Returns workmail inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: workmail inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/workmail.html
     """ 
     return glob.get_inventory(
         ownerId = oId,

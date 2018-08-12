@@ -23,10 +23,8 @@ def get_apigateway_inventory(oId):
     """
         Returns API Gateway inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: API Gateway inventory
         :rtype: json

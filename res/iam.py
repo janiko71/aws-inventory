@@ -23,8 +23,8 @@ def get_kms_inventory(oId):
     """
         Returns keys managed by KMS (global)
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: KMS inventory
         :rtype: json

@@ -6,7 +6,10 @@ from time import gmtime, strftime
 #
 # Environment Variables & File handling & logging
 #
+
+# --- Format for displaying actions
 display = 'OwnerID : {} ! Region : {:16} ! {} ({})'
+
 # --- Initial values for inventory files names
 t = gmtime()
 timestamp = strftime("%Y%m%d%H%M%S", t)

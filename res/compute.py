@@ -23,8 +23,8 @@ def get_ec2_inventory(oId):
     """
         Returns ec2 inventory, without any analysis or any formatting
 
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: ec2 inventory
         :rtype: json
@@ -44,8 +44,8 @@ def get_interfaces_inventory(oId):
     """
         Returns network interfaces detailed inventory
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: network interfaces inventory
         :rtype: json
@@ -63,8 +63,8 @@ def get_vpc_inventory(oId):
     """
         Returns VPC detailed inventory
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: VPC inventory
         :rtype: json
@@ -82,8 +82,8 @@ def get_ebs_inventory(oId):
     """
         Returns EBS detailed inventory
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: EBS inventory
         :rtype: json
@@ -107,11 +107,13 @@ def get_elasticbeanstalk_environments_inventory(oId):
     """
         Returns Elastic Beanstalk detailed inventory
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: Elastic Beanstalk inventory (environments)
         :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/elasticbeanstalk.html
     """
     return glob.get_inventory(
         ownerId = oId,
@@ -126,8 +128,8 @@ def get_elasticbeanstalk_applications_inventory(oId):
     """
         Returns Elastic Beanstalk detailed inventory
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: Elastic Beanstalk inventory (applications)
         :rtype: json
@@ -151,11 +153,13 @@ def get_ecs_inventory(oId):
     """
         Returns ECS detailed inventory
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: ECS inventory
         :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ecs.html
     """
     return glob.get_inventory(
         ownerId = oId,
@@ -165,14 +169,15 @@ def get_ecs_inventory(oId):
         key_get = "clusters"
     )
 
+
 def get_ecs_tasks_inventory(oId):
     """
         Returns ECS tasks inventory /!\ NOT WORKING YET
 
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
-        :return: ECS inventory
+        :return: ECS tasks inventory
         :rtype: json
     """
     return glob.get_inventory(
@@ -190,31 +195,29 @@ def get_ecs_tasks_inventory(oId):
 
 #  ------------------------------------------------------------------------
 #
-#    EKS
+#    EKS (not working)
 #
 #  ------------------------------------------------------------------------
 
-def get_eks_inventory(ownerId, region_name):
+def get_eks_inventory(oId):
     """
         Returns eks inventory (if the region is avalaible)
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region: region name
-        :type region: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
-        :return: S3 inventory
+        :return: eks inventory
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
     """
     inventory = []
-    try:
+    '''try:
         eks = boto3.client('eks')
         print('OwnerID : {}, EKS inventory, Region : {}'.format(ownerId, region_name))
         inventory.append(eks.list_clusters())
     except:
-        print('OwnerID : {}, EKS not supported in region : {}'.format(ownerId, region_name))
+        print('OwnerID : {}, EKS not supported in region : {}'.format(ownerId, region_name))'''
     
     return inventory
 
@@ -229,7 +232,10 @@ def get_lambda_inventory(oId):
     """
         Returns lambda inventory.
 
-        :return: S3 inventory
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: lambda inventory
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
@@ -248,9 +254,13 @@ def get_lambda_inventory(oId):
 #    Lightsail
 #
 #  ------------------------------------------------------------------------
+
 def get_lightsail_inventory(oId):
     """
-        Returns lightsail inventory. 
+        Returns lightsail inventory, with loadbalancers and IPs
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: lightsail inventory
         :rtype: json

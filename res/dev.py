@@ -23,13 +23,13 @@ def get_codestar_inventory(oId):
     """
         Returns codestar details
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: codestar inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/codestar.html
     """ 
     return glob.get_inventory(
         ownerId = oId,

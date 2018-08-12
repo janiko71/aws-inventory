@@ -25,13 +25,13 @@ def get_clouddirectory_inventory(oId):
     """
         Returns keys managed by KMS (global)
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
-        :return: KMS inventory
+        :return: clouddirectory inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/clouddirectory.html
     """ 
     return glob.get_inventory(
         ownerId = oId,

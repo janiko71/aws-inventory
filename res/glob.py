@@ -7,12 +7,43 @@ import res.utils as utils
 
 #  ------------------------------------------------------------------------
 #
-#     The MOST important function of that project: generic inventory
+#     The MOST important functions of that project: generic inventory
 #
 #  ------------------------------------------------------------------------
 
 def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "", detail_function = "", join_key = "", detail_join_key = "", detail_get_key = ""):
+    """
+        Returns inventory for a service. It's a generic function, meaning that it should work for almost any AWS service,
+        except for specialized ones or for those who don't have AWS CLI/SDK equivalent. 
+        
+        The list of parameters is impressive but it allows to add a service in minutes without any re-coding (just testing!)
 
+        :param ownerId: ownerId (AWS account). Mandatory.
+        :param aws_service: name of AWS service (= the name used in SDK, and defined in config.py). Mandatory.
+        :param aws_region: scope of the inventory, depending on the service. Some are globalized, some needs to be executed in every AWS region. Mandatory.
+        :param function_name: the name of the SDK function to call to get inventory (or the list of resources). Mandatory.
+        :param key_get: the key containing information about the resource, when SDK returns a dict. Optional.
+        :param detail_function: the SDK function to call to get details, if needed. Optional.
+        :param join_key: Id of the resource you for which you want details.
+        :param detail_join_key: When needed, field name of the paramater to include in de detail_function to get the right resource instance.
+        :param detail_get_key: the key containing detailed information about the resource, when SDK returns a dict. Optional.
+
+        :type ownerId: string
+        :type aws_service: string
+        :type aws_region: string
+        :type function_name: string
+        :type key_get: string
+        :type detail_function: string
+        :type join_key: string
+        :type detail_join_key: string
+        :type detail_get_key: string        
+
+        :return: neptune inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/neptune.html
+
+    """
     # aws_region = all, global
 
     inventory = []
@@ -25,9 +56,9 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "",
             try:
                 region_name = region['RegionName']
                 config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
-                utils.display(ownerId, region_name, aws_service, function_name)
                 client = boto3.client(aws_service, region_name)
                 inv_list = client.__getattribute__(function_name)().get(key_get)
+                utils.display(ownerId, region_name, aws_service, function_name)
                 for inv in inv_list:
                     detailed_inv = get_inventory_detail(client, region_name, inv, detail_function, join_key, detail_join_key, detail_get_key)
                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
@@ -60,10 +91,11 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "",
 
 def get_inventory_detail(client, region_name, inv, detail_function, join_key, detail_join_key, detail_get_key):
 
-    # a revoir à cause des paramètres à rajouter, pour la sélection (param) et pour le get (qui poeut être nul ou différent de ce qui a été utilisé)
-    # tests : KMS, codestar
-    # liste : get_key
-    # detail : join_key, detail_join_key, detail_get_key
+    '''
+        Get details for the resource, if needed. Same parameters as get_detail but all are mandatory except detail_get_key
+
+        .. seealso:: :function:`get_inventory`
+    '''
 
     if (detail_function != ""):
         if (isinstance(inv, str)):

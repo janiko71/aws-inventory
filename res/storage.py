@@ -1,6 +1,6 @@
 import boto3
 import botocore
-from botocore.exceptions import *
+from botocore.exceptions import ClientError
 import pprint
 import config
 import json
@@ -24,8 +24,8 @@ def get_s3_inventory(oId):
     """
         Returns S3 quick inventory
 
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: S3 inventory
         :rtype: json
@@ -129,17 +129,13 @@ def get_efs_inventory(oId):
     """
         Returns EFS inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: EFS inventory
         :rtype: json
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/efs.html
-                 if the region is not supported, an exception is raised (EndpointConnectionError 
-                 or AccessDeniedException)
     """
     return glob.get_inventory(
         ownerId = oId,
@@ -160,8 +156,8 @@ def get_glacier_inventory(oId):
     """
         Returns Glacier inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: Glacier inventory
         :rtype: json
