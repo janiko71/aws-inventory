@@ -168,7 +168,12 @@ def get_ecs_inventory(oId):
         function_name = "describe_clusters", 
         key_get = "clusters"
     )
-
+    ''' detail_function = "list_container_instances",
+        join_key = "clusterName", 
+        detail_join_key = "cluster", 
+        detail_get_key = ""
+        '''
+    
 
 def get_ecs_tasks_inventory(oId):
     """
