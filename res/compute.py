@@ -184,12 +184,12 @@ def get_ecs_tasks_inventory(oId):
         ownerId = oId,
         aws_service = "ecs", 
         aws_region = "all", 
-        function_name = "list_tasks", 
-        key_get = "taskArns",
-        detail_function = "describe_tasks", 
-        join_key = "tasks", 
-        detail_join_key = "tasks", 
-        detail_get_key = "tasks"
+        function_name = "list_task_definitions", 
+        key_get = "taskDefinitionArns",
+        detail_function = "describe_task_definition", 
+        join_key = "taskDefinitionArn", 
+        detail_join_key = "taskDefinition", 
+        detail_get_key = "taskDefinition"
     )
 
 

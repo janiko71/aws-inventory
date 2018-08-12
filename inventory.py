@@ -127,16 +127,20 @@ if ('lambda' in arguments):
 # ----------------- Elastic beanstalk
 #
 if ('elasticbeanstalk' in arguments):
-    inventory["elasticbeanstalk-environments"] = compute.get_elasticbeanstalk_environments_inventory(ownerId)
-    inventory["elasticbeanstalk-applications"] = compute.get_elasticbeanstalk_applications_inventory(ownerId)
+    inventory["elasticbeanstalk"] = {
+        "elasticbeanstalk-environments": compute.get_elasticbeanstalk_environments_inventory(ownerId),
+        "elasticbeanstalk-applications": compute.get_elasticbeanstalk_applications_inventory(ownerId)
+    }
 
 
 # 
 # ----------------- ECS
 #
 if ('ecs' in arguments):
-    inventory["ecs"] = compute.get_ecs_inventory(ownerId)
-    #inventory["ecs-tasks"] = compute.get_ecs_tasks_inventory(ownerId) see prb with arrays
+    inventory["ecs"] = {
+        "ecs-clusters": compute.get_ecs_inventory(ownerId),
+        "ecs-tasks": compute.get_ecs_tasks_inventory(ownerId)
+    }        
 
 
 # 
