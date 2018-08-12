@@ -38,8 +38,9 @@ def get_codestar_inventory(oId):
         function_name = "list_projects", 
         key_get = "projects",
         detail_function = "describe_project", 
-        key_get_detail = "projectId",
-        key_selector = "id"
+        join_key = "projectId", 
+        detail_join_key = "id", 
+        detail_get_key = ""
     )
 
 

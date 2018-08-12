@@ -1,6 +1,6 @@
 # Python imports
 import boto3
-from botocore.exceptions import *
+from botocore.exceptions import EndpointConnectionError, ClientError
 import botocore
 import collections
 import csv
@@ -55,8 +55,8 @@ else:
     arguments = sys.argv[1:]
     utils.check_arguments(arguments)
 print('-'*100)
-print ('Number of arguments:', nb_arg, 'arguments.')
-print ('Argument List:', str(arguments))
+print ('Number of services:', nb_arg, 'arguments.')
+print ('Services List     :', str(arguments))
 print('-'*100)
 
 #################################################################
@@ -142,8 +142,7 @@ if ('ecs' in arguments):
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
-    utils.display(ownerId, "all regions", "lightsail inventory", "")
-    inventory['lightsail'] = json.loads(utils.json_datetime_converter(compute.get_lightsail_inventory()))
+    inventory['lightsail'] = compute.get_lightsail_inventory(ownerId)
 
 
 #################################################################
@@ -225,7 +224,7 @@ if ('apigateway' in arguments):
 #
 if ('ce' in arguments):
     ce_inventory = []
-    utils.display(ownerId, 'global', "cost explorer inventory")
+    utils.display(ownerId, 'global', "cost explorer inventory", "")
     list_ce = fact.get_ce_inventory(ownerId, None).get('ResultsByTime')
     for item in list_ce:
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
@@ -253,7 +252,7 @@ region_name = 'global'
 # ----------------- S3 quick inventory
 #
 if ('s3' in arguments):
-    inventory["s3"] = storage.get_s3_inventory(ownerId, region_name)
+    inventory["s3"] = storage.get_s3_inventory(ownerId)
 
 #
 # ----------------- Final inventory

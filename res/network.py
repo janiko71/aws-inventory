@@ -39,27 +39,8 @@ def get_apigateway_inventory(oId):
         aws_service = "apigateway", 
         aws_region = "all", 
         function_name = "get_rest_apis", 
-        key_get = "items",
-        detail_function = "", 
-        key_get_detail = "",
-        key_selector = ""
+        key_get = "items"
     )
-
-    '''apigateway_inventory = []
-    
-    for region in config.regions:
-
-        region_name = region['RegionName']
-        utils.display(ownerId, region_name, "apigateway inventory")
-
-        client = boto3.client('apigateway', region_name)
-
-        for apigateway in client.get_rest_apis().get('items'):
-            apigateway_inventory.append(json.loads(utils.json_datetime_converter(apigateway)))
-
-    config.logger.info('API Gateway inventory, region {}, get_api_inventory'.format(region_name))
-
-    return apigateway_inventory'''
 
 
 #

@@ -38,10 +38,7 @@ def get_clouddirectory_inventory(oId):
         aws_service = "clouddirectory", 
         aws_region = "all", 
         function_name = "list_directories", 
-        key_get = "Directories",
-        detail_function = "", 
-        key_get_detail = "",
-        key_selector = ""
+        key_get = "Directories"
     )
 
 
