@@ -27,6 +27,7 @@ import res.network    as net
 import res.fact       as fact
 import res.security   as security
 import res.management as mgn
+import res.business   as bus
 
 #
 # Let's rock'n roll
@@ -178,6 +179,12 @@ if ('rds' in arguments):
 if ('dynamodb' in arguments):
     inventory['dynamodb'] = db.get_dynamodb_inventory(ownerId)
 
+#
+# ----------------- Neptune inventory
+#
+if ('neptune' in arguments):
+    inventory['neptune'] = db.get_neptune_inventory(ownerId)
+
 
 #################################################################
 #                      SECURITY & IAM                           #
@@ -219,6 +226,27 @@ if ('apigateway' in arguments):
     inventory['apigateway'] = net.get_apigateway_inventory(ownerId)
 
 
+#################################################################
+#                   BUSINESS PRODUCTIVITY                       #
+#################################################################
+#
+# ----------------- Alexa for Business
+#
+if ('alexa' in arguments):
+    inventory['alexa'] = bus.get_alexa_inventory(ownerId)
+
+#
+# ----------------- WorkDocs (not implemented)
+#
+if ('workdocs' in arguments):
+    inventory['workdocs'] = bus.get_workdocs_inventory(ownerId)
+
+#
+# ----------------- Workmail (not well tested, some rights issues)
+#
+if ('workmail' in arguments):
+    inventory['workmail'] = bus.get_workmail_inventory(ownerId)
+
 #
 # ----------------- Cost Explorer (experimental)
 #
@@ -228,7 +256,6 @@ if ('ce' in arguments):
     list_ce = fact.get_ce_inventory(ownerId, None).get('ResultsByTime')
     for item in list_ce:
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
-    print(ce_inventory)
     inventory['cost-explorer'] = ce_inventory
 
 #

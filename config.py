@@ -28,7 +28,7 @@ S3_INVENTORY_BUCKET="xx"
 
 # --- Arguments/Supported commands
 SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs','glacier','rds','ce','kms','dynamodb','apigateway','ecs','elasticbeanstalk',
-    'clouddirectory','codestar']
+    'clouddirectory','codestar','alexa','workmail','neptune']
 
 # --- AWS Regions 
 with open('aws_regions.json') as json_file:

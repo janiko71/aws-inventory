@@ -78,6 +78,35 @@ def get_dynamodb_inventory(oId):
     )
 
 
+#  ------------------------------------------------------------------------
+#
+#    Neptune 
+#
+#  ------------------------------------------------------------------------
+
+def get_neptune_inventory(oId):
+    """
+        Returns neptune inventory
+
+        :param ownerId: ownerId (AWS account)
+        :type ownerId: string
+        :param region_name: region name
+        :type region_name: string
+
+        :return: neptune inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/neptune.html
+
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "neptune", 
+        aws_region = "all", 
+        function_name = "describe_db_instances", 
+        key_get = "DBInstances"
+    )
+
 #
 # Hey, doc: we're in a module!
 #

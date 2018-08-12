@@ -6,6 +6,27 @@ This python script lists all the main resources of your AWS account. This invent
 
 Intended for personal use (even if I added some professional features like logging), and for only one account. For more information on multiple accounts, read the [wiki](https://github.com/janiko71/aws-inventory/wiki).
 
+Supported AWS services is limited, but I add some regulary. Until now, supported services are :
+* s3
+* ec2
+* vpc
+* network
+* ebs
+* lambda
+* lightsail
+* efs
+* glacier
+* rds
+* ce (cost explorer, but still experimental)
+* kms
+* dynamodb
+* apigateway
+* ecs
+* elasticbeanstalk
+* clouddirectory
+* codestar
+* neptune
+
 ~~Derived from https://github.com/powerupcloud/AWSInventoryLambda but not forked because it has been too much modified.~~ Rewritten from scratch to be more _pythonified_.
 ## Pre-requisites
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
