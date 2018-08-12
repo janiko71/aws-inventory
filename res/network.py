@@ -3,6 +3,7 @@ import botocore
 import json
 import config
 import res.utils as utils
+import res.glob  as glob
 
 # =======================================================================================================================
 #
@@ -18,14 +19,12 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_apigateway_inventory(ownerId, region_name):
+def get_apigateway_inventory(oId):
     """
         Returns API Gateway inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: API Gateway inventory
         :rtype: json
@@ -33,12 +32,13 @@ def get_apigateway_inventory(ownerId, region_name):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
     """
-    config.logger.info('API Gateway inventory, region {}, get_api_inventory'.format(region_name))
-
-    client = boto3.client('apigateway', region_name)
-    rds_list = client.get_rest_apis().get('items')
-
-    return rds_list
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "apigateway", 
+        aws_region = "all", 
+        function_name = "get_rest_apis", 
+        key_get = "items"
+    )
 
 
 #

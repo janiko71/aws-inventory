@@ -3,22 +3,43 @@ import botocore
 import json
 import config
 import res.utils as utils
+import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : None. IAM has its own module
-#  Unsupported services : Cognito, Secrets Manager, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, Directory Service, WAF & Shield, Artifact
+#  Supported services   : Directory Service 
+#  Unsupported services : Cognito, Secrets Manager, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, 
+#                           WAF & Shield, Artifact
+#
+#  Note: IAM has its own module
 #
 # =======================================================================================================================
 
 #  ------------------------------------------------------------------------
 #
-#    ??? 
+#    Cloud Directory (simple)
 #
 #  ------------------------------------------------------------------------
 
+def get_clouddirectory_inventory(oId):
+    """
+        Returns keys managed by KMS (global)
 
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
+        :return: clouddirectory inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/clouddirectory.html
+    """ 
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "clouddirectory", 
+        aws_region = "all", 
+        function_name = "list_directories", 
+        key_get = "Directories"
+    )
 
 
 #

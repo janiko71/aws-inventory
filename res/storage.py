@@ -1,13 +1,15 @@
 import boto3
 import botocore
-from botocore.exceptions import *
+from botocore.exceptions import ClientError
 import pprint
 import config
+import json
 import res.utils as utils
+import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : S3 (quick), EFS (Elastic File System), Glacier
+#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier
 #  Unsupported services : Storage Gateway
 #
 # =======================================================================================================================
@@ -18,52 +20,101 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_s3_inventory(region_name):
+def get_s3_inventory(oId):
     """
         Returns S3 quick inventory
 
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: S3 inventory
         :rtype: json
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
     """
-    config.logger.info('s3 inventory, region {}, get_s3_inventory'.format(region_name))
-    
+   
     inventory = []
-    s3 = boto3.client('s3')
+
+    bucket_list = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "s3", 
+        aws_region = "global", 
+        function_name = "list_buckets", 
+        key_get = "Buckets"
+    )
+
+    # S3 needs some analysis (website, size)
+
+    s3 = boto3.client("s3")
     
-    listbuckets = s3.list_buckets().get('Buckets')
-    
-    if len(listbuckets) > 0:
-        for bucket in listbuckets:
-            #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.list_objects_v2
-            bucketname = bucket['Name']
-            this_bucket = {bucketname: []}
+    if len(bucket_list) > 0:
+
+        for bucket in bucket_list:
+
+            bucket_name = bucket['Name']
+
             # Check if a website if configured; if yes, it could lead to a DLP issue
-            has_website = 'unknown'
             try:
-                s3.get_bucket_website(Bucket = bucketname)
-                has_website = 'yes'
+                has_website = 'unknown'
+                has_website = s3.get_bucket_website(Bucket = bucket_name)
+                del has_website['ResponseMetadata']
             except ClientError as ce:
                 if 'NoSuchWebsiteConfiguration' in ce.args[0]:
                     has_website = 'no'
+            bucket['website'] = has_website
+
+            # Tags
+            try:
+                bucket['tags'] = s3.get_bucket_tagging(Bucket = bucket_name).get('TagSet')
+            except:
+                pass
+
+            # ACL
+            try:
+                acl = s3.get_bucket_acl(Bucket = bucket_name)
+                del acl['ResponseMetadata']
+            except:
+                pass
+            bucket['acl'] = acl              
+            
+            # Policy
+            try:
+                policy = "no"
+                policy = json.JSONDecoder().decode(s3.get_bucket_policy(Bucket = bucket_name).get('Policy'))
+                del policy['ResponseMetadata']
+            except:
+                pass
+            bucket['policy'] = policy
+
+            # Encryption
+            try:
+                encrypt = "no"
+                encrypt = s3.get_bucket_encryption(Bucket = bucket_name)
+                del encrypt['ResponseMetadata']
+            except:
+                pass
+            bucket['encryption'] = encrypt  
+
+            # Other
+            bucket['location'] = s3.get_bucket_location(Bucket = bucket_name).get('LocationConstraint')
+
             # Summarize nb of objets and total size (for the current bucket)
-            this_bucket['has_website'] = has_website
             paginator = s3.get_paginator('list_objects_v2')
             nbobj = 0
             size = 0
             #page_objects = paginator.paginate(Bucket=bucketname,PaginationConfig={'MaxItems': 10})
-            page_objects = paginator.paginate(Bucket = bucketname)
+            page_objects = paginator.paginate(Bucket = bucket_name)
             for objects in page_objects:
-                nbobj += len(objects['Contents'])
-                for obj in objects['Contents']:
-                    size += obj['Size']
-            this_bucket['number_of_objects'] = nbobj
-            this_bucket['total_size'] = size
-            inventory.append(this_bucket)
+                try:
+                    nbobj += len(objects['Contents'])
+                    for obj in objects['Contents']:
+                        size += obj['Size']
+                except:
+                    pass
+            bucket['number_of_objects'] = nbobj
+            bucket['total_size'] = size
+
+            inventory.append(bucket)
 
     return inventory
 
@@ -74,36 +125,25 @@ def get_s3_inventory(region_name):
 #
 #  ------------------------------------------------------------------------
 
-def get_efs_inventory(ownerId, region_name):
+def get_efs_inventory(oId):
     """
         Returns EFS inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: EFS inventory
         :rtype: json
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/efs.html
-                 if the region is not supported, an exception is raised (EndpointConnectionError 
-                 or AccessDeniedException)
     """
-    config.logger.info('EFS inventory, region {}, get_efs_inventory'.format(region_name))
-    
-    inventory = []
-    try:
-        efs = boto3.client('efs', region_name)
-        efs_list = efs.describe_file_systems().get('FileSystems')
-        utils.display(ownerId, region_name, "EFS inventory")
-        for fs in efs_list:
-            inventory.append(fs)
-    except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
-        # unsupported region for efs
-        config.logger.warning(region_name + ' is an unsupported region for EFS')
-
-    return inventory
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "efs", 
+        aws_region = "all", 
+        function_name = "describe_file_systems", 
+        key_get = "FileSystems"
+    )
 
 
 #  ------------------------------------------------------------------------
@@ -112,14 +152,12 @@ def get_efs_inventory(ownerId, region_name):
 #
 #  ------------------------------------------------------------------------
 
-def get_glacier_inventory(ownerId, region_name):
+def get_glacier_inventory(oId):
     """
         Returns Glacier inventory
 
-        :param ownerId: ownerId (AWS account)
-        :type ownerId: string
-        :param region_name: region name
-        :type region_name: string
+        :param oId: ownerId (AWS account)
+        :type oId: string
 
         :return: Glacier inventory
         :rtype: json
@@ -128,20 +166,14 @@ def get_glacier_inventory(ownerId, region_name):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
-    config.logger.info('Glacier inventory, region {}, get_glacier_inventory'.format(region_name))
-    
-    inventory = []
-    try:
-        glacier = boto3.client('glacier', region_name)
-        glacier_list = glacier.list_vaults().get('VaultList')
-        utils.display(ownerId, region_name, "glacier inventory")
-        for g in glacier_list:
-            inventory.append(g)
-    except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
-        # unsupported region for efs
-        config.logger.warning(region_name + ' is an unsupported region for Glacier')
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "glacier", 
+        aws_region = "all", 
+        function_name = "list_vaults", 
+        key_get = "VaultList"
+    )
 
-    return inventory
 
 #
 # Hey, doc: we're in a module!

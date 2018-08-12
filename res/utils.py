@@ -14,8 +14,8 @@ import config
 #  Useful functions
 #
 
-def display(ownerId, function, region_name):
-    print(config.display.format(ownerId, function, region_name))
+def display(ownerId, function, region_name, function_name):
+    print(config.display.format(ownerId, function, region_name, function_name))
     return
 
 
@@ -73,4 +73,3 @@ def json_datetime_converter(json_text):
         :rtype: json
     """
     return json.dumps(json_text, default = datetime_converter)      
-

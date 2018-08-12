@@ -1,6 +1,6 @@
 # Python imports
 import boto3
-from botocore.exceptions import *
+from botocore.exceptions import EndpointConnectionError, ClientError
 import botocore
 import collections
 import csv
@@ -17,12 +17,17 @@ import res.utils as utils
 import config
 
 # AWS Services imports 
-import res.compute as compute
-import res.storage as storage
-import res.db      as db
-import res.glob    as glob
-import res.iam     as iam
-import res.network as net
+import res.glob       as glob
+import res.compute    as compute
+import res.storage    as storage
+import res.db         as db
+import res.dev        as dev
+import res.iam        as iam
+import res.network    as net
+import res.fact       as fact
+import res.security   as security
+import res.management as mgn
+import res.business   as bus
 
 #
 # Let's rock'n roll
@@ -51,10 +56,13 @@ else:
     arguments = sys.argv[1:]
     utils.check_arguments(arguments)
 print('-'*100)
-print ('Number of arguments:', nb_arg, 'arguments.')
-print ('Argument List:', str(arguments))
+print ('Number of services:', nb_arg, 'arguments.')
+print ('Services List     :', str(arguments))
 print('-'*100)
 
+#################################################################
+#                           COMPUTE                             #
+#################################################################
 # 
 # ----------------- EC2
 #
@@ -66,7 +74,7 @@ if ('ec2' in arguments):
     ebs_inventory        = []
 
     # Lookup in every AWS Region
-    for current_region in regions:
+    '''for current_region in regions:
     
         current_region_name = current_region['RegionName']
         utils.display(ownerId, current_region_name, "ec2 inventory")
@@ -100,121 +108,162 @@ if ('ec2' in arguments):
     inventory["ec2"]            = ec2_inventory
     inventory["ec2-interfaces"] = interfaces_inventory
     inventory["ec2-vpcs"]       = vpcs_inventory
-    inventory["ec2-ebs"]        = ebs_inventory
+    inventory["ec2-ebs"]        = ebs_inventory'''
+
+    inventory["ec2"] = compute.get_ec2_inventory(ownerId)
+    inventory["ec2-network-interfaces"] = compute.get_interfaces_inventory(ownerId)
+    inventory["ec2-vpcs"] = compute.get_vpc_inventory(ownerId)
+    inventory["ec2-ebs"] = compute.get_ebs_inventory(ownerId)
 
 
 # 
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
-    utils.display(ownerId, "all regions", "lambda inventory")
-    inventory["lambda"] = compute.get_lambda_inventory()
+    inventory["lambda"] = compute.get_lambda_inventory(ownerId)
+
+
+# 
+# ----------------- Elastic beanstalk
+#
+if ('elasticbeanstalk' in arguments):
+    inventory["elasticbeanstalk"] = {
+        "elasticbeanstalk-environments": compute.get_elasticbeanstalk_environments_inventory(ownerId),
+        "elasticbeanstalk-applications": compute.get_elasticbeanstalk_applications_inventory(ownerId)
+    }
+
+
+# 
+# ----------------- ECS
+#
+if ('ecs' in arguments):
+    inventory["ecs"] = {
+        "ecs-clusters": compute.get_ecs_inventory(ownerId),
+        "ecs-tasks": compute.get_ecs_tasks_inventory(ownerId)
+    }        
 
 
 # 
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
-    utils.display(ownerId, "all regions", "lightsail inventory")
-    inventory['lightsail'] = json.loads(utils.json_datetime_converter(compute.get_lightsail_inventory()))
+    inventory['lightsail'] = compute.get_lightsail_inventory(ownerId)
 
 
+#################################################################
+#                           STORAGE                             #
+#################################################################
 #
 # ----------------- EFS inventory
 #
 if ('efs' in arguments):
-    efs_inventory = []
-    for current_region in regions:
-        efs_list = storage.get_efs_inventory(ownerId, current_region['RegionName'])
-        for efs in efs_list:
-            efs_inventory.append(json.loads(utils.json_datetime_converter(efs)))
-    inventory['efs'] = efs_inventory
+    inventory['efs'] = storage.get_efs_inventory(ownerId)
 
 
 #
 # ----------------- Glacier inventory
 #
 if ('glacier' in arguments):
-    glacier_inventory = []
-    for current_region in regions:
-        glacier_list = storage.get_glacier_inventory(ownerId, current_region['RegionName'])
-        for glacier in glacier_list:
-            glacier_inventory.append(json.loads(utils.json_datetime_converter(glacier)))
-    inventory['glacier'] = glacier_inventory
+    inventory['glacier'] = storage.get_glacier_inventory(ownerId)
 
 
+#################################################################
+#                          DATABASES                            #
+#################################################################
 #
 # ----------------- RDS inventory
 #
 if ('rds' in arguments):
-    rds_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "rds inventory")
-        rds_list = db.get_rds_inventory(ownerId, current_region_name)
-        for rds in rds_list:
-            rds_inventory.append(json.loads(utils.json_datetime_converter(rds)))
-    inventory['rds'] = rds_inventory
+    inventory['rds'] = db.get_rds_inventory(ownerId)
 
 
 #
 # ----------------- dynamodb inventory
 #
 if ('dynamodb' in arguments):
-    dynamodb_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "dynamodb inventory")
-        dynamodb_list = db.get_dynamodb_inventory(ownerId, current_region_name)
-        for dynamodb in dynamodb_list:
-            dynamodb_inventory.append(json.loads(utils.json_datetime_converter(dynamodb)))
-    inventory['dynamodb'] = dynamodb_inventory
+    inventory['dynamodb'] = db.get_dynamodb_inventory(ownerId)
+
+#
+# ----------------- Neptune inventory
+#
+if ('neptune' in arguments):
+    inventory['neptune'] = db.get_neptune_inventory(ownerId)
 
 
+#################################################################
+#                      SECURITY & IAM                           #
+#################################################################
 #
 # ----------------- KMS inventory
 #
 if ('kms' in arguments):
-    kms_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "kms inventory")
-        kms_list = iam.get_kms_inventory(ownerId, current_region_name)
-        for kms in kms_list:
-            kms_inventory.append(json.loads(utils.json_datetime_converter(kms)))
-    inventory['kms'] = kms_inventory
+    inventory['kms'] = iam.get_kms_inventory(ownerId)
 
 
+#################################################################
+#                      DEVELOPER TOOLS                          #
+#################################################################
+#
+# ----------------- CodeStar inventory
+#
+if ('codestar' in arguments):
+    inventory['codestar'] = dev.get_codestar_inventory(ownerId)
+
+
+#################################################################
+#                         MANAGEMENT                            #
+#################################################################
+#
+# ----------------- Cloud directory
+#
+if ('clouddirectory' in arguments):
+    inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
+
+
+#################################################################
+#                          NETWORK                              #
+#################################################################
 #
 # ----------------- API Gateway inventory
 #
 if ('apigateway' in arguments):
-    apigateway_inventory = []
-    for current_region in regions:
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "apigateway inventory")
-        apigateway_list = net.get_apigateway_inventory(ownerId, current_region_name)
-        for apigateway in apigateway_list:
-            apigateway_inventory.append(json.loads(utils.json_datetime_converter(apigateway)))
-    inventory['apigateway'] = apigateway_inventory
+    inventory['apigateway'] = net.get_apigateway_inventory(ownerId)
 
+
+#################################################################
+#                   BUSINESS PRODUCTIVITY                       #
+#################################################################
+#
+# ----------------- Alexa for Business
+#
+if ('alexa' in arguments):
+    inventory['alexa'] = bus.get_alexa_inventory(ownerId)
 
 #
+# ----------------- WorkDocs (not implemented)
+#
+if ('workdocs' in arguments):
+    inventory['workdocs'] = bus.get_workdocs_inventory(ownerId)
+
+#
+# ----------------- Workmail (not well tested, some rights issues)
+#
+if ('workmail' in arguments):
+    inventory['workmail'] = bus.get_workmail_inventory(ownerId)
 
 #
 # ----------------- Cost Explorer (experimental)
 #
 if ('ce' in arguments):
     ce_inventory = []
-    utils.display(ownerId, 'global', "cost explorer inventory")
-    list_ce = glob.get_ce_inventory(ownerId, None).get('ResultsByTime')
+    utils.display(ownerId, 'global', "cost explorer inventory", "")
+    list_ce = fact.get_ce_inventory(ownerId, None).get('ResultsByTime')
     for item in list_ce:
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
-    print(ce_inventory)
-    inventory['ce'] = ce_inventory
+    inventory['cost-explorer'] = ce_inventory
 
 #
-# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS SDK
+# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS CLI
 #
 #for current_region in regions:
 #    current_region_name = current_region['RegionName']
@@ -228,14 +277,13 @@ if ('ce' in arguments):
 # International Resources (no region)
 #
 
-current_region_name = 'global'
+region_name = 'global'
 
 #
 # ----------------- S3 quick inventory
 #
 if ('s3' in arguments):
-    utils.display(ownerId, current_region_name, "S3 quick inventory")
-    inventory["s3"] = storage.get_s3_inventory(current_region_name)
+    inventory["s3"] = storage.get_s3_inventory(ownerId)
 
 #
 # ----------------- Final inventory

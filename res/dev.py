@@ -8,39 +8,39 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : KMS
-#  Unsupported services : IAM
+#  Supported services   : CodeStar
+#  Unsupported services : CodeCommit, CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray
 #
 # =======================================================================================================================
 
 #  ------------------------------------------------------------------------
 #
-#    KMS (Keys Management System)
+#    CodeStar
 #
 #  ------------------------------------------------------------------------
 
-def get_kms_inventory(oId):
+def get_codestar_inventory(oId):
     """
-        Returns keys managed by KMS (global)
+        Returns codestar details
 
         :param oId: ownerId (AWS account)
         :type oId: string
 
-        :return: KMS inventory
+        :return: codestar inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/codestar.html
     """ 
     return glob.get_inventory(
         ownerId = oId,
-        aws_service = "kms", 
+        aws_service = "codestar", 
         aws_region = "all", 
-        function_name = "list_keys", 
-        key_get = "Keys",
-        detail_function = "describe_key", 
-        join_key = "KeyId", 
-        detail_join_key = "KeyId", 
-        detail_get_key = "KeyMetadata"
+        function_name = "list_projects", 
+        key_get = "projects",
+        detail_function = "describe_project", 
+        join_key = "projectId", 
+        detail_join_key = "id", 
+        detail_get_key = ""
     )
 
 
