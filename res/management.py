@@ -42,6 +42,8 @@ def get_cloudformation_inventory(oId):
         detail_join_key = "StackName", 
         detail_get_key = ""
     )
+
+
 #  ------------------------------------------------------------------------
 #
 #    CloudTrail
@@ -67,6 +69,32 @@ def get_cloudtrail_inventory(oId):
         function_name = "describe_trails", 
         key_get = "trailList"
     )
+#  ------------------------------------------------------------------------
+#
+#    CloudWatch
+#
+#  ------------------------------------------------------------------------
+
+def get_cloudwatch_inventory(oId):
+    """
+        Returns cloudwatch inventory (if the region is avalaible)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: cloudwatch inventory
+        :rtype: json
+
+        .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudwatch.html
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudwatch", 
+        aws_region = "all", 
+        function_name = "describe_alarms", 
+        key_get = "MetricAlarms"
+    )
+
 
 #
 # Hey, doc: we're in a module!

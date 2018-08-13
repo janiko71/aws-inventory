@@ -218,6 +218,12 @@ if ('cloudtrail' in arguments):
     inventory['cloudtrail'] = mgn.get_cloudtrail_inventory(ownerId)
 
 
+# ----------------- CloudWatch
+#
+if ('cloudwatch' in arguments):
+    inventory['cloudwatch'] = mgn.get_cloudwatch_inventory(ownerId)
+
+
 #################################################################
 #                          NETWORK                              #
 #################################################################
