@@ -8,7 +8,7 @@ from time import gmtime, strftime
 #
 
 # --- Format for displaying actions
-display = 'OwnerID : {} ! Region : {:16} ! {} ({})'
+display = "OwnerID : {} ! {:6.2f} % ! Region : {:16} ! {} ({}){}"
 
 # --- Initial values for inventory files names
 t = gmtime()
@@ -27,13 +27,21 @@ logger.addHandler(hdlr)
 logger.setLevel(logging.WARNING)
 
 # --- If needed: S3 bucket name to write inventory
-S3_INVENTORY_BUCKET="xx"
+S3_INVENTORY_BUCKET="s3-bucket"
 
 # --- Arguments/Supported commands
-SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs','glacier','rds','ce','kms','dynamodb','apigateway','ecs','elasticbeanstalk',
-    'clouddirectory','codestar','alexa','workmail','neptune']
+SUPPORTED_INVENTORIES = {'s3': 1, 'ec2': 4, 'lambda': 1 , 'lightsail': 3, 'efs': 1, 'glacier': 1, 'rds': 1, 'ce': 1, 'kms': 1, 'dynamodb': 1, 'apigateway': 1,
+    'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 2, 'acm': 1, 'acm-pca': 1, 'autoscaling': 3,
+    'cloudformation': 1, 'cloudtrail': 1, 'cloudwatch': 1, 'eks': 1}
+SUPPORTED_COMMANDS = list(SUPPORTED_INVENTORIES.keys())
 
 # --- AWS Regions 
 with open('aws_regions.json') as json_file:
     aws_regions = json.load(json_file)
 regions = aws_regions.get('Regions',[]) 
+
+# Counters
+nb_svc = 0
+nb_regions = len(regions)
+nb_units_todo = 0
+nb_units_done = 0

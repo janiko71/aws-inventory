@@ -215,15 +215,66 @@ def get_eks_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
     """
-    inventory = []
-    '''try:
-        eks = boto3.client('eks')
-        print('OwnerID : {}, EKS inventory, Region : {}'.format(ownerId, region_name))
-        inventory.append(eks.list_clusters())
-    except:
-        print('OwnerID : {}, EKS not supported in region : {}'.format(ownerId, region_name))'''
-    
-    return inventory
+    inv = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "eks", 
+        aws_region = "all", 
+        function_name = "list_clusters", 
+        key_get = "clusters",
+        detail_function = "describe_cluster", 
+        join_key = "", 
+        detail_join_key = "name", 
+        detail_get_key = "cluster"
+    )
+    return inv
+
+
+
+#  ------------------------------------------------------------------------
+#
+#    Autoscaling
+#
+#  ------------------------------------------------------------------------
+
+def get_autoscaling_inventory(oId):
+    """
+        Returns eks inventory (if the region is avalaible)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: eks inventory
+        :rtype: json
+
+        .. note:: https://boto3.readthedocs.io/en/latest/reference/services/autoscaling.html
+    """
+    autoscaling_inventory = {}
+
+    autoscaling_inventory['autoscaling-groups'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "autoscaling", 
+        aws_region = "all", 
+        function_name = "describe_auto_scaling_groups", 
+        key_get = "AutoScalingGroups"
+    )
+
+    autoscaling_inventory['autoscaling-launch-configuration'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "autoscaling", 
+        aws_region = "all", 
+        function_name = "describe_launch_configurations", 
+        key_get = "LaunchConfigurations"
+    )
+
+    autoscaling_inventory['autoscaling-plans'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "autoscaling-plans", 
+        aws_region = "all", 
+        function_name = "describe_scaling_plans", 
+        key_get = "ScalingPlans"
+    )
+
+    return autoscaling_inventory
 
 
 #  ------------------------------------------------------------------------

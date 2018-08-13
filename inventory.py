@@ -51,12 +51,18 @@ inventory = {}
 nb_arg = len(sys.argv) - 1
 if (nb_arg == 0):
     arguments = config.SUPPORTED_COMMANDS
-    nb_arg = len(arguments)
+    arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 else:
     arguments = sys.argv[1:]
     utils.check_arguments(arguments)
+
+# Counters
+config.nb_units_done = 0
+for svc in arguments:
+    config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])
+
 print('-'*100)
-print ('Number of services:', nb_arg, 'arguments.')
+print ('Number of services:', len(arguments))
 print ('Services List     :', str(arguments))
 print('-'*100)
 
@@ -68,60 +74,16 @@ print('-'*100)
 #
 
 if ('ec2' in arguments):
-    ec2_inventory        = []
-    interfaces_inventory = []
-    vpcs_inventory       = []
-    ebs_inventory        = []
-
-    # Lookup in every AWS Region
-    '''for current_region in regions:
-    
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "ec2 inventory")
-
-        # EC2 instances
-        instances = compute.get_ec2_inventory(current_region_name)
-        for instance in instances:
-            json_ec2_desc = json.loads(utils.json_datetime_converter(instance))
-            ec2_inventory.append(compute.get_ec2_analysis(json_ec2_desc, current_region_name))
-
-        # Network
-        for ifc in compute.get_interfaces_inventory(current_region_name):
-            interfaces_inventory.append(json.loads(utils.json_datetime_converter(ifc)))
-
-        # VPCs
-        for vpc in compute.get_vpc_inventory(current_region_name):
-            vpcs_inventory.append(vpc)
-
-        # EBS
-        ebs_list = compute.get_ebs_inventory(current_region_name)
-        for ebs in ebs_list:
-            ebs_inventory.append(json.loads(utils.json_datetime_converter(ebs)))
-
-        # EBS, snapshot
-        # describe_nat_gateways()
-        # describe_internet_gateways()
-        # describe_reserved_instances()
-        # describe_snapshots()
-        # describe_subnets()
-
-    inventory["ec2"]            = ec2_inventory
-    inventory["ec2-interfaces"] = interfaces_inventory
-    inventory["ec2-vpcs"]       = vpcs_inventory
-    inventory["ec2-ebs"]        = ebs_inventory'''
-
     inventory["ec2"] = compute.get_ec2_inventory(ownerId)
     inventory["ec2-network-interfaces"] = compute.get_interfaces_inventory(ownerId)
     inventory["ec2-vpcs"] = compute.get_vpc_inventory(ownerId)
     inventory["ec2-ebs"] = compute.get_ebs_inventory(ownerId)
-
 
 # 
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
     inventory["lambda"] = compute.get_lambda_inventory(ownerId)
-
 
 # 
 # ----------------- Elastic beanstalk
@@ -132,7 +94,6 @@ if ('elasticbeanstalk' in arguments):
         "elasticbeanstalk-applications": compute.get_elasticbeanstalk_applications_inventory(ownerId)
     }
 
-
 # 
 # ----------------- ECS
 #
@@ -142,12 +103,23 @@ if ('ecs' in arguments):
         "ecs-tasks": compute.get_ecs_tasks_inventory(ownerId)
     }        
 
-
 # 
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
     inventory['lightsail'] = compute.get_lightsail_inventory(ownerId)
+
+# 
+# ----------------- Autoscaling
+#
+if ('autoscaling' in arguments):
+    inventory['autoscaling'] = compute.get_autoscaling_inventory(ownerId)
+
+#
+# ----------------- EKS inventory
+#
+if ('eks' in arguments):
+    inventory['eks'] = compute.get_eks_inventory(ownerId)
 
 
 #################################################################
@@ -158,7 +130,6 @@ if ('lightsail' in arguments):
 #
 if ('efs' in arguments):
     inventory['efs'] = storage.get_efs_inventory(ownerId)
-
 
 #
 # ----------------- Glacier inventory
@@ -175,7 +146,6 @@ if ('glacier' in arguments):
 #
 if ('rds' in arguments):
     inventory['rds'] = db.get_rds_inventory(ownerId)
-
 
 #
 # ----------------- dynamodb inventory
@@ -199,6 +169,24 @@ if ('neptune' in arguments):
 if ('kms' in arguments):
     inventory['kms'] = iam.get_kms_inventory(ownerId)
 
+#
+# ----------------- Cloud directory
+#
+if ('clouddirectory' in arguments):
+    inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
+
+#
+# ----------------- ACM (Certificates) inventory
+#
+if ('acm' in arguments):
+    inventory['acm'] = security.get_acm_inventory(ownerId)
+
+#
+# ----------------- ACMPCA (Certificates) inventory Private Certificate Authority
+#
+if ('acm-pca' in arguments):
+    inventory['acm-pca'] = security.get_acm_inventory(ownerId)
+
 
 #################################################################
 #                      DEVELOPER TOOLS                          #
@@ -214,10 +202,20 @@ if ('codestar' in arguments):
 #                         MANAGEMENT                            #
 #################################################################
 #
-# ----------------- Cloud directory
+# ----------------- CloudFormation
 #
-if ('clouddirectory' in arguments):
-    inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
+if ('cloudformation' in arguments):
+    inventory['cloudformation'] = mgn.get_cloudformation_inventory(ownerId)#
+
+# ----------------- CloudTrail
+#
+if ('cloudtrail' in arguments):
+    inventory['cloudtrail'] = mgn.get_cloudtrail_inventory(ownerId)
+
+# ----------------- CloudWatch
+#
+if ('cloudwatch' in arguments):
+    inventory['cloudwatch'] = mgn.get_cloudwatch_inventory(ownerId)
 
 
 #################################################################
@@ -262,20 +260,10 @@ if ('ce' in arguments):
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
     inventory['cost-explorer'] = ce_inventory
 
-#
-# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS CLI
-#
-#for current_region in regions:
-#    current_region_name = current_region['RegionName']
-#    eks_list = eks.get_eks_inventory(ownerId, current_region_name)
-#    #print(eks_list)
-# Other non implemented services:
-#  - alexaforbusiness
 
-
-#
-# International Resources (no region)
-#
+#################################################################
+#               International Resources (no region)             #
+#################################################################
 
 region_name = 'global'
 
@@ -302,3 +290,9 @@ json_file.write(json.JSONEncoder().encode(inventory))
 #
 json_file.close()
 
+#
+# This is the end
+#
+print()
+print("End of processing.")
+print()
