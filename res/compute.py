@@ -215,15 +215,19 @@ def get_eks_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
     """
-    inventory = []
-    '''try:
-        eks = boto3.client('eks')
-        print('OwnerID : {}, EKS inventory, Region : {}'.format(ownerId, region_name))
-        inventory.append(eks.list_clusters())
-    except:
-        print('OwnerID : {}, EKS not supported in region : {}'.format(ownerId, region_name))'''
-    
-    return inventory
+    inv = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "eks", 
+        aws_region = "all", 
+        function_name = "list_clusters", 
+        key_get = "clusters",
+        detail_function = "describe_cluster", 
+        join_key = "", 
+        detail_join_key = "name", 
+        detail_get_key = "cluster"
+    )
+    return inv
+
 
 
 #  ------------------------------------------------------------------------

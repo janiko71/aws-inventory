@@ -108,6 +108,7 @@ def get_inventory_detail(client, region_name, inv, detail_function, join_key, de
     detailed_inv = inv
     if (detail_function != ""):
         if (isinstance(inv, str)):
+            detailed_inv = {detail_get_key: inv}
             key = inv
         else:
             key = inv.get(join_key)

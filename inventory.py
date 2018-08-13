@@ -79,13 +79,11 @@ if ('ec2' in arguments):
     inventory["ec2-vpcs"] = compute.get_vpc_inventory(ownerId)
     inventory["ec2-ebs"] = compute.get_ebs_inventory(ownerId)
 
-
 # 
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
     inventory["lambda"] = compute.get_lambda_inventory(ownerId)
-
 
 # 
 # ----------------- Elastic beanstalk
@@ -96,7 +94,6 @@ if ('elasticbeanstalk' in arguments):
         "elasticbeanstalk-applications": compute.get_elasticbeanstalk_applications_inventory(ownerId)
     }
 
-
 # 
 # ----------------- ECS
 #
@@ -106,19 +103,23 @@ if ('ecs' in arguments):
         "ecs-tasks": compute.get_ecs_tasks_inventory(ownerId)
     }        
 
-
 # 
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
     inventory['lightsail'] = compute.get_lightsail_inventory(ownerId)
 
-
 # 
 # ----------------- Autoscaling
 #
 if ('autoscaling' in arguments):
     inventory['autoscaling'] = compute.get_autoscaling_inventory(ownerId)
+
+#
+# ----------------- EKS inventory
+#
+if ('eks' in arguments):
+    inventory['eks'] = compute.get_eks_inventory(ownerId)
 
 
 #################################################################
@@ -129,7 +130,6 @@ if ('autoscaling' in arguments):
 #
 if ('efs' in arguments):
     inventory['efs'] = storage.get_efs_inventory(ownerId)
-
 
 #
 # ----------------- Glacier inventory
@@ -146,7 +146,6 @@ if ('glacier' in arguments):
 #
 if ('rds' in arguments):
     inventory['rds'] = db.get_rds_inventory(ownerId)
-
 
 #
 # ----------------- dynamodb inventory
@@ -170,20 +169,17 @@ if ('neptune' in arguments):
 if ('kms' in arguments):
     inventory['kms'] = iam.get_kms_inventory(ownerId)
 
-
 #
 # ----------------- Cloud directory
 #
 if ('clouddirectory' in arguments):
     inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
 
-
 #
 # ----------------- ACM (Certificates) inventory
 #
 if ('acm' in arguments):
     inventory['acm'] = security.get_acm_inventory(ownerId)
-
 
 #
 # ----------------- ACMPCA (Certificates) inventory Private Certificate Authority
@@ -211,12 +207,10 @@ if ('codestar' in arguments):
 if ('cloudformation' in arguments):
     inventory['cloudformation'] = mgn.get_cloudformation_inventory(ownerId)#
 
-
 # ----------------- CloudTrail
 #
 if ('cloudtrail' in arguments):
     inventory['cloudtrail'] = mgn.get_cloudtrail_inventory(ownerId)
-
 
 # ----------------- CloudWatch
 #
@@ -266,20 +260,10 @@ if ('ce' in arguments):
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
     inventory['cost-explorer'] = ce_inventory
 
-#
-# ----------------- EKS inventory (Kubernetes) : not implemented yet in AWS CLI
-#
-#for current_region in regions:
-#    current_region_name = current_region['RegionName']
-#    eks_list = eks.get_eks_inventory(ownerId, current_region_name)
-#    #print(eks_list)
-# Other non implemented services:
-#  - alexaforbusiness
 
-
-#
-# International Resources (no region)
-#
+#################################################################
+#               International Resources (no region)             #
+#################################################################
 
 region_name = 'global'
 
