@@ -114,6 +114,13 @@ if ('lightsail' in arguments):
     inventory['lightsail'] = compute.get_lightsail_inventory(ownerId)
 
 
+# 
+# ----------------- Autoscaling
+#
+if ('autoscaling' in arguments):
+    inventory['autoscaling'] = compute.get_autoscaling_inventory(ownerId)
+
+
 #################################################################
 #                           STORAGE                             #
 #################################################################

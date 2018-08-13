@@ -228,6 +228,45 @@ def get_eks_inventory(oId):
 
 #  ------------------------------------------------------------------------
 #
+#    Autoscaling
+#
+#  ------------------------------------------------------------------------
+
+def get_autoscaling_inventory(oId):
+    """
+        Returns eks inventory (if the region is avalaible)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: eks inventory
+        :rtype: json
+
+        .. note:: https://boto3.readthedocs.io/en/latest/reference/services/autoscaling.html
+    """
+    autoscaling_inventory = {}
+
+    autoscaling_inventory['autoscaling-groups'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "autoscaling", 
+        aws_region = "all", 
+        function_name = "describe_auto_scaling_groups", 
+        key_get = "AutoScalingGroups"
+    )
+
+    autoscaling_inventory['autoscaling-launch-configuration'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "autoscaling", 
+        aws_region = "all", 
+        function_name = "describe_launch_configurations", 
+        key_get = "LaunchConfigurations"
+    )
+
+    return autoscaling_inventory
+
+
+#  ------------------------------------------------------------------------
+#
 #    Lambda
 #
 #  ------------------------------------------------------------------------
