@@ -7,26 +7,8 @@ Intended for personal use (even if I added some professional features like loggi
 
 **If you test this code, please send me feedback**: I can't test every configuration (especially when there are a lot of items in inventories), so either if it works or not, let me know what is fine and what needs to be corrected (use [issues](https://github.com/janiko71/aws-inventory/issues)).
 
-Supported AWS services is limited, but I add some regulary. Until now, supported services are :
-* s3
-* ec2
-* vpc
-* network
-* ebs
-* lambda
-* lightsail
-* efs
-* glacier
-* rds
-* ce (cost explorer, but still experimental)
-* kms
-* dynamodb
-* apigateway
-* ecs
-* elasticbeanstalk
-* clouddirectory
-* codestar
-* neptune
+Supported AWS services is limited, but I add some regulary. **Supported services are detailed [here (wiki)](https://github.com/janiko71/aws-inventory/wiki/Supported-services)**:
+
 
 ~~Derived from https://github.com/powerupcloud/AWSInventoryLambda but not forked because it has been too much modified.~~ Rewritten from scratch to be more _pythonified_.
 ## Pre-requisites
