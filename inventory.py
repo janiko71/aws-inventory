@@ -51,13 +51,18 @@ inventory = {}
 nb_arg = len(sys.argv) - 1
 if (nb_arg == 0):
     arguments = config.SUPPORTED_COMMANDS
-    argument.delete('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
-    nb_arg = len(arguments)
+    arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 else:
     arguments = sys.argv[1:]
     utils.check_arguments(arguments)
+
+# Counters
+config.nb_svc = len(arguments)
+config.nb_units_todo = config.nb_svc * config.nb_regions
+config.nb_units_done = 0
+
 print('-'*100)
-print ('Number of services:', nb_arg, 'arguments.')
+print ('Number of services:', config.nb_svc,'.')
 print ('Services List     :', str(arguments))
 print('-'*100)
 

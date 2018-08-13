@@ -8,7 +8,7 @@ from time import gmtime, strftime
 #
 
 # --- Format for displaying actions
-display = 'OwnerID : {} ! Region : {:16} ! {} ({})'
+display = "OwnerID : {} ! {:6.2f} % ! Region : {:16} ! {} ({}){}"
 
 # --- Initial values for inventory files names
 t = gmtime()
@@ -37,3 +37,9 @@ SUPPORTED_COMMANDS = ['s3','ec2','vpc','network','ebs','lambda','lightsail','efs
 with open('aws_regions.json') as json_file:
     aws_regions = json.load(json_file)
 regions = aws_regions.get('Regions',[]) 
+
+# Counters
+nb_svc = 0
+nb_regions = len(regions)
+nb_units_todo = 0
+nb_units_done = 0
