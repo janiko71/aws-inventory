@@ -205,7 +205,11 @@ if ('codestar' in arguments):
 #################################################################
 #                         MANAGEMENT                            #
 #################################################################
-
+#
+# ----------------- CloudFormation
+#
+if ('cloudformation' in arguments):
+    inventory['cloudformation'] = mgn.get_cloudformation_inventory(ownerId)
 
 
 #################################################################

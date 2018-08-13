@@ -24,14 +24,15 @@ formatter       = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 # --- Log handler
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 
 # --- If needed: S3 bucket name to write inventory
 S3_INVENTORY_BUCKET="xx"
 
 # --- Arguments/Supported commands
 SUPPORTED_INVENTORIES = {'s3': 1, 'ec2': 4, 'lambda': 1 , 'lightsail': 3, 'efs': 1, 'glacier': 1, 'rds': 1, 'ce': 1, 'kms': 1, 'dynamodb': 1, 'apigateway': 1,
-    'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 2, 'acm': 1, 'acm-pca': 1, 'autoscaling': 2}
+    'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 2, 'acm': 1, 'acm-pca': 1, 'autoscaling': 3,
+    'cloudformation': 1}
 SUPPORTED_COMMANDS = list(SUPPORTED_INVENTORIES.keys())
 
 # --- AWS Regions 

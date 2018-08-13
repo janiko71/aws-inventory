@@ -262,6 +262,14 @@ def get_autoscaling_inventory(oId):
         key_get = "LaunchConfigurations"
     )
 
+    autoscaling_inventory['autoscaling-plans'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "autoscaling-plans", 
+        aws_region = "all", 
+        function_name = "describe_scaling_plans", 
+        key_get = "ScalingPlans"
+    )
+
     return autoscaling_inventory
 
 

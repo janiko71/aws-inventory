@@ -63,9 +63,12 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "",
                 for inv in inv_list:
                     detailed_inv = get_inventory_detail(client, region_name, inv, detail_function, join_key, detail_join_key, detail_get_key)
                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
-            except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
+            except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
                 # unsupported region for efs
                 config.logger.warning("{} is not available (not supported?) in region {}.".format(aws_service, region_name))
+                config.logger.debug("Error text : {}".format(e))
+            except Exception as e:
+                config.logger.error("Error while processing {}, {}.\n{}".format(aws_service, region_name, e))
 
     elif (aws_region == 'global'):
 
@@ -82,6 +85,9 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "",
         except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
             # unsupported region for efs
             config.logger.warning("A problem occurred or {} is not not supported.".format(aws_service))        
+            config.logger.debug("Error text : {}".format(e))
+        except Exception as e:
+            config.logger.error("Error while processing {}, {}.\n{}".format(aws_service, region_name, e))
 
     else:
 
@@ -99,6 +105,7 @@ def get_inventory_detail(client, region_name, inv, detail_function, join_key, de
         .. seealso:: :function:`get_inventory`
     '''
 
+    detailed_inv = inv
     if (detail_function != ""):
         if (isinstance(inv, str)):
             key = inv
@@ -106,13 +113,12 @@ def get_inventory_detail(client, region_name, inv, detail_function, join_key, de
             key = inv.get(join_key)
         param = {detail_join_key: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
         if (detail_get_key != ""):
-            detailed_inv = client.__getattribute__(detail_function)(**param).get(detail_get_key)
+            detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param).get(detail_get_key)
         else:
-            detailed_inv = client.__getattribute__(detail_function)(**param)
-            if ("ResponseMetadata" in detailed_inv):
-                del detailed_inv['ResponseMetadata']
-    else:
-        detailed_inv = inv
+            detail_get_key = 'details'
+            detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param)
+        if ("ResponseMetadata" in detailed_inv[detail_get_key]):
+            del detailed_inv[detail_get_key]['ResponseMetadata']
 
     if ('RegionName' not in detailed_inv):
         detailed_inv['RegionName'] = region_name
