@@ -51,6 +51,7 @@ inventory = {}
 nb_arg = len(sys.argv) - 1
 if (nb_arg == 0):
     arguments = config.SUPPORTED_COMMANDS
+    argument.delete('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
     nb_arg = len(arguments)
 else:
     arguments = sys.argv[1:]
@@ -72,43 +73,6 @@ if ('ec2' in arguments):
     interfaces_inventory = []
     vpcs_inventory       = []
     ebs_inventory        = []
-
-    # Lookup in every AWS Region
-    '''for current_region in regions:
-    
-        current_region_name = current_region['RegionName']
-        utils.display(ownerId, current_region_name, "ec2 inventory")
-
-        # EC2 instances
-        instances = compute.get_ec2_inventory(current_region_name)
-        for instance in instances:
-            json_ec2_desc = json.loads(utils.json_datetime_converter(instance))
-            ec2_inventory.append(compute.get_ec2_analysis(json_ec2_desc, current_region_name))
-
-        # Network
-        for ifc in compute.get_interfaces_inventory(current_region_name):
-            interfaces_inventory.append(json.loads(utils.json_datetime_converter(ifc)))
-
-        # VPCs
-        for vpc in compute.get_vpc_inventory(current_region_name):
-            vpcs_inventory.append(vpc)
-
-        # EBS
-        ebs_list = compute.get_ebs_inventory(current_region_name)
-        for ebs in ebs_list:
-            ebs_inventory.append(json.loads(utils.json_datetime_converter(ebs)))
-
-        # EBS, snapshot
-        # describe_nat_gateways()
-        # describe_internet_gateways()
-        # describe_reserved_instances()
-        # describe_snapshots()
-        # describe_subnets()
-
-    inventory["ec2"]            = ec2_inventory
-    inventory["ec2-interfaces"] = interfaces_inventory
-    inventory["ec2-vpcs"]       = vpcs_inventory
-    inventory["ec2-ebs"]        = ebs_inventory'''
 
     inventory["ec2"] = compute.get_ec2_inventory(ownerId)
     inventory["ec2-network-interfaces"] = compute.get_interfaces_inventory(ownerId)
