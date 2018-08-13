@@ -57,12 +57,12 @@ else:
     utils.check_arguments(arguments)
 
 # Counters
-config.nb_svc = len(arguments)
-config.nb_units_todo = config.nb_svc * config.nb_regions
 config.nb_units_done = 0
+for svc in arguments:
+    config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])
 
 print('-'*100)
-print ('Number of services:', config.nb_svc,'.')
+print ('Number of services:', len(arguments))
 print ('Services List     :', str(arguments))
 print('-'*100)
 
@@ -74,11 +74,6 @@ print('-'*100)
 #
 
 if ('ec2' in arguments):
-    ec2_inventory        = []
-    interfaces_inventory = []
-    vpcs_inventory       = []
-    ebs_inventory        = []
-
     inventory["ec2"] = compute.get_ec2_inventory(ownerId)
     inventory["ec2-network-interfaces"] = compute.get_interfaces_inventory(ownerId)
     inventory["ec2-vpcs"] = compute.get_vpc_inventory(ownerId)
@@ -169,6 +164,27 @@ if ('kms' in arguments):
     inventory['kms'] = iam.get_kms_inventory(ownerId)
 
 
+#
+# ----------------- Cloud directory
+#
+if ('clouddirectory' in arguments):
+    inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
+
+
+#
+# ----------------- ACM (Certificates) inventory
+#
+if ('acm' in arguments):
+    inventory['acm'] = security.get_acm_inventory(ownerId)
+
+
+#
+# ----------------- ACMPCA (Certificates) inventory Private Certificate Authority
+#
+if ('acm-pca' in arguments):
+    inventory['acm-pca'] = security.get_acm_inventory(ownerId)
+
+
 #################################################################
 #                      DEVELOPER TOOLS                          #
 #################################################################
@@ -182,11 +198,7 @@ if ('codestar' in arguments):
 #################################################################
 #                         MANAGEMENT                            #
 #################################################################
-#
-# ----------------- Cloud directory
-#
-if ('clouddirectory' in arguments):
-    inventory['clouddirectory'] = security.get_clouddirectory_inventory(ownerId)
+
 
 
 #################################################################
@@ -271,3 +283,9 @@ json_file.write(json.JSONEncoder().encode(inventory))
 #
 json_file.close()
 
+#
+# This is the end
+#
+print()
+print("End of processing.")
+print()

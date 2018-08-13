@@ -15,12 +15,16 @@ import config
 #
 
 def display(ownerId, function, region_name, function_name):
+    progression = (config.nb_units_done / config.nb_units_todo * 100)
+    print(config.display.format(ownerId, progression, function, region_name, function_name, " "*20), end="\r", flush=True)
+    return
+
+def progress(region_name):
     if (region_name == "global"):
         config.nb_units_done = config.nb_units_done + config.nb_regions
     else:        
         config.nb_units_done = config.nb_units_done + 1
-    progression = (config.nb_units_done / config.nb_units_todo * 100)
-    print(config.display.format(ownerId, progression, function, region_name, function_name, " "*20), end="\r", flush=True)
+    config.logger.debug("config.nb_units_done {} config.nb_units_todo {}".format(config.nb_units_done, config.nb_units_todo))        
     return
 
 

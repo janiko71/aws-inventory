@@ -42,6 +42,64 @@ def get_clouddirectory_inventory(oId):
     )
 
 
+#  ------------------------------------------------------------------------
+#
+#    ACM (Certificate Manager)
+#
+#  ------------------------------------------------------------------------
+
+def get_acm_inventory(oId):
+    """
+        Returns certificates managed with ACM
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: certificates inventory
+        :rtype: json
+
+        ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm.htm
+    """ 
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "acm", 
+        aws_region = "all", 
+        function_name = "list_certificates", 
+        key_get = "CertificateSummaryList",
+        detail_function = "describe_certificate", 
+        join_key = "CertificateArn", 
+        detail_join_key = "CertificateArn", 
+        detail_get_key = "Certificate"        
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    ACMPCA (Certificate Manager Private Certificate Authority)
+#
+#  ------------------------------------------------------------------------
+
+def get_acm_inventory(oId):
+    """
+        Returns certificates managed with ACM
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: certificates inventory
+        :rtype: json
+
+        ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm-pca.html
+    """ 
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "acm-pca", 
+        aws_region = "all", 
+        function_name = "list_certificate_authorities", 
+        key_get = "CertificateAuthorities" 
+    )
+
+
 #
 # Hey, doc: we're in a module!
 #

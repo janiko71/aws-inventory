@@ -55,6 +55,7 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "",
         for region in config.regions:
             try:
                 region_name = region['RegionName']
+                utils.progress(region_name)
                 config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
                 client = boto3.client(aws_service, region_name)
                 inv_list = client.__getattribute__(function_name)().get(key_get)
@@ -72,6 +73,7 @@ def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "",
         try:
             client = boto3.client(aws_service)
             config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
+            utils.progress(aws_region)
             utils.display(ownerId, aws_region, aws_service, function_name)
             inv_list = client.__getattribute__(function_name)().get(key_get)
             for inv in inv_list:
