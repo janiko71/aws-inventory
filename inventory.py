@@ -209,7 +209,13 @@ if ('codestar' in arguments):
 # ----------------- CloudFormation
 #
 if ('cloudformation' in arguments):
-    inventory['cloudformation'] = mgn.get_cloudformation_inventory(ownerId)
+    inventory['cloudformation'] = mgn.get_cloudformation_inventory(ownerId)#
+
+
+# ----------------- CloudTrail
+#
+if ('cloudtrail' in arguments):
+    inventory['cloudtrail'] = mgn.get_cloudtrail_inventory(ownerId)
 
 
 #################################################################

@@ -42,7 +42,31 @@ def get_cloudformation_inventory(oId):
         detail_join_key = "StackName", 
         detail_get_key = ""
     )
+#  ------------------------------------------------------------------------
+#
+#    CloudTrail
+#
+#  ------------------------------------------------------------------------
 
+def get_cloudtrail_inventory(oId):
+    """
+        Returns cloudtrail inventory (if the region is avalaible)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: cloudtrail inventory
+        :rtype: json
+
+        .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudtrail.html
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudtrail", 
+        aws_region = "all", 
+        function_name = "describe_trails", 
+        key_get = "trailList"
+    )
 
 #
 # Hey, doc: we're in a module!
