@@ -40,7 +40,7 @@ def check_arguments(arguments):
     """   
     new_arguments = []
     for arg in arguments:
-        if (arg not in config.SUPPORTED_COMMANDS):
+        if (arg not in config.SUPPORTED_COMMANDS) and (arg not in config.SUPPORTED_PARAMETERS):
             raise Exception('Unknown argument [' + arg + ']')
         if (arg == "debug"):
             config.logger.setLevel(logging.DEBUG)

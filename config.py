@@ -34,10 +34,8 @@ SUPPORTED_INVENTORIES = {'s3': 1, 'ec2': 4, 'lambda': 1 , 'lightsail': 3, 'efs':
     'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 2, 'acm': 1, 'acm-pca': 1, 'autoscaling': 3,
     'cloudformation': 1, 'cloudtrail': 1, 'cloudwatch': 1, 'eks': 1}
 SUPPORTED_COMMANDS = list(SUPPORTED_INVENTORIES.keys())
-SUPPORTED_COMMANDS.append('debug')
-SUPPORTED_COMMANDS.append('info')
-SUPPORTED_COMMANDS.append('warning')
-SUPPORTED_COMMANDS.append('error')
+SUPPORTED_PARAMETERS = ['debug', 'info', 'warning', 'error']
+
 
 # --- AWS Regions 
 with open('aws_regions.json') as json_file:

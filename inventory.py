@@ -50,21 +50,28 @@ inventory = {}
 # Argumentation
 nb_arg = len(sys.argv) - 1
 if (nb_arg == 0):
+    # if no arguments, we try all AWS services
     arguments = config.SUPPORTED_COMMANDS
     arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 else:
     arguments = sys.argv[1:]
+    # we check if arguments are valid or not, and eventually remove the log parameter
     arguments = utils.check_arguments(arguments)
+    # if there is no more log parameter and if the list is still empty, we try all AWS services
+    if (len(arguments) == 0):
+        arguments = config.SUPPORTED_COMMANDS
+        arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
+
+print('-'*100)
+print ('Number of services:', len(arguments))
+print ('Services List     :', str(arguments))
+print('-'*100)
 
 # Counters
 config.nb_units_done = 0
 for svc in arguments:
     config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])
 
-print('-'*100)
-print ('Number of services:', len(arguments))
-print ('Services List     :', str(arguments))
-print('-'*100)
 
 #################################################################
 #                           COMPUTE                             #
