@@ -75,11 +75,11 @@ def get_acm_inventory(oId):
 
 #  ------------------------------------------------------------------------
 #
-#    ACMPCA (Certificate Manager Private Certificate Authority)
+#    ACMPCA (Certificate Manager Private Certificate Authority). Not implemented yet.
 #
 #  ------------------------------------------------------------------------
 
-def get_acm_inventory(oId):
+def get_acmpca_inventory(oId):
     """
         Returns certificates managed with ACM
 
