@@ -97,8 +97,8 @@ def get_neptune_inventory(oId):
     neptune_inventory = {}
 
     '''
-    No need of instances : they are listed in RDS
-    
+    No need of instances : they are listed in RDS --> checked.
+
     neptune_inventory['instances'] = glob.get_inventory(
         ownerId = oId,
         aws_service = "neptune", 
