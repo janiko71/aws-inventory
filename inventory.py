@@ -29,48 +29,53 @@ import res.security   as security
 import res.management as mgn
 import res.business   as bus
 
-#
-# Let's rock'n roll
-#
 
 # --- AWS basic information
+
 ownerId = utils.get_ownerID()
 config.logger.info('OWNER ID:'+ownerId)
 
 
 # --- AWS Regions 
+
 with open('aws_regions.json') as json_file:
     aws_regions = json.load(json_file)
 regions = aws_regions.get('Regions',[] ) 
 
 
-# Initialization
+# --- Inventory initialization
+
 inventory = {}
 
-# Argumentation
-nb_arg = len(sys.argv) - 1
+# --- Argumentation. See function check_arguments.
+# 
+# If we find log level parameter, we adjust log level.
+# If we find no service name, we inventory all services.
+# Else we only inventory services passed in cmd line.
+
+arguments = utils.check_arguments(sys.argv[1:])
+nb_arg = len(arguments)
+
+# if no arguments, we try all AWS services
 if (nb_arg == 0):
-    # if no arguments, we try all AWS services
     arguments = config.SUPPORTED_COMMANDS
     arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
-else:
-    arguments = sys.argv[1:]
-    # we check if arguments are valid or not, and eventually remove the log parameter
-    arguments = utils.check_arguments(arguments)
-    # if there is no more log parameter and if the list is still empty, we try all AWS services
-    if (len(arguments) == 0):
-        arguments = config.SUPPORTED_COMMANDS
-        arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 
+# --- Displaying execution parameters
 print('-'*100)
 print ('Number of services:', len(arguments))
 print ('Services List     :', str(arguments))
 print('-'*100)
 
-# Counters
+# --- Progression counter initialization
 config.nb_units_done = 0
 for svc in arguments:
     config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])
+
+
+#
+# Let's rock'n roll
+#
 
 
 #################################################################

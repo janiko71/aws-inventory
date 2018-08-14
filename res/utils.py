@@ -30,7 +30,9 @@ def progress(region_name):
 
 def check_arguments(arguments):
     """
-        Check if the arguments (in command line) are known.
+        Check if the arguments (in command line) are known. If not, we raises an exception.
+
+        We also look for the debug level. If we found it, we adjust the log level but we don't include it in the service list.
 
         :param arguments: list of arguments
         :type arguments: list

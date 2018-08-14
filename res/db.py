@@ -96,6 +96,9 @@ def get_neptune_inventory(oId):
     """
     neptune_inventory = {}
 
+    '''
+    No need of instances : they are listed in RDS
+    
     neptune_inventory['instances'] = glob.get_inventory(
         ownerId = oId,
         aws_service = "neptune", 
@@ -103,6 +106,7 @@ def get_neptune_inventory(oId):
         function_name = "describe_db_instances", 
         key_get = "DBInstances"
     )
+    '''
 
     neptune_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
