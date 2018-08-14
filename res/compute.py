@@ -20,6 +20,7 @@ import res.glob  as glob
 #  ------------------------------------------------------------------------
 
 def get_ec2_inventory(oId):
+
     """
         Returns ec2 inventory, without any analysis or any formatting
 
@@ -31,6 +32,7 @@ def get_ec2_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ec2.html
     """
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ec2", 
@@ -41,6 +43,7 @@ def get_ec2_inventory(oId):
 
 
 def get_interfaces_inventory(oId):
+
     """
         Returns network interfaces detailed inventory
 
@@ -50,6 +53,7 @@ def get_interfaces_inventory(oId):
         :return: network interfaces inventory
         :rtype: json
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ec2", 
@@ -60,6 +64,7 @@ def get_interfaces_inventory(oId):
 
 
 def get_vpc_inventory(oId):
+
     """
         Returns VPC detailed inventory
 
@@ -69,6 +74,7 @@ def get_vpc_inventory(oId):
         :return: VPC inventory
         :rtype: json
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ec2", 
@@ -79,6 +85,7 @@ def get_vpc_inventory(oId):
 
 
 def get_ebs_inventory(oId):
+
     """
         Returns EBS detailed inventory
 
@@ -88,6 +95,7 @@ def get_ebs_inventory(oId):
         :return: EBS inventory
         :rtype: json
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ec2", 
@@ -104,6 +112,7 @@ def get_ebs_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_elasticbeanstalk_environments_inventory(oId):
+
     """
         Returns Elastic Beanstalk detailed inventory
 
@@ -115,6 +124,7 @@ def get_elasticbeanstalk_environments_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/elasticbeanstalk.html
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "elasticbeanstalk", 
@@ -125,6 +135,7 @@ def get_elasticbeanstalk_environments_inventory(oId):
 
 
 def get_elasticbeanstalk_applications_inventory(oId):
+
     """
         Returns Elastic Beanstalk detailed inventory
 
@@ -134,6 +145,7 @@ def get_elasticbeanstalk_applications_inventory(oId):
         :return: Elastic Beanstalk inventory (applications)
         :rtype: json
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "elasticbeanstalk", 
@@ -150,6 +162,7 @@ def get_elasticbeanstalk_applications_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_ecs_inventory(oId):
+
     """
         Returns ECS detailed inventory
 
@@ -161,6 +174,7 @@ def get_ecs_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ecs.html
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ecs", 
@@ -175,6 +189,7 @@ def get_ecs_inventory(oId):
     
 
 def get_ecs_services_inventory(oId):
+
     """
         Returns ECS tasks inventory /!\ NOT WORKING YET
 
@@ -184,6 +199,7 @@ def get_ecs_services_inventory(oId):
         :return: ECS tasks inventory
         :rtype: json
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ecs", 
@@ -198,6 +214,7 @@ def get_ecs_services_inventory(oId):
     
 
 def get_ecs_tasks_inventory(oId):
+
     """
         Returns ECS tasks inventory
 
@@ -207,6 +224,7 @@ def get_ecs_tasks_inventory(oId):
         :return: ECS tasks inventory
         :rtype: json
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "ecs", 
@@ -227,6 +245,7 @@ def get_ecs_tasks_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_eks_inventory(oId):
+
     """
         Returns eks inventory (if the region is avalaible)
 
@@ -238,6 +257,7 @@ def get_eks_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
     """
+
     inv = glob.get_inventory(
         ownerId = oId,
         aws_service = "eks", 
@@ -252,7 +272,6 @@ def get_eks_inventory(oId):
     return inv
 
 
-
 #  ------------------------------------------------------------------------
 #
 #    Autoscaling
@@ -260,6 +279,7 @@ def get_eks_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_autoscaling_inventory(oId):
+
     """
         Returns eks inventory (if the region is avalaible)
 
@@ -271,6 +291,7 @@ def get_autoscaling_inventory(oId):
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/autoscaling.html
     """
+
     autoscaling_inventory = {}
 
     autoscaling_inventory['autoscaling-groups'] = glob.get_inventory(
@@ -307,6 +328,7 @@ def get_autoscaling_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_lambda_inventory(oId):
+
     """
         Returns lambda inventory.
 
@@ -318,6 +340,7 @@ def get_lambda_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "lambda", 
@@ -334,6 +357,7 @@ def get_lambda_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_lightsail_inventory(oId):
+
     """
         Returns lightsail inventory, with loadbalancers and IPs
 
@@ -345,6 +369,7 @@ def get_lightsail_inventory(oId):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lightsail.html
     """
+
     lightsail_inventory = {}
 
     lightsail_inventory['lightsail-instances'] = glob.get_inventory(

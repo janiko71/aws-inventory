@@ -19,6 +19,7 @@ import res.glob  as glob
 #  ------------------------------------------------------------------------
 
 def get_rds_inventory(oId):
+
     """
         Returns RDS inventory
 
@@ -33,6 +34,7 @@ def get_rds_inventory(oId):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "rds", 
@@ -49,6 +51,7 @@ def get_rds_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_dynamodb_inventory(oId):
+
     """
         Returns dynamoDB inventory
 
@@ -62,6 +65,7 @@ def get_dynamodb_inventory(oId):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "dynamodb", 
@@ -82,8 +86,9 @@ def get_dynamodb_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_neptune_inventory(oId):
+
     """
-        Returns neptune inventory (instances & clusters)
+        Returns neptune inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -94,19 +99,8 @@ def get_neptune_inventory(oId):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/neptune.html
 
     """
+
     neptune_inventory = {}
-
-    '''
-    No need of instances : they are listed in RDS --> checked.
-
-    neptune_inventory['instances'] = glob.get_inventory(
-        ownerId = oId,
-        aws_service = "neptune", 
-        aws_region = "all", 
-        function_name = "describe_db_instances", 
-        key_get = "DBInstances"
-    )
-    '''
 
     neptune_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,

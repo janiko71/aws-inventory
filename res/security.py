@@ -22,6 +22,7 @@ import res.glob  as glob
 #  ------------------------------------------------------------------------
 
 def get_clouddirectory_inventory(oId):
+
     """
         Returns keys managed by KMS (global)
 
@@ -33,6 +34,7 @@ def get_clouddirectory_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/clouddirectory.html
     """ 
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "clouddirectory", 
@@ -49,6 +51,7 @@ def get_clouddirectory_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_acm_inventory(oId):
+
     """
         Returns certificates managed with ACM
 
@@ -60,6 +63,7 @@ def get_acm_inventory(oId):
 
         ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm.htm
     """ 
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "acm", 
@@ -80,6 +84,7 @@ def get_acm_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_acmpca_inventory(oId):
+
     """
         Returns certificates managed with ACM
 
@@ -91,6 +96,7 @@ def get_acmpca_inventory(oId):
 
         ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm-pca.html
     """ 
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "acm-pca", 

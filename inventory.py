@@ -68,6 +68,7 @@ print ('Services List     :', str(arguments))
 print('-'*100)
 
 # --- Progression counter initialization
+
 config.nb_units_done = 0
 for svc in arguments:
     config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])

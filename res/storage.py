@@ -21,6 +21,7 @@ import res.glob as glob
 #  ------------------------------------------------------------------------
 
 def get_s3_inventory(oId):
+
     """
         Returns S3 quick inventory
 
@@ -32,7 +33,7 @@ def get_s3_inventory(oId):
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
     """
-   
+       
     inventory = []
 
     bucket_list = glob.get_inventory(
@@ -126,6 +127,7 @@ def get_s3_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_efs_inventory(oId):
+
     """
         Returns EFS inventory
 
@@ -137,6 +139,7 @@ def get_efs_inventory(oId):
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/efs.html
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "efs", 
@@ -153,6 +156,7 @@ def get_efs_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_glacier_inventory(oId):
+
     """
         Returns Glacier inventory
 
@@ -166,6 +170,7 @@ def get_glacier_inventory(oId):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "glacier", 

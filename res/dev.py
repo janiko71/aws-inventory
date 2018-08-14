@@ -20,6 +20,7 @@ import res.glob as glob
 #  ------------------------------------------------------------------------
 
 def get_codestar_inventory(oId):
+
     """
         Returns codestar details
 
@@ -31,6 +32,7 @@ def get_codestar_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/codestar.html
     """ 
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "codestar", 

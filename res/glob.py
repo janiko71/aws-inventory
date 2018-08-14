@@ -12,6 +12,7 @@ import res.utils as utils
 #  ------------------------------------------------------------------------
 
 def get_inventory(ownerId, aws_service, aws_region, function_name, key_get = "", detail_function = "", join_key = "", detail_join_key = "", detail_get_key = ""):
+
     """
         Returns inventory for a service. It's a generic function, meaning that it should work for almost any AWS service,
         except for specialized ones or for those who don't have AWS CLI/SDK equivalent. 

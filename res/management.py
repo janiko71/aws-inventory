@@ -20,6 +20,7 @@ import res.glob  as glob
 #  ------------------------------------------------------------------------
 
 def get_cloudformation_inventory(oId):
+
     """
         Returns cloudformation inventory (if the region is avalaible)
 
@@ -31,6 +32,7 @@ def get_cloudformation_inventory(oId):
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudformation.html
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "cloudformation", 
@@ -51,6 +53,7 @@ def get_cloudformation_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_cloudtrail_inventory(oId):
+
     """
         Returns cloudtrail inventory (if the region is avalaible)
 
@@ -62,6 +65,7 @@ def get_cloudtrail_inventory(oId):
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudtrail.html
     """
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "cloudtrail", 
@@ -69,6 +73,8 @@ def get_cloudtrail_inventory(oId):
         function_name = "describe_trails", 
         key_get = "trailList"
     )
+
+
 #  ------------------------------------------------------------------------
 #
 #    CloudWatch
@@ -76,6 +82,7 @@ def get_cloudtrail_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_cloudwatch_inventory(oId):
+
     """
         Returns cloudwatch inventory (if the region is avalaible)
 
@@ -87,6 +94,7 @@ def get_cloudwatch_inventory(oId):
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudwatch.html
     """
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "cloudwatch", 
