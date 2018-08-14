@@ -54,7 +54,7 @@ if (nb_arg == 0):
     arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 else:
     arguments = sys.argv[1:]
-    utils.check_arguments(arguments)
+    arguments = utils.check_arguments(arguments)
 
 # Counters
 config.nb_units_done = 0

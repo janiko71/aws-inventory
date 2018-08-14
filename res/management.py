@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : CloudFormation
-#  Unsupported services : CloudTrail, CloudWtach, AWS Auto Scaling, Config, OpsWork, Service Catalog, 
+#  Supported services   : CloudFormation, CloudTrail, CloudWatch, AWS Auto Scaling 
+#  Unsupported services : Config, OpsWork, Service Catalog, 
 #                               Systems Manager, Trusted Advisor, Managed Services
 #
 # =======================================================================================================================

@@ -38,10 +38,21 @@ def check_arguments(arguments):
         :return: owner ID
         :rtype: string
     """   
+    new_arguments = []
     for arg in arguments:
         if (arg not in config.SUPPORTED_COMMANDS):
             raise Exception('Unknown argument [' + arg + ']')
-    return 
+        if (arg == "debug"):
+            config.logger.setLevel(logging.DEBUG)
+        elif (arg == "info"):
+            config.logger.setLevel(logging.INFO)
+        elif (arg == "warning"):
+            config.logger.setLevel(logging.WARNING)
+        elif (arg == "error"):
+            config.logger.setLevel(logging.ERROR)
+        else:
+            new_arguments.append(arg)
+    return new_arguments
 
 
 def get_ownerID():

@@ -174,9 +174,32 @@ def get_ecs_inventory(oId):
     #detail_get_key = ""
     
 
-def get_ecs_tasks_inventory(oId):
+def get_ecs_services_inventory(oId):
     """
         Returns ECS tasks inventory /!\ NOT WORKING YET
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: ECS tasks inventory
+        :rtype: json
+    """
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ecs", 
+        aws_region = "all", 
+        function_name = "list_services", 
+        key_get = "serviceArns",
+        detail_function = "describe_services", 
+        join_key = "", 
+        detail_join_key = "services", 
+        detail_get_key = "services"
+    )
+    
+
+def get_ecs_tasks_inventory(oId):
+    """
+        Returns ECS tasks inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -199,7 +222,7 @@ def get_ecs_tasks_inventory(oId):
 
 #  ------------------------------------------------------------------------
 #
-#    EKS (not working)
+#    EKS
 #
 #  ------------------------------------------------------------------------
 
