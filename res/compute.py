@@ -38,7 +38,8 @@ def get_ec2_inventory(oId):
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_instances", 
-        key_get = "Reservations"
+        key_get = "Reservations",
+        pagination = True
     )
 
 
@@ -101,7 +102,8 @@ def get_ebs_inventory(oId):
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_volumes", 
-        key_get = "Volumes"
+        key_get = "Volumes",
+        pagination = True
     )
 
 
