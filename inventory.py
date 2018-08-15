@@ -212,6 +212,12 @@ if ('acm-pca' in arguments):
 if ('secrets' in arguments):
     inventory['secrets-manager'] = security.get_secrets_inventory(ownerId)
     
+#
+# ----------------- Cloud HSM
+#
+if ('hsm' in arguments):
+    inventory['cloud-hsm'] = security.get_hsm_inventory(ownerId)
+
 
 #################################################################
 #                      DEVELOPER TOOLS                          #
