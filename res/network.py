@@ -39,7 +39,8 @@ def get_apigateway_inventory(oId):
         aws_service = "apigateway", 
         aws_region = "all", 
         function_name = "get_rest_apis", 
-        key_get = "items"
+        key_get = "items",
+        pagination = True
     )
 
 

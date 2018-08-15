@@ -211,7 +211,9 @@ def get_ecs_services_inventory(oId):
         detail_function = "describe_services", 
         join_key = "", 
         detail_join_key = "services", 
-        detail_get_key = "services"
+        detail_get_key = "services",
+        pagination = True,
+        pagination_detail = True
     )
     
 
@@ -236,7 +238,9 @@ def get_ecs_tasks_inventory(oId):
         detail_function = "describe_task_definition", 
         join_key = "taskDefinitionArn", 
         detail_join_key = "taskDefinition", 
-        detail_get_key = "taskDefinition"
+        detail_get_key = "taskDefinition",
+        pagination = True,
+        pagination_detail = True
     )
 
 
@@ -301,7 +305,8 @@ def get_autoscaling_inventory(oId):
         aws_service = "autoscaling", 
         aws_region = "all", 
         function_name = "describe_auto_scaling_groups", 
-        key_get = "AutoScalingGroups"
+        key_get = "AutoScalingGroups",
+        pagination = True
     )
 
     autoscaling_inventory['autoscaling-launch-configuration'] = glob.get_inventory(
@@ -309,7 +314,8 @@ def get_autoscaling_inventory(oId):
         aws_service = "autoscaling", 
         aws_region = "all", 
         function_name = "describe_launch_configurations", 
-        key_get = "LaunchConfigurations"
+        key_get = "LaunchConfigurations",
+        pagination = True
     )
 
     autoscaling_inventory['autoscaling-plans'] = glob.get_inventory(
@@ -348,7 +354,8 @@ def get_lambda_inventory(oId):
         aws_service = "lambda", 
         aws_region = "all", 
         function_name = "list_functions", 
-        key_get = "Functions"
+        key_get = "Functions",
+        pagination = True
     )
 
 
@@ -379,7 +386,8 @@ def get_lightsail_inventory(oId):
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_instances", 
-        key_get = "instances"
+        key_get = "instances",
+        pagination = True
     )
 
     lightsail_inventory['lightsail-loadbalancers'] = glob.get_inventory(
@@ -395,7 +403,8 @@ def get_lightsail_inventory(oId):
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_static_ips", 
-        key_get = "staticIps"
+        key_get = "staticIps",
+        pagination = True
     )
 
     return lightsail_inventory

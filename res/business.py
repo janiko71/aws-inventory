@@ -42,7 +42,8 @@ def get_alexa_inventory(oId):
         detail_function = "describe_project", 
         join_key = "projectId", 
         detail_join_key = "id", 
-        detail_get_key = ""
+        detail_get_key = "",
+        pagination = True
     )
 
 
@@ -104,7 +105,8 @@ def get_workmail_inventory(oId):
         detail_function = "describe_organization", 
         join_key = "OrganizationId", 
         detail_join_key = "OrganizationId", 
-        detail_get_key = ""        
+        detail_get_key = ""  ,
+        pagination = True  
     )    
 
 

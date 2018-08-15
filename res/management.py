@@ -42,7 +42,8 @@ def get_cloudformation_inventory(oId):
         detail_function = "describe_stack_resources", 
         join_key = "StackName", 
         detail_join_key = "StackName", 
-        detail_get_key = ""
+        detail_get_key = "",
+        pagination = True
     )
 
 
@@ -100,7 +101,8 @@ def get_cloudwatch_inventory(oId):
         aws_service = "cloudwatch", 
         aws_region = "all", 
         function_name = "describe_alarms", 
-        key_get = "MetricAlarms"
+        key_get = "MetricAlarms",
+        pagination = True
     )
 
 

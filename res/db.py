@@ -40,7 +40,8 @@ def get_rds_inventory(oId):
         aws_service = "rds", 
         aws_region = "all", 
         function_name = "describe_db_instances", 
-        key_get = "DBInstances"
+        key_get = "DBInstances",
+        pagination = True
     )
 
 
@@ -75,7 +76,8 @@ def get_dynamodb_inventory(oId):
         detail_function = "describe_table", 
         join_key = "TableName", 
         detail_join_key = "TableName", 
-        detail_get_key = "Table"
+        detail_get_key = "Table",
+        pagination = True
     )
 
 

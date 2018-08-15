@@ -42,7 +42,8 @@ def get_kms_inventory(oId):
         detail_function = "describe_key", 
         join_key = "KeyId", 
         detail_join_key = "KeyId", 
-        detail_get_key = "KeyMetadata"
+        detail_get_key = "KeyMetadata",
+        pagination = True
     )
 
 

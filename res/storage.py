@@ -145,7 +145,8 @@ def get_efs_inventory(oId):
         aws_service = "efs", 
         aws_region = "all", 
         function_name = "describe_file_systems", 
-        key_get = "FileSystems"
+        key_get = "FileSystems",
+        pagination = True
     )
 
 
@@ -176,7 +177,8 @@ def get_glacier_inventory(oId):
         aws_service = "glacier", 
         aws_region = "all", 
         function_name = "list_vaults", 
-        key_get = "VaultList"
+        key_get = "VaultList",
+        pagination = True
     )
 
 
