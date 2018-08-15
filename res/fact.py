@@ -12,6 +12,7 @@ import res.utils as utils
 #  ------------------------------------------------------------------------
 
 def get_ce_inventory(ownerId, values):
+
     """
         Returns cost inventory, for a period (1 month ?)
 
@@ -32,6 +33,7 @@ def get_ce_inventory(ownerId, values):
                  if the region is not supported, an exception is raised (EndpointConnectionError 
                  or AccessDeniedException)
     """
+    
     config.logger.info('RDS inventory, all regions, get_rds_inventory')
 
     client = boto3.client('ce')

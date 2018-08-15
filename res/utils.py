@@ -15,11 +15,20 @@ import config
 #
 
 def display(ownerId, function, region_name, function_name):
+
+    '''
+        Formatting display output, with progression (in %)
+    '''
     progression = (config.nb_units_done / config.nb_units_todo * 100)
     print(config.display.format(ownerId, progression, function, region_name, function_name, " "*20), end="\r", flush=True)
     return
 
 def progress(region_name):
+
+    '''
+        Shows job progression, depending on services passed in arguments
+    '''
+
     if (region_name == "global"):
         config.nb_units_done = config.nb_units_done + config.nb_regions
     else:        
@@ -29,8 +38,9 @@ def progress(region_name):
 
 
 def check_arguments(arguments):
+
     """
-        Check if the arguments (in command line) are known. If not, we raises an exception.
+        Check if the arguments (in command line) are known. If not, we raise an exception.
 
         We also look for the debug level. If we found it, we adjust the log level but we don't include it in the service list.
 
@@ -40,6 +50,7 @@ def check_arguments(arguments):
         :return: owner ID
         :rtype: string
     """   
+
     new_arguments = []
     for arg in arguments:
         if (arg not in config.SUPPORTED_COMMANDS) and (arg not in config.SUPPORTED_PARAMETERS):
@@ -58,12 +69,14 @@ def check_arguments(arguments):
 
 
 def get_ownerID():
+
     """
         Get owner ID of the AWS account we are working on
 
         :return: owner ID
         :rtype: string
-    """   
+    """  
+
     sts = boto3.client('sts')
     identity = sts.get_caller_identity()
     ownerId = identity['Account']
@@ -71,6 +84,7 @@ def get_ownerID():
 
 
 def datetime_converter(dt):
+
     """
         Converts a python datetime object (returned by AWS SDK) into a readable and SERIALIZABLE string
 
@@ -80,11 +94,13 @@ def datetime_converter(dt):
         :return: datetime in a good format
         :rtype: str
     """
+
     if isinstance(dt, datetime.datetime):
         return dt.__str__()  
 
 
 def json_datetime_converter(json_text):
+
     """
         Parses a json object and converts all datetime objects (returned by AWS SDK) into str objects
 
@@ -94,4 +110,5 @@ def json_datetime_converter(json_text):
         :return: json with date in string format
         :rtype: json
     """
+
     return json.dumps(json_text, default = datetime_converter)      

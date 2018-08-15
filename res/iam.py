@@ -20,6 +20,7 @@ import res.glob as glob
 #  ------------------------------------------------------------------------
 
 def get_kms_inventory(oId):
+
     """
         Returns keys managed by KMS (global)
 
@@ -31,6 +32,7 @@ def get_kms_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
     """ 
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "kms", 
@@ -40,7 +42,8 @@ def get_kms_inventory(oId):
         detail_function = "describe_key", 
         join_key = "KeyId", 
         detail_join_key = "KeyId", 
-        detail_get_key = "KeyMetadata"
+        detail_get_key = "KeyMetadata",
+        pagination = True
     )
 
 

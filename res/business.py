@@ -20,6 +20,7 @@ import res.glob as glob
 #  ------------------------------------------------------------------------
 
 def get_alexa_inventory(oId):
+
     """
         Returns alexa skills
 
@@ -31,6 +32,7 @@ def get_alexa_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/alexaforbusiness.html
     """ 
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "alexaforbusiness", 
@@ -40,7 +42,8 @@ def get_alexa_inventory(oId):
         detail_function = "describe_project", 
         join_key = "projectId", 
         detail_join_key = "id", 
-        detail_get_key = ""
+        detail_get_key = "",
+        pagination = True
     )
 
 
@@ -51,6 +54,7 @@ def get_alexa_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_workdocs_inventory(oId):
+
     """
         Returns workdocs inventory
 
@@ -62,6 +66,7 @@ def get_workdocs_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/workdocs.html
     """ 
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "workdocs", 
@@ -78,6 +83,7 @@ def get_workdocs_inventory(oId):
 #  ------------------------------------------------------------------------
 
 def get_workmail_inventory(oId):
+
     """
         Returns workmail inventory
 
@@ -89,6 +95,7 @@ def get_workmail_inventory(oId):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/workmail.html
     """ 
+
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "workmail", 
@@ -98,7 +105,8 @@ def get_workmail_inventory(oId):
         detail_function = "describe_organization", 
         join_key = "OrganizationId", 
         detail_join_key = "OrganizationId", 
-        detail_get_key = ""        
+        detail_get_key = ""  ,
+        pagination = True  
     )    
 
 

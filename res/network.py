@@ -20,6 +20,7 @@ import res.glob  as glob
 #  ------------------------------------------------------------------------
 
 def get_apigateway_inventory(oId):
+
     """
         Returns API Gateway inventory
 
@@ -32,12 +33,14 @@ def get_apigateway_inventory(oId):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
     """
+    
     return glob.get_inventory(
         ownerId = oId,
         aws_service = "apigateway", 
         aws_region = "all", 
         function_name = "get_rest_apis", 
-        key_get = "items"
+        key_get = "items",
+        pagination = True
     )
 
 
