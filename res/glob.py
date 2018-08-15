@@ -118,7 +118,7 @@ def get_inventory(ownerId,
                 detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key)
                 inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
-        except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError):
+        except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
 
             # unsupported region (or bad coding somewhere)
             config.logger.warning("A problem occurred or {} is not not supported.".format(aws_service))        

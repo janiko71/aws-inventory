@@ -8,8 +8,9 @@ import res.glob  as glob
 # to do : autoscaling, security groups
 # =======================================================================================================================
 #
-#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), Elastic Container Service (ECS), Elastic Beanstalk
-#  Unsupported services : EKS (not supported in SDK), Batch
+#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), 
+#                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch
+#  Unsupported services : None
 #
 # =======================================================================================================================
 
@@ -109,7 +110,7 @@ def get_ebs_inventory(oId):
 
 #  ------------------------------------------------------------------------
 #
-#    Elastic Beanstalk /!\ Not sure it works well (often returns empty responses!!!)
+#    Elastic Beanstalk 
 #
 #  ------------------------------------------------------------------------
 
@@ -357,6 +358,55 @@ def get_lambda_inventory(oId):
         key_get = "Functions",
         pagination = True
     )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Batch
+#
+#  ------------------------------------------------------------------------
+
+def get_batch_inventory(oId):
+
+    """
+        Returns batch jobs inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: batch inventory
+        :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/batch.html
+    """
+    inventory = {}
+
+    inventory['job-definitions'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "batch", 
+        aws_region = "all", 
+        function_name = "describe_job_definitions", 
+        key_get = "jobDefinitions"
+    )
+
+    inventory['job-queues'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "batch", 
+        aws_region = "all", 
+        function_name = "describe_job_queues", 
+        key_get = "jobQueues"
+    )
+
+    inventory['compute-environements'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "batch", 
+        aws_region = "all", 
+        function_name = "describe_compute_environments", 
+        key_get = "computeEnvironments"
+    )
+
+    return inventory
+
 
 
 #  ------------------------------------------------------------------------

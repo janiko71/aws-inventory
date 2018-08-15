@@ -134,6 +134,12 @@ if ('autoscaling' in arguments):
 if ('eks' in arguments):
     inventory['eks'] = compute.get_eks_inventory(ownerId)
 
+#
+# ----------------- Batch jobs inventory
+#
+if ('batch' in arguments):
+    inventory['batch'] = compute.get_batch_inventory(ownerId)
+
 
 #################################################################
 #                           STORAGE                             #
@@ -239,6 +245,18 @@ if ('cloudwatch' in arguments):
 #
 if ('apigateway' in arguments):
     inventory['apigateway'] = net.get_apigateway_inventory(ownerId)
+
+#
+# ----------------- Route 53 inventory
+#
+if ('route53' in arguments):
+    inventory['route53'] = net.get_route53_inventory(ownerId)
+
+#
+# ----------------- CloudFront inventory
+#
+if ('cloudfront' in arguments):
+    inventory['cloudfront'] = net.get_cloudfront_inventory(ownerId)
 
 
 #################################################################
