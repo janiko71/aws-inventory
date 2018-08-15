@@ -206,6 +206,12 @@ if ('acm' in arguments):
 if ('acm-pca' in arguments):
     inventory['acm-pca'] = security.get_acm_inventory(ownerId)
 
+#
+# ----------------- Secrets Manager
+#
+if ('secrets' in arguments):
+    inventory['secrets-manager'] = security.get_secrets_inventory(ownerId)
+    
 
 #################################################################
 #                      DEVELOPER TOOLS                          #

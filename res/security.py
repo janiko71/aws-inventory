@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Directory Service 
-#  Unsupported services : Cognito, Secrets Manager, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, 
+#  Supported services   : Directory Service, Secrets Manager 
+#  Unsupported services : Cognito, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, 
 #                           WAF & Shield, Artifact
 #
 #  Note: IAM has its own module
@@ -107,6 +107,33 @@ def get_acmpca_inventory(oId):
         key_get = "CertificateAuthorities"
     )
 
+
+#  ------------------------------------------------------------------------
+#
+#    Secrets Manager
+#  ------------------------------------------------------------------------
+
+def get_secrets_inventory(oId):
+
+    """
+        Returns certificates managed with ACM
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: certificates inventory
+        :rtype: json
+
+        ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm-pca.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "secretsmanager", 
+        aws_region = "all", 
+        function_name = "list_secrets", 
+        key_get = "SecretList"
+    )
 
 #
 # Hey, doc: we're in a module!
