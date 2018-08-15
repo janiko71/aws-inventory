@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Directory Service 
-#  Unsupported services : Cognito, Secrets Manager, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, 
+#  Supported services   : Directory Service, Secrets Manager 
+#  Unsupported services : Cognito, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager, CloudHSM, 
 #                           WAF & Shield, Artifact
 #
 #  Note: IAM has its own module
@@ -74,7 +74,7 @@ def get_acm_inventory(oId):
         detail_function = "describe_certificate", 
         join_key = "CertificateArn", 
         detail_join_key = "CertificateArn", 
-        detail_get_key = "Certificate"      ,
+        detail_get_key = "Certificate",
         pagination = True
     )
 
@@ -106,6 +106,94 @@ def get_acmpca_inventory(oId):
         function_name = "list_certificate_authorities", 
         key_get = "CertificateAuthorities"
     )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Secrets Manager
+#
+#  ------------------------------------------------------------------------
+
+def get_secrets_inventory(oId):
+
+    """
+        Returns all secrets managed by AWS (without values of the secrets ;-)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: secrets inventory 
+        :rtype: json
+
+        ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm-pca.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "secretsmanager", 
+        aws_region = "all", 
+        function_name = "list_secrets", 
+        key_get = "SecretList"
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    CloudHSM 
+#
+#  ------------------------------------------------------------------------
+
+def get_hsm_inventory(oId):
+
+    """
+        Returns cloud HSM inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: HSM inventory
+        :rtype: json
+
+        ..note:: https://boto3.readthedocs.io/en/latest/reference/services/CloudHSM.html
+    """ 
+    inventory = {}
+
+    inventory['clusters'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudhsmv2", 
+        aws_region = "all", 
+        function_name = "describe_clusters", 
+        key_get = "Clusters",
+        pagination = True
+    )
+
+    inventory['hsm'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudhsm", 
+        aws_region = "all", 
+        function_name = "list_hsms", 
+        key_get = "HsmList",
+        detail_function = "describe_hsm", 
+        join_key = "", 
+        detail_join_key = "HsmArn", 
+        detail_get_key = "",        
+        pagination = True
+    )
+
+    inventory['luna'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudhsm", 
+        aws_region = "all", 
+        function_name = "list_luna_clients", 
+        key_get = "ClientList",
+        detail_function = "describe_luna_client", 
+        join_key = "", 
+        detail_join_key = "ClientArn", 
+        detail_get_key = "",        
+        pagination = True
+    )
+
+    return inventory
 
 
 #

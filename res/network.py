@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : API Gateway (simple), VPC (in 'compute' module)
-#  Unsupported services : Route 53, Cloud Front, Direct Connect
+#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, Cloud Front
+#  Unsupported services : Direct Connect
 #
 # =======================================================================================================================
 
@@ -42,6 +42,95 @@ def get_apigateway_inventory(oId):
         key_get = "items",
         pagination = True
     )
+
+
+#  ------------------------------------------------------------------------
+#
+#    CloudFront
+#
+#  ------------------------------------------------------------------------
+
+def get_cloudfront_inventory(oId):
+
+    """
+        Returns cloudfront inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Acloudfront inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/cloudfront.html
+
+    """
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudfront", 
+        aws_region = "all", 
+        function_name = "list_distributions", 
+        key_get = "Items",
+        pagination = True
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Route 53
+#
+#  ------------------------------------------------------------------------
+
+def get_route53_inventory(oId):
+
+    """
+        Returns route 53 inventory, partial.
+
+        Traffic policies are not detailed because the detail function needs 2 arguments.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: route 53 inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/route53.html
+
+    """
+    
+    inventory = {}
+    
+    inventory['zones'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "route53", 
+        aws_region = "global", 
+        function_name = "list_hosted_zones_by_name", 
+        key_get = "HostedZones",
+        detail_function = "list_resource_record_sets", 
+        join_key = "Id", 
+        detail_join_key = "HostedZoneId", 
+        detail_get_key = "ResourceRecordSets",
+        pagination = True
+    )
+
+    inventory['traffic-policies'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "route53", 
+        aws_region = "global", 
+        function_name = "list_traffic_policies", 
+        key_get = "TrafficPolicySummaries",
+        pagination = True
+    )
+
+    inventory['domains'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "route53domains", 
+        aws_region = "all", 
+        function_name = "list_domains", 
+        key_get = "Domains"
+    )
+
+    return inventory
 
 
 #
