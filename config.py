@@ -61,3 +61,12 @@ nb_svc = 0
 nb_regions = len(regions)
 nb_units_todo = 0
 nb_units_done = 0
+
+#
+# --- Global inventory, for multithreading purpose
+#
+awslambda = {}
+ec2 = {}
+ec2_network_interfaces = {}
+ec2_vpcs = {}
+ec2_ebs = {}

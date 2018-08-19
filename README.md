@@ -14,6 +14,9 @@ Supported AWS services is limited, but I add some regulary. **Supported services
 ## Pre-requisites
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
 Some other packages are mandatory, like datetime.
+# What's new in this version?
+This is an attempt to use multithreading in order to accelerate the script. 
+
 # How to use it
 This script is intented to be executed from any python environment (and not only as a AWS lambda function as the original script). More information on [wiki](https://github.com/janiko71/aws-inventory/wiki).
 

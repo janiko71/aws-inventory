@@ -28,6 +28,7 @@ import res.fact       as fact
 import res.security   as security
 import res.management as mgn
 import res.business   as bus
+import res.awsthread  as awsthread
 
 
 # --- AWS basic information
@@ -87,16 +88,40 @@ for svc in arguments:
 #
 
 if ('ec2' in arguments):
-    inventory["ec2"] = compute.get_ec2_inventory(ownerId)
+    """inventory["ec2"] = compute.get_ec2_inventory(ownerId)
     inventory["ec2-network-interfaces"] = compute.get_interfaces_inventory(ownerId)
     inventory["ec2-vpcs"] = compute.get_vpc_inventory(ownerId)
-    inventory["ec2-ebs"] = compute.get_ebs_inventory(ownerId)
+    inventory["ec2-ebs"] = compute.get_ebs_inventory(ownerId)"""
+    t_ec2         = awsthread.AWSThread("ec2", compute.get_ec2_inventory, ownerId)
+    t_ec2_network = awsthread.AWSThread("ec2_network_interfaces", compute.get_interfaces_inventory, ownerId)
+    t_ec2_vpcs    = awsthread.AWSThread("ec2_vpcs", compute.get_vpc_inventory, ownerId)
+    t_ec2_ebs     = awsthread.AWSThread("ec2_ebs", compute.get_ebs_inventory, ownerId)
+    t_ec2.start()
+    t_ec2_network.start()
+    t_ec2_vpcs.start()
+    t_ec2_ebs.start()
+
+
 
 # 
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
-    inventory["lambda"] = compute.get_lambda_inventory(ownerId)
+    #inventory["lambda"] = compute.get_lambda_inventory(ownerId)
+    t_lambda = awsthread.AWSThread("awslambda", compute.get_lambda_inventory, ownerId)
+    t_lambda.start()
+
+    t_lambda.join()
+    t_ec2.join()
+    t_ec2_network.join()
+    t_ec2_vpcs.join()
+    t_ec2_ebs.join()
+
+    inventory["ec2"] = config.ec2
+    inventory["ec2-network-interfaces"] = config.ec2_network_interfaces
+    inventory["ec2-vpcs"] = config.ec2_vpcs
+    inventory["ec2-ebs"] = config.ec2_ebs
+    inventory["lambda"] = config.awslambda
 
 # 
 # ----------------- Elastic beanstalk
