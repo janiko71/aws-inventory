@@ -30,8 +30,7 @@ def get_ce_inventory(ownerId, values):
         b.get_cost_and_usage(TimePeriod={'Start': '2018-01-01','End': '2018-08-31'},Granularity='MONTHLY',Metrics=('AmortizedCost' , 'BlendedCost' , 'UnblendedCost' , 'UsageQuantity')
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/rds.html
-                 if the region is not supported, an exception is raised (EndpointConnectionError 
-                 or AccessDeniedException)
+
     """
     
     config.logger.info('RDS inventory, all regions, get_rds_inventory')

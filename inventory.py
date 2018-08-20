@@ -156,6 +156,12 @@ if ('efs' in arguments):
 if ('glacier' in arguments):
     inventory['glacier'] = storage.get_glacier_inventory(ownerId)
 
+#
+# ----------------- Storage gateway inventory
+#
+if ('storagegateway' in arguments):
+    inventory['storagegateway'] = storage.get_storagegateway_inventory(ownerId)
+
 
 #################################################################
 #                          DATABASES                            #
@@ -177,6 +183,18 @@ if ('dynamodb' in arguments):
 #
 if ('neptune' in arguments):
     inventory['neptune'] = db.get_neptune_inventory(ownerId)
+
+#
+# ----------------- Redshift inventory
+#
+if ('redshift' in arguments):
+    inventory['redshift'] = db.get_redshift_inventory(ownerId)
+    
+#
+# ----------------- Neptune inventory
+#
+if ('elasticache' in arguments):
+    inventory['elasticache'] = db.get_elasticache_inventory(ownerId)
 
 
 #################################################################
