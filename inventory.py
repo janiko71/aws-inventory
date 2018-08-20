@@ -164,7 +164,7 @@ if ('glacier' in arguments):
 # ----------------- Storage gateway inventory
 #
 if ('storagegateway' in arguments):
-    thread_list.append(awsthread.AWSThread('storagegateway'], storage.get_storagegateway_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('storagegateway', storage.get_storagegateway_inventory, ownerId))
 
 
 #################################################################
@@ -192,13 +192,13 @@ if ('neptune' in arguments):
 # ----------------- Redshift inventory
 #
 if ('redshift' in arguments):
-    thread_list.append(awsthread.AWSThread('redshift'], db.get_redshift_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('redshift', db.get_redshift_inventory, ownerId))
     
 #
 # ----------------- Elasticache inventory
 #
 if ('elasticache' in arguments):
-    thread_list.append(awsthread.AWSThread('elasticache'], db.get_elasticache_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('elasticache', db.get_elasticache_inventory, ownerId))
 
 
 #################################################################
@@ -258,7 +258,7 @@ if ('codestar' in arguments):
 # ----------------- Simple Queue Service inventory
 #
 if ('sqs' in arguments):
-    thread_list.append(awsthread.AWSThread('sqs'], integ.get_sqs_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('sqs', integ.get_sqs_inventory, ownerId))
 
 
 #################################################################
