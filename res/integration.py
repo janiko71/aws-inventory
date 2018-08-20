@@ -94,6 +94,50 @@ def get_mq_inventory(oId):
     
     return mq_inventory
 
+
+#  ------------------------------------------------------------------------
+#
+#    Simple Notification Service (SNS)
+#
+#  ------------------------------------------------------------------------
+
+def get_sns_inventory(oId):
+
+    """
+        Returns sns (topics, applications) details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Amazon sns inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/sns.html
+    """ 
+
+    sns_inventory = {}
+    
+    sns_inventory['topics'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "sns", 
+        aws_region = "all", 
+        function_name = "list_topics", 
+        key_get = "Topics",
+        pagination = True
+    )
+
+    sns_inventory['applications'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "sns", 
+        aws_region = "all", 
+        function_name = "list_platform_applications", 
+        key_get = "PlatformApplications",
+        pagination = True
+    )
+    
+    return sns_inventory
+
+
 #
 # Hey, doc: we're in a module!
 #

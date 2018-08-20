@@ -266,6 +266,12 @@ if ('sqs' in arguments):
 if ('mq' in arguments):
     thread_list.append(awsthread.AWSThread('mq', integ.get_mq_inventory, ownerId))
 
+#
+# ----------------- Simple Notification Serv ice inventory
+#
+if ('sns' in arguments):
+    thread_list.append(awsthread.AWSThread('sns', integ.get_sns_inventory, ownerId))
+    
 
 #################################################################
 #                         MANAGEMENT                            #

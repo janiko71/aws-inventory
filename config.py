@@ -48,7 +48,7 @@ S3_INVENTORY_BUCKET="s3-bucket"
 SUPPORTED_INVENTORIES = {'s3': 1, 'ec2': 4, 'lambda': 1 , 'lightsail': 3, 'efs': 1, 'glacier': 1, 'rds': 1, 'ce': 1, 'kms': 1, 'dynamodb': 1, 'apigateway': 1,
     'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 1, 'acm': 1, 'acm-pca': 1, 'autoscaling': 3,
     'cloudformation': 1, 'cloudtrail': 1, 'cloudwatch': 1, 'eks': 1, 'batch': 3, 'route53': 3, 'cloudfront': 1, 'secrets': 1, 'hsm': 3, 'elasticache': 2,
-	'redshift': 2, 'storagegateway': 1, 'sqs': 1, 'mq': 2}
+	'redshift': 2, 'storagegateway': 1, 'sqs': 1, 'mq': 2, 'sns': 2}
 SUPPORTED_COMMANDS = list(SUPPORTED_INVENTORIES.keys())
 SUPPORTED_PARAMETERS = ['debug', 'info', 'warning', 'error']
 
