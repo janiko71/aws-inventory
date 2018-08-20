@@ -12,10 +12,12 @@ Supported AWS services is limited, but I add some regulary. **Supported services
 
 ~~Derived from https://github.com/powerupcloud/AWSInventoryLambda but not forked because it has been too much modified.~~ Rewritten from scratch to be more _pythonified_.
 ## Pre-requisites
+This program needs Python 3.4 or newer. 
+
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
-Some other packages are mandatory, like datetime.
+
 # What's new in this version?
-This is an attempt to use multithreading in order to accelerate the script. 
+This is an attempt to use multithreading in order to accelerate the script. And, at first sight, it looks better: 230 seconds instead of 960 (for the same inventory) on my first test.
 
 # How to use it
 This script is intented to be executed from any python environment (and not only as a AWS lambda function as the original script). More information on [wiki](https://github.com/janiko71/aws-inventory/wiki).
