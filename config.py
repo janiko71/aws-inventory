@@ -1,6 +1,7 @@
 import time
 import logging
 import json
+import os
 from time import gmtime, strftime
 
 #
@@ -17,11 +18,14 @@ display = "OwnerID : {} ! {:6.2f} % ! Region : {:16} ! {} ({}){}"
 t = gmtime()
 timestamp = strftime("%Y%m%d%H%M%S", t)
 filepath = './output/'
+os.makedirs(filepath, exist_ok=True)
 
 
 # --- logging variables
 
 log_filepath    = './log/'
+os.makedirs(log_filepath, exist_ok=True)
+
 logger          = logging.getLogger('aws-inventory')
 hdlr            = logging.FileHandler(log_filepath+'inventory.log')
 formatter       = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -44,7 +48,7 @@ S3_INVENTORY_BUCKET="s3-bucket"
 SUPPORTED_INVENTORIES = {'s3': 1, 'ec2': 4, 'lambda': 1 , 'lightsail': 3, 'efs': 1, 'glacier': 1, 'rds': 1, 'ce': 1, 'kms': 1, 'dynamodb': 1, 'apigateway': 1,
     'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 1, 'acm': 1, 'acm-pca': 1, 'autoscaling': 3,
     'cloudformation': 1, 'cloudtrail': 1, 'cloudwatch': 1, 'eks': 1, 'batch': 3, 'route53': 3, 'cloudfront': 1, 'secrets': 1, 'hsm': 3, 'elasticache': 2,
-    'redshift': 2, 'storagegateway': 1, 'sqs': 1}
+	'redshift': 2, 'storagegateway': 1, 'sqs': 1}
 SUPPORTED_COMMANDS = list(SUPPORTED_INVENTORIES.keys())
 SUPPORTED_PARAMETERS = ['debug', 'info', 'warning', 'error']
 
@@ -62,3 +66,8 @@ nb_svc = 0
 nb_regions = len(regions)
 nb_units_todo = 0
 nb_units_done = 0
+
+#
+# --- Global inventory, for multithreading purpose
+#
+global_inventory = {}

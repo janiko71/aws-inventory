@@ -53,10 +53,8 @@ def get_inventory(ownerId,
         :type pagination: boolean
         :type pagination_detail: boolean       
 
-        :return: neptune inventory
+        :return: inventory
         :rtype: json
-
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/neptune.html
 
     """
     # aws_region = all, global
@@ -113,7 +111,9 @@ def get_inventory(ownerId,
             config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
             utils.progress(aws_region)
             utils.display(ownerId, aws_region, aws_service, function_name)
+
             inv_list = client.__getattribute__(function_name)().get(key_get)
+            
             for inv in inv_list:
                 detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key)
                 inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
