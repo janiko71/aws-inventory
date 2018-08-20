@@ -17,17 +17,18 @@ import res.utils as utils
 import config
 
 # AWS Services imports 
-import res.glob       as glob
-import res.compute    as compute
-import res.storage    as storage
-import res.db         as db
-import res.dev        as dev
-import res.iam        as iam
-import res.network    as net
-import res.fact       as fact
-import res.security   as security
-import res.management as mgn
-import res.business   as bus
+import res.glob         as glob
+import res.compute      as compute
+import res.storage      as storage
+import res.db           as db
+import res.dev          as dev
+import res.iam          as iam
+import res.network      as net
+import res.fact         as fact
+import res.security     as security
+import res.management   as mgn
+import res.business     as bus
+import res.integration  as integ
 
 
 # --- AWS basic information
@@ -191,7 +192,7 @@ if ('redshift' in arguments):
     inventory['redshift'] = db.get_redshift_inventory(ownerId)
     
 #
-# ----------------- Neptune inventory
+# ----------------- Elasticache inventory
 #
 if ('elasticache' in arguments):
     inventory['elasticache'] = db.get_elasticache_inventory(ownerId)
@@ -245,6 +246,16 @@ if ('hsm' in arguments):
 #
 if ('codestar' in arguments):
     inventory['codestar'] = dev.get_codestar_inventory(ownerId)
+
+
+#################################################################
+#                        INTEGRATION                            #
+#################################################################
+#
+# ----------------- Simple Queue Service inventory
+#
+if ('sqs' in arguments):
+    inventory['sqs'] = integ.get_sqs_inventory(ownerId)
 
 
 #################################################################

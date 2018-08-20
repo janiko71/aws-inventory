@@ -9,8 +9,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier
-#  Unsupported services : Storage Gateway
+#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway
+#  Unsupported services : None
 #
 # =======================================================================================================================
 
