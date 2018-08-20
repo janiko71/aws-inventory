@@ -15,7 +15,7 @@ import res.glob as glob
 
 #  ------------------------------------------------------------------------
 #
-#    Simple Queue Service
+#    Simple Queue Service. Not sure that the API works well (strange responses in aws cli)
 #
 #  ------------------------------------------------------------------------
 
@@ -45,6 +45,54 @@ def get_sqs_inventory(oId):
         detail_get_key = "Attributes"
     )
 
+
+#  ------------------------------------------------------------------------
+#
+#    Amazon MQ
+#
+#  ------------------------------------------------------------------------
+
+def get_mq_inventory(oId):
+
+    """
+        Returns Amazon MQ details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Amazon MQ inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/mq.html
+    """ 
+
+    mq_inventory = {}
+    
+    mq_inventory['brokers'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "mq", 
+        aws_region = "all", 
+        function_name = "list_brokers", 
+        key_get = "BrokerSummaries",
+        detail_function = "describe_broker", 
+        join_key = "BrokerId", 
+        detail_join_key = "BrokerId", 
+        detail_get_key = ""
+    )
+
+    mq_inventory['configurations'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "mq", 
+        aws_region = "all", 
+        function_name = "list_configurations", 
+        key_get = "Configurations",
+        detail_function = "describe_configuration", 
+        join_key = "Id", 
+        detail_join_key = "ConfigurationId", 
+        detail_get_key = ""
+    )
+    
+    return mq_inventory
 
 #
 # Hey, doc: we're in a module!

@@ -260,6 +260,12 @@ if ('codestar' in arguments):
 if ('sqs' in arguments):
     thread_list.append(awsthread.AWSThread('sqs', integ.get_sqs_inventory, ownerId))
 
+#
+# ----------------- Amazon MQ inventory
+#
+if ('mq' in arguments):
+    thread_list.append(awsthread.AWSThread('mq', integ.get_mq_inventory, ownerId))
+
 
 #################################################################
 #                         MANAGEMENT                            #
