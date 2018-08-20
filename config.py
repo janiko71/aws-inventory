@@ -1,6 +1,7 @@
 import time
 import logging
 import json
+import os
 from time import gmtime, strftime
 
 #
@@ -17,11 +18,14 @@ display = "OwnerID : {} ! {:6.2f} % ! Region : {:16} ! {} ({}){}"
 t = gmtime()
 timestamp = strftime("%Y%m%d%H%M%S", t)
 filepath = './output/'
+os.makedirs(filepath, exist_ok=True)
 
 
 # --- logging variables
 
 log_filepath    = './log/'
+os.makedirs(log_filepath, exist_ok=True)
+
 logger          = logging.getLogger('aws-inventory')
 hdlr            = logging.FileHandler(log_filepath+'inventory.log')
 formatter       = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -61,3 +65,8 @@ nb_svc = 0
 nb_regions = len(regions)
 nb_units_todo = 0
 nb_units_done = 0
+
+#
+# --- Global inventory, for multithreading purpose
+#
+global_inventory = {}
