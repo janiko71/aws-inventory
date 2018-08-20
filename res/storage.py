@@ -9,8 +9,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier
-#  Unsupported services : Storage Gateway
+#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway
+#  Unsupported services : None
 #
 # =======================================================================================================================
 
@@ -168,8 +168,7 @@ def get_glacier_inventory(oId):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/glacier.html
-                 if the region is not supported, an exception is raised (EndpointConnectionError 
-                 or AccessDeniedException)
+
     """
     
     return glob.get_inventory(
@@ -178,6 +177,41 @@ def get_glacier_inventory(oId):
         aws_region = "all", 
         function_name = "list_vaults", 
         key_get = "VaultList",
+        pagination = True
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Storage Gateway
+#
+#  ------------------------------------------------------------------------
+
+def get_storagegateway_inventory(oId):
+
+    """
+        Returns Storage gateway inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Storage gateway inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/storagegateway.html
+
+    """
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "storagegateway", 
+        aws_region = "all", 
+        function_name = "list_gateways", 
+        key_get = "Gateways",
+        detail_function = "describe_gateway_information",
+        detail_get_key = "",
+        join_key = "GatewayARN",
+        detail_join_key = "GatewayARN",
         pagination = True
     )
 

@@ -28,8 +28,8 @@ import res.fact       as fact
 import res.security   as security
 import res.management as mgn
 import res.business   as bus
+import res.integration  as integ
 import res.awsthread  as awsthread
-
 
 # --- AWS basic information
 
@@ -160,6 +160,12 @@ if ('efs' in arguments):
 if ('glacier' in arguments):
     thread_list.append(awsthread.AWSThread('glacier', storage.get_glacier_inventory, ownerId))
 
+#
+# ----------------- Storage gateway inventory
+#
+if ('storagegateway' in arguments):
+    thread_list.append(awsthread.AWSThread('storagegateway', storage.get_storagegateway_inventory, ownerId))
+
 
 #################################################################
 #                          DATABASES                            #
@@ -181,6 +187,18 @@ if ('dynamodb' in arguments):
 #
 if ('neptune' in arguments):
     thread_list.append(awsthread.AWSThread('neptune', db.get_neptune_inventory, ownerId))
+
+#
+# ----------------- Redshift inventory
+#
+if ('redshift' in arguments):
+    thread_list.append(awsthread.AWSThread('redshift', db.get_redshift_inventory, ownerId))
+    
+#
+# ----------------- Elasticache inventory
+#
+if ('elasticache' in arguments):
+    thread_list.append(awsthread.AWSThread('elasticache', db.get_elasticache_inventory, ownerId))
 
 
 #################################################################
@@ -232,6 +250,28 @@ if ('hsm' in arguments):
 if ('codestar' in arguments):
     thread_list.append(awsthread.AWSThread('codestar', dev.get_codestar_inventory, ownerId))
 
+
+#################################################################
+#                        INTEGRATION                            #
+#################################################################
+#
+# ----------------- Simple Queue Service inventory
+#
+if ('sqs' in arguments):
+    thread_list.append(awsthread.AWSThread('sqs', integ.get_sqs_inventory, ownerId))
+
+#
+# ----------------- Amazon MQ inventory
+#
+if ('mq' in arguments):
+    thread_list.append(awsthread.AWSThread('mq', integ.get_mq_inventory, ownerId))
+
+#
+# ----------------- Simple Notification Serv ice inventory
+#
+if ('sns' in arguments):
+    thread_list.append(awsthread.AWSThread('sns', integ.get_sns_inventory, ownerId))
+    
 
 #################################################################
 #                         MANAGEMENT                            #

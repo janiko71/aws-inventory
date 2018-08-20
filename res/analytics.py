@@ -8,34 +8,34 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : CodeStar
-#  Unsupported services : CodeCommit, CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray
+#  Supported services   : None
+#  Unsupported services : Athena, EMR, CloudSearch, Elasticsearch Service, Kinesis, Quicksight, Data Pipeline, Glue
 #
 # =======================================================================================================================
 
 #  ------------------------------------------------------------------------
 #
-#    CodeStar
+#    XXX
 #
 #  ------------------------------------------------------------------------
 
-def get_codestar_inventory(oId):
+def get_xxx_inventory(oId):
 
     """
-        Returns codestar details
+        Returns xxx details
 
         :param oId: ownerId (AWS account)
         :type oId: string
 
-        :return: codestar inventory
+        :return: xxx inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/codestar.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/xxx.html
     """ 
     
     return glob.get_inventory(
         ownerId = oId,
-        aws_service = "codestar", 
+        aws_service = "xxx", 
         aws_region = "all", 
         function_name = "list_projects", 
         key_get = "projects",
