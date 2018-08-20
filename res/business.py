@@ -113,5 +113,5 @@ def get_workmail_inventory(oId):
 #
 # Hey, doc: we're in a module!
 #
-#if (__name__ == '__main__'):
-#    print('Module => Do not execute')
+if (__name__ == '__main__'):
+    print('Module => Do not execute')

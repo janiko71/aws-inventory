@@ -112,3 +112,9 @@ def json_datetime_converter(json_text):
     """
 
     return json.dumps(json_text, default = datetime_converter)      
+
+#
+# Hey, doc: we're in a module!
+#
+if (__name__ == '__main__'):
+    print('Module => Do not execute')
