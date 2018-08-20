@@ -1,29 +1,44 @@
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": [
-                "batch:DescribeJobQueues",
-                "route53:ListTrafficPolicyInstances",
-                "route53:ListTrafficPolicyInstancesByHostedZone",
-                "route53:ListHostedZones",
-                "batch:ListJobs",
-                "batch:DescribeComputeEnvironments",
-                "cloudhsm:DescribeClusters",
-                "route53:ListHostedZonesByName",
-                "batch:DescribeJobs",
-                "route53domains:ListDomains",
-                "route53:ListTrafficPolicies",
-                "route53:ListResourceRecordSets",
-                "cloudfront:ListDistributions",
-                "batch:DescribeJobDefinitions",
-                "route53:GetTrafficPolicyInstance",
-                "cloudhsm:ListHsms",
-                "secretsmanager:ListSecrets"
-            ],
-            "Resource": "*"
-        }
-    ]
+"Version": "2012-10-17",
+"Statement": [
+    {
+        "Sid": "VisualEditor0",
+        "Effect": "Allow",
+        "Action": [
+            "batch:DescribeJobQueues",
+            "route53:ListTrafficPolicyInstances",
+            "elasticache:DescribeReservedCacheNodes",
+            "mq:ListBrokers",
+            "storagegateway:DescribeGatewayInformation",
+            "sns:ListTopics",
+            "sqs:*",
+            "batch:DescribeComputeEnvironments",
+            "route53:ListHostedZonesByName",
+            "cloudhsm:DescribeClusters",
+            "storagegateway:ListGateways",
+            "batch:DescribeJobs",
+            "mq:DescribeBroker",
+            "route53domains:ListDomains",
+            "elasticache:DescribeCacheSubnetGroups",
+            "route53:ListTrafficPolicies",
+            "route53:ListResourceRecordSets",
+            "route53:GetTrafficPolicyInstance",
+            "cloudhsm:ListHsms",
+            "mq:DescribeConfiguration",
+            "elasticache:DescribeReplicationGroups",
+            "route53:ListTrafficPolicyInstancesByHostedZone",
+            "route53:ListHostedZones",
+            "batch:ListJobs",
+            "mq:ListConfigurations",
+            "redshift:DescribeReservedNodes",
+            "redshift:DescribeClusters",
+            "cloudfront:ListDistributions",
+            "batch:DescribeJobDefinitions",
+            "elasticache:DescribeCacheClusters",
+            "secretsmanager:ListSecrets",
+            "sns:ListPlatformApplications",
+            "elasticache:DescribeCacheSecurityGroups"
+        ],
+        "Resource": "*"
+    }
+]
 }
