@@ -176,8 +176,7 @@ def get_hsm_inventory(oId):
         detail_function = "describe_hsm", 
         join_key = "", 
         detail_join_key = "HsmArn", 
-        detail_get_key = "",        
-        pagination = True
+        detail_get_key = ""
     )
 
     inventory['luna'] = glob.get_inventory(
@@ -189,8 +188,7 @@ def get_hsm_inventory(oId):
         detail_function = "describe_luna_client", 
         join_key = "", 
         detail_join_key = "ClientArn", 
-        detail_get_key = "",        
-        pagination = True
+        detail_get_key = ""
     )
 
     return inventory
