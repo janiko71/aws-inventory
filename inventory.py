@@ -65,9 +65,10 @@ if (nb_arg == 0):
 
 # --- Displaying execution parameters
 print('-'*100)
-print ('Number of services:', len(arguments))
-print ('Services List     :', str(arguments))
+print ('Number of services   :', len(arguments))
+print ('Services List        :', str(arguments))
 print('-'*100)
+
 
 # --- Progression counter initialization
 
@@ -410,7 +411,7 @@ for svc in arguments:
 
 
 execution_time = time.time() - t0
-print("\n\nAll inventories are done. Duration: {:6f} seconds\n".format(execution_time))
+print("\n\nAll inventories are done. Duration: {:2f} seconds\n".format(execution_time))
 
 #
 # ----------------- Final inventory

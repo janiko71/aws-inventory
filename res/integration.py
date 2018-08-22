@@ -85,11 +85,7 @@ def get_mq_inventory(oId):
         aws_service = "mq", 
         aws_region = "all", 
         function_name = "list_configurations", 
-        key_get = "Configurations",
-        detail_function = "describe_configuration", 
-        join_key = "Id", 
-        detail_join_key = "ConfigurationId", 
-        detail_get_key = ""
+        key_get = "Configurations"
     )
     
     return mq_inventory
