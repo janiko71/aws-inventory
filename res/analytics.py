@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Elasticsearch Service, CloudSearch, 
-#  Unsupported services : Athena, EMR, Kinesis, Quicksight (not scriptable), Data Pipeline, Glue
+#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, 
+#  Unsupported services : Athena, EMR, Kinesis, Quicksight (not scriptable), Glue
 #
 # =======================================================================================================================
 
