@@ -17,19 +17,20 @@ import res.utils as utils
 import config
 
 # AWS Services imports 
-import res.glob       as glob
-import res.compute    as compute
-import res.storage    as storage
-import res.db         as db
-import res.dev        as dev
-import res.iam        as iam
-import res.network    as net
-import res.fact       as fact
-import res.security   as security
-import res.management as mgn
-import res.business   as bus
+import res.glob         as glob
+import res.compute      as compute
+import res.storage      as storage
+import res.db           as db
+import res.dev          as dev
+import res.iam          as iam
+import res.network      as net
+import res.fact         as fact
+import res.security     as security
+import res.analytics    as analytics
+import res.management   as mgn
+import res.business     as bus
 import res.integration  as integ
-import res.awsthread  as awsthread
+import res.awsthread    as awsthread
 
 # --- AWS basic information
 
@@ -99,7 +100,9 @@ if ('ec2' in arguments):
     thread_list.append(awsthread.AWSThread("ec2-network-interfaces", compute.get_interfaces_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("ec2-vpcs", compute.get_vpc_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("ec2-ebs", compute.get_ebs_inventory, ownerId))
-
+    thread_list.append(awsthread.AWSThread("ec2-security-groups", compute.get_sg_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ec2-internet-gateways", compute.get_igw_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ec2-nat-gateways", compute.get_ngw_inventory, ownerId))
 
 # 
 # ----------------- Lambda functions
@@ -275,6 +278,16 @@ if ('sns' in arguments):
     
 
 #################################################################
+#                         ANALYTICS                             #
+#################################################################
+#
+# ----------------- ElasticSearch
+#
+if ('es' in arguments):
+    thread_list.append(awsthread.AWSThread('es', analytics.get_es_inventory, ownerId))  
+
+
+#################################################################
 #                         MANAGEMENT                            #
 #################################################################
 #
@@ -386,8 +399,11 @@ for svc in arguments:
 
         inventory["ec2"] = config.global_inventory["ec2"]    
         inventory["ec2-network-interfaces"] = config.global_inventory["ec2-network-interfaces"]    
-        inventory["ec2-vpcs"] = config.global_inventory["ec2-vpcs"]    
         inventory["ec2-ebs"] = config.global_inventory["ec2-ebs"]    
+        inventory["ec2-vpcs"] = config.global_inventory["ec2-vpcs"]    
+        inventory["ec2-security-groups"] = config.global_inventory["ec2-security-groups"]    
+        inventory["ec2-internet-gateways"] = config.global_inventory["ec2-internet-gateways"]    
+        inventory["ec2-nat-gateways"] = config.global_inventory["ec2-nat-gateways"] 
 
     elif (svc == "ecs"):
 

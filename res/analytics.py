@@ -15,34 +15,34 @@ import res.glob as glob
 
 #  ------------------------------------------------------------------------
 #
-#    XXX
+#    Elasticsearch
 #
 #  ------------------------------------------------------------------------
 
-def get_xxx_inventory(oId):
+def get_es_inventory(oId):
 
     """
-        Returns xxx details
+        Returns Elasticsearch details
 
         :param oId: ownerId (AWS account)
         :type oId: string
 
-        :return: xxx inventory
+        :return: Elasticsearch inventory
         :rtype: json
 
-        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/xxx.html
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/es.html
     """ 
     
     return glob.get_inventory(
         ownerId = oId,
-        aws_service = "xxx", 
+        aws_service = "es", 
         aws_region = "all", 
-        function_name = "list_projects", 
-        key_get = "projects",
-        detail_function = "describe_project", 
-        join_key = "projectId", 
-        detail_join_key = "id", 
-        detail_get_key = ""
+        function_name = "list_domain_names", 
+        key_get = "DomainNames",
+        join_key = "DomainName",
+        detail_join_key = "DomainName",
+        detail_function = "describe_elasticsearch_domain",
+        detail_get_key = "DomainStatus"
     )
 
 
