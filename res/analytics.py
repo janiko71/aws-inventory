@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : None
-#  Unsupported services : Athena, EMR, CloudSearch, Elasticsearch Service, Kinesis, Quicksight, Data Pipeline, Glue
+#  Supported services   : Elasticsearch Service, 
+#  Unsupported services : Athena, EMR, CloudSearch, Kinesis, Quicksight, Data Pipeline, Glue
 #
 # =======================================================================================================================
 
@@ -43,6 +43,35 @@ def get_es_inventory(oId):
         detail_join_key = "DomainName",
         detail_function = "describe_elasticsearch_domain",
         detail_get_key = "DomainStatus"
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Cloudsearch
+#
+#  ------------------------------------------------------------------------
+
+def get_cloudsearch_inventory(oId):
+
+    """
+        Returns cloudsearch details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: cloudsearch inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/cloudsearch.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "cloudsearch", 
+        aws_region = "all", 
+        function_name = "describe_domains", 
+        key_get = "DomainStatusList"
     )
 
 

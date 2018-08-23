@@ -286,6 +286,12 @@ if ('sns' in arguments):
 if ('es' in arguments):
     thread_list.append(awsthread.AWSThread('es', analytics.get_es_inventory, ownerId))  
 
+#
+# ----------------- Cloudsearch
+#
+if ('cloudsearch' in arguments):
+    thread_list.append(awsthread.AWSThread('cloudsearch', analytics.get_cloudsearch_inventory, ownerId)) 
+    
 
 #################################################################
 #                         MANAGEMENT                            #

@@ -17,18 +17,18 @@ display = "OwnerID : {} ! {:6.2f} % ! Region : {:16} ! {} ({}){}"
 
 t = gmtime()
 timestamp = strftime("%Y%m%d%H%M%S", t)
-filepath = './output/'
+filepath = "./output/"
 os.makedirs(filepath, exist_ok=True)
 
 
 # --- logging variables
 
-log_filepath    = './log/'
+log_filepath    = "./log/"
 os.makedirs(log_filepath, exist_ok=True)
 
-logger          = logging.getLogger('aws-inventory')
-hdlr            = logging.FileHandler(log_filepath+'inventory.log')
-formatter       = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+logger          = logging.getLogger("aws-inventory")
+hdlr            = logging.FileHandler(log_filepath+"inventory.log")
+formatter       = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 
 
 # --- Log handler
@@ -45,19 +45,19 @@ S3_INVENTORY_BUCKET="s3-bucket"
 
 # --- Arguments/Supported commands
 
-SUPPORTED_INVENTORIES = {'s3': 1, 'ec2': 7, 'lambda': 1 , 'lightsail': 3, 'efs': 1, 'glacier': 1, 'rds': 1, 'ce': 1, 'kms': 1, 'dynamodb': 1, 'apigateway': 1,
-    'ecs': 2, 'elasticbeanstalk': 2, 'clouddirectory': 1, 'codestar': 1, 'alexa': 1, 'workmail': 1, 'neptune': 1, 'acm': 1, 'acm-pca': 1, 'autoscaling': 3,
-    'cloudformation': 1, 'cloudtrail': 1, 'cloudwatch': 1, 'eks': 1, 'batch': 3, 'route53': 3, 'cloudfront': 1, 'secrets': 1, 'hsm': 3, 'elasticache': 2,
-	'redshift': 2, 'storagegateway': 1, 'sqs': 1, 'mq': 2, 'sns': 2, 'es': 1}
+SUPPORTED_INVENTORIES = {"s3": 1, "ec2": 7, "lambda": 1 , "lightsail": 3, "efs": 1, "glacier": 1, "rds": 1, "ce": 1, "kms": 1, "dynamodb": 1, "apigateway": 1,
+    "ecs": 2, "elasticbeanstalk": 2, "clouddirectory": 1, "codestar": 1, "alexa": 1, "workmail": 1, "neptune": 1, "acm": 1, "acm-pca": 1, "autoscaling": 3,
+    "cloudformation": 1, "cloudtrail": 1, "cloudwatch": 1, "eks": 1, "batch": 3, "route53": 3, "cloudfront": 1, "secrets": 1, "hsm": 3, "elasticache": 2,
+	"redshift": 2, "storagegateway": 1, "sqs": 1, "mq": 2, "sns": 2, "es": 1, "cloudsearch": 1}
 SUPPORTED_COMMANDS = list(SUPPORTED_INVENTORIES.keys())
-SUPPORTED_PARAMETERS = ['debug', 'info', 'warning', 'error']
+SUPPORTED_PARAMETERS = ["debug", "info", "warning", "error"]
 
 
 # --- AWS Regions 
 
-with open('aws_regions.json') as json_file:
+with open("aws_regions.json") as json_file:
     aws_regions = json.load(json_file)
-regions = aws_regions.get('Regions',[]) 
+regions = aws_regions.get("Regions",[]) 
 
 
 # --- Counters
