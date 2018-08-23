@@ -292,6 +292,12 @@ if ('es' in arguments):
 if ('cloudsearch' in arguments):
     thread_list.append(awsthread.AWSThread('cloudsearch', analytics.get_cloudsearch_inventory, ownerId)) 
     
+#
+# ----------------- Data Pipeline
+#
+if ('datapipeline' in arguments):
+    thread_list.append(awsthread.AWSThread('datapipeline', analytics.get_datapipeline_inventory, ownerId)) 
+
 
 #################################################################
 #                         MANAGEMENT                            #

@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Elasticsearch Service, 
-#  Unsupported services : Athena, EMR, CloudSearch, Kinesis, Quicksight, Data Pipeline, Glue
+#  Supported services   : Elasticsearch Service, CloudSearch, 
+#  Unsupported services : Athena, EMR, Kinesis, Quicksight (not scriptable), Data Pipeline, Glue
 #
 # =======================================================================================================================
 
@@ -75,8 +75,42 @@ def get_cloudsearch_inventory(oId):
     )
 
 
+#  ------------------------------------------------------------------------
+#
+#    Data Pipeline
+#
+#  ------------------------------------------------------------------------
+
+def get_datapipeline_inventory(oId):
+
+    """
+        Returns datapipeline details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: datapipeline inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/datapipeline.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "datapipeline", 
+        aws_region = "all", 
+        function_name = "list_pipelines", 
+        key_get = "pipelineIdList",
+        pagination = True,
+        join_key = "id",
+        detail_join_key = "pipelineId",
+        detail_function = "get_pipeline_definition",
+        detail_get_key = ""
+    )
+
+
 #
 # Hey, doc: we're in a module!
 #
-if (__name__ == '__main__'):
-    print('Module => Do not execute')
+if (__name__ == "__main__"):
+    print("Module => Do not execute")
