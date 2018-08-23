@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : None
-#  Unsupported services : Step functions, Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), SWF
+#  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), 
+#  Unsupported services : Step functions, SWF
 #
 # =======================================================================================================================
 

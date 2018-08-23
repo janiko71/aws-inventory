@@ -108,6 +108,70 @@ def get_ebs_inventory(oId):
     )
 
 
+def get_sg_inventory(oId):
+
+    """
+        Returns Security Groups inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Security Groups inventory
+        :rtype: json
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_security_groups", 
+        key_get = "SecurityGroups",
+        pagination = True
+    )
+
+
+def get_igw_inventory(oId):
+
+    """
+        Returns Internet Gateways inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Internet Gateways inventory
+        :rtype: json
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_internet_gateways", 
+        key_get = "InternetGateways"
+    )
+
+
+def get_ngw_inventory(oId):
+
+    """
+        Returns Nat Gateways inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Nat Gateways inventory
+        :rtype: json
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_nat_gateways", 
+        key_get = "NatGateways"
+    )
+
+
 #  ------------------------------------------------------------------------
 #
 #    Elastic Beanstalk 
@@ -194,7 +258,7 @@ def get_ecs_inventory(oId):
 def get_ecs_services_inventory(oId):
 
     """
-        Returns ECS tasks inventory /!\ NOT WORKING YET
+        Returns ECS tasks inventory  NOT WORKING YET
 
         :param oId: ownerId (AWS account)
         :type oId: string
