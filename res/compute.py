@@ -86,6 +86,27 @@ def get_vpc_inventory(oId):
     )
 
 
+def get_subnet_inventory(oId):
+
+    """
+        Returns VPC subnets inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: VPC subnets inventory
+        :rtype: json
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_subnets", 
+        key_get = "Subnets"
+    )
+
+
 def get_ebs_inventory(oId):
 
     """
@@ -105,6 +126,48 @@ def get_ebs_inventory(oId):
         function_name = "describe_volumes", 
         key_get = "Volumes",
         pagination = True
+    )
+
+
+def get_eips_inventory(oId):
+
+    """
+        Returns Elastic IPs inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Elastic IPs inventory
+        :rtype: json
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_addresses", 
+        key_get = "Addresses"
+    )
+
+
+def get_egpus_inventory(oId):
+
+    """
+        Returns Elastic GPUs inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: Elastic GPUs inventory
+        :rtype: json
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "ec2", 
+        aws_region = "all", 
+        function_name = "describe_elastic_gpus", 
+        key_get = "ElasticGpuSet"
     )
 
 
