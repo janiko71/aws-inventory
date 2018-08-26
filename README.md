@@ -17,7 +17,10 @@ This program needs Python 3.4 or newer.
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
 
 # What's new in this version?
-This is an attempt to use multithreading in order to accelerate the script. And, at first sight, it looks better: 230 seconds instead of 960 (for the same inventory) on my first test.
+This is an attempt to use multithreading in order to accelerate the script. And, at first sight, it looks better: 230 seconds instead of 960 (for the same inventory) on my first test. A lot of services has been added, with some improvements (like for Lightsail).
+
+# And in the next one?
+I'm working on a visualization tool. It can be useful for infra services (EC2, EFS, VPC, etc.). I don't know yet how far I can go, and what is the best dataviz tool for that. I'm trying with [vis.js](http://visjs.org/).
 
 # How to use it
 This script is intented to be executed from any python environment (and not only as a AWS lambda function as the original script). More information on [wiki](https://github.com/janiko71/aws-inventory/wiki).

@@ -69,6 +69,7 @@ print('-'*100)
 print ('Number of services   :', len(arguments))
 print ('Services List        :', str(arguments))
 print('-'*100)
+print()
 
 
 # --- Progression counter initialization
@@ -103,6 +104,9 @@ if ('ec2' in arguments):
     thread_list.append(awsthread.AWSThread("ec2-security-groups", compute.get_sg_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("ec2-internet-gateways", compute.get_igw_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("ec2-nat-gateways", compute.get_ngw_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ec2-subnets", compute.get_subnet_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ec2-eips", compute.get_eips_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ec2-egpus", compute.get_egpus_inventory, ownerId))
 
 # 
 # ----------------- Lambda functions
@@ -341,6 +345,11 @@ if ('route53' in arguments):
 if ('cloudfront' in arguments):
     thread_list.append(awsthread.AWSThread('cloudfront', net.get_cloudfront_inventory, ownerId))
 
+#
+# ----------------- Load Balancer inventory
+#
+if ('elb' in arguments):
+    thread_list.append(awsthread.AWSThread('elb', net.get_elb_inventory, ownerId))
 
 #################################################################
 #                   BUSINESS PRODUCTIVITY                       #
@@ -416,6 +425,9 @@ for svc in arguments:
         inventory["ec2-security-groups"] = config.global_inventory["ec2-security-groups"]    
         inventory["ec2-internet-gateways"] = config.global_inventory["ec2-internet-gateways"]    
         inventory["ec2-nat-gateways"] = config.global_inventory["ec2-nat-gateways"] 
+        inventory["ec2-subnets"] = config.global_inventory["ec2-subnets"] 
+        inventory["ec2-eips"] = config.global_inventory["ec2-eips"] 
+        inventory["ec2-egpu"] = config.global_inventory["ec2-egpus"] 
 
     elif (svc == "ecs"):
 

@@ -58,7 +58,7 @@ def get_cloudfront_inventory(oId):
         :param oId: ownerId (AWS account)
         :type oId: string
 
-        :return: Acloudfront inventory
+        :return: Cloudfront inventory
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/cloudfront.html
@@ -131,6 +131,38 @@ def get_route53_inventory(oId):
     )
 
     return inventory
+
+
+
+#  ------------------------------------------------------------------------
+#
+#    Elastic Load Balancer
+#
+#  ------------------------------------------------------------------------
+
+def get_elb_inventory(oId):
+
+    """
+        Returns ELB inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: ELB inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elbv2.html
+
+    """
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "elbv2", 
+        aws_region = "all", 
+        function_name = "describe_load_balancers", 
+        key_get = "LoadBalancers",
+        pagination = True
+    )
 
 
 #
