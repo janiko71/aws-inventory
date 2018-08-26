@@ -580,9 +580,16 @@ def get_lightsail_inventory(oId):
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_static_ips", 
-        key_get = "staticIps",
-        pagination = True
+        key_get = "staticIps"
     )
+
+    lightsail_inventory['lightsail-disks'] = glob.get_inventory(
+        ownerId = oId,
+        aws_service = "lightsail", 
+        aws_region = "all", 
+        function_name = "get_disks", 
+        key_get = "disks"
+    )    
 
     return lightsail_inventory
 
