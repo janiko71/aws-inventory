@@ -26,9 +26,9 @@ I'm working on a visualization tool. It can be useful for infra services (EC2, E
 This script is intented to be executed from any python environment (and not only as a AWS lambda function as the original script). More information on [wiki](https://github.com/janiko71/aws-inventory/wiki).
 
 # If you like it
-This project is _open source_ (GPL-3.0) , but took me some time and efforts to design, to code, to make some researches and to test it. I hope you like this script, and that it will be useful for you.
+This project is _open source_ (GPL-3.0), but took me some time and efforts to design, to code, to make some researches and to test it. I hope you like this script, and that it will be useful for you.
 
-So, this project in **donationware** (or _donateware_). It means that you _can_ give me a small fee or retribution for my work. For those who are familiar with [RFCs](https://www.ietf.org/rfc/rfc2119.txt), it's not SHOULD but it's MAY. Think about it espacially if you fork the project, but there is **no obligation**.
+So, this project in **donationware** (or _donateware_). It means that you _can_ give me a small fee or retribution for my work. For those who are familiar with [RFCs](https://www.ietf.org/rfc/rfc2119.txt), it's not SHOULD but it's MAY. Think about it especially if you fork the project, but there is **no obligation**.
 
 For instance, a couple of $ or € can help me buying a dozen of coffee at work! And if you are millionnaire or a big company, please note that the service I use ([leetchi.com](https://www.leetchi.com/c/janiko71-aws-inventory)) accepts millions of $/€, which could be help me with coffees until retirement.
 
