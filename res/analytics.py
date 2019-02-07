@@ -109,6 +109,40 @@ def get_datapipeline_inventory(oId):
     )
 
 
+#  ------------------------------------------------------------------------
+#
+#    Elastic MapReduce
+#
+#  ------------------------------------------------------------------------
+
+def get_emr_inventory(oId):
+
+    """
+        Returns emr details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: emr inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/emr.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "emr", 
+        aws_region = "all", 
+        function_name = "list_clusters", 
+        key_get = "Clusters",
+        pagination = True,
+        join_key = "Id",
+        detail_join_key = "ClusterId",
+        detail_function = "describe_cluster",
+        detail_get_key = ""
+    )
+
+
 #
 # Hey, doc: we're in a module!
 #

@@ -16,7 +16,7 @@ import time
 import res.utils as utils
 import config
 
-# AWS Services imports 
+# AWS Services imports
 import res.glob         as glob
 import res.compute      as compute
 import res.storage      as storage
@@ -38,11 +38,11 @@ ownerId = utils.get_ownerID()
 config.logger.info('OWNER ID:'+ownerId)
 
 
-# --- AWS Regions 
+# --- AWS Regions
 
 with open('aws_regions.json') as json_file:
     aws_regions = json.load(json_file)
-regions = aws_regions.get('Regions',[] ) 
+regions = aws_regions.get('Regions',[] )
 
 
 # --- Inventory initialization
@@ -51,7 +51,7 @@ inventory = {}
 
 
 # --- Argumentation. See function check_arguments.
-# 
+#
 # If we find log level parameter, we adjust log level.
 # If we find no service name, we inventory all services.
 # Else we only inventory services passed in cmd line.
@@ -92,7 +92,7 @@ t0 = time.time()
 #################################################################
 #                           COMPUTE                             #
 #################################################################
-# 
+#
 # ----------------- EC2
 #
 
@@ -108,33 +108,33 @@ if ('ec2' in arguments):
     thread_list.append(awsthread.AWSThread("ec2-eips", compute.get_eips_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("ec2-egpus", compute.get_egpus_inventory, ownerId))
 
-# 
+#
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
     thread_list.append(awsthread.AWSThread("lambda", compute.get_lambda_inventory, ownerId))
 
-# 
+#
 # ----------------- Elastic beanstalk
 #
 if ('elasticbeanstalk' in arguments):
     thread_list.append(awsthread.AWSThread("elasticbeanstalk-environments", compute.get_elasticbeanstalk_environments_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("elasticbeanstalk-applications", compute.get_elasticbeanstalk_applications_inventory, ownerId))
 
-# 
+#
 # ----------------- ECS
 #
 if ('ecs' in arguments):
     thread_list.append(awsthread.AWSThread("ecs-clusters", compute.get_ecs_inventory, ownerId))
     thread_list.append(awsthread.AWSThread("ecs-tasks", compute.get_ecs_tasks_inventory, ownerId))
 
-# 
+#
 # ----------------- Lighstail instances
-# 
+#
 if ('lightsail' in arguments):
     thread_list.append(awsthread.AWSThread('lightsail', compute.get_lightsail_inventory, ownerId))
 
-# 
+#
 # ----------------- Autoscaling
 #
 if ('autoscaling' in arguments):
@@ -201,7 +201,7 @@ if ('neptune' in arguments):
 #
 if ('redshift' in arguments):
     thread_list.append(awsthread.AWSThread('redshift', db.get_redshift_inventory, ownerId))
-    
+
 #
 # ----------------- Elasticache inventory
 #
@@ -241,7 +241,7 @@ if ('acm-pca' in arguments):
 #
 if ('secrets' in arguments):
     thread_list.append(awsthread.AWSThread('secrets', security.get_secrets_inventory, ownerId))
-    
+
 #
 # ----------------- Cloud HSM
 #
@@ -279,7 +279,7 @@ if ('mq' in arguments):
 #
 if ('sns' in arguments):
     thread_list.append(awsthread.AWSThread('sns', integ.get_sns_inventory, ownerId))
-    
+
 
 #################################################################
 #                         ANALYTICS                             #
@@ -288,20 +288,25 @@ if ('sns' in arguments):
 # ----------------- ElasticSearch
 #
 if ('es' in arguments):
-    thread_list.append(awsthread.AWSThread('es', analytics.get_es_inventory, ownerId))  
+    thread_list.append(awsthread.AWSThread('es', analytics.get_es_inventory, ownerId))
 
 #
 # ----------------- Cloudsearch
 #
 if ('cloudsearch' in arguments):
-    thread_list.append(awsthread.AWSThread('cloudsearch', analytics.get_cloudsearch_inventory, ownerId)) 
-    
+    thread_list.append(awsthread.AWSThread('cloudsearch', analytics.get_cloudsearch_inventory, ownerId))
+
 #
 # ----------------- Data Pipeline
 #
 if ('datapipeline' in arguments):
-    thread_list.append(awsthread.AWSThread('datapipeline', analytics.get_datapipeline_inventory, ownerId)) 
+    thread_list.append(awsthread.AWSThread('datapipeline', analytics.get_datapipeline_inventory, ownerId))
 
+#
+# ----------------- Elastic MapReduce
+#
+if ('emr' in arguments):
+    thread_list.append(awsthread.AWSThread('emr', analytics.get_emr_inventory, ownerId))
 
 #################################################################
 #                         MANAGEMENT                            #
@@ -399,18 +404,18 @@ if ('s3' in arguments):
 
 
 # -------------------------------------------------------------------
-#                                                  
+#
 #                         Thread management
 #
 # -------------------------------------------------------------------
-    
+
 for th in thread_list:
     th.start()
 
 for th in thread_list:
     th.join()
 
-# 
+#
 # ----------------- Gathering all inventories
 #
 for svc in arguments:
@@ -418,23 +423,23 @@ for svc in arguments:
     # Some particular cases
     if (svc == "ec2"):
 
-        inventory["ec2"] = config.global_inventory["ec2"]    
-        inventory["ec2-network-interfaces"] = config.global_inventory["ec2-network-interfaces"]    
-        inventory["ec2-ebs"] = config.global_inventory["ec2-ebs"]    
-        inventory["ec2-vpcs"] = config.global_inventory["ec2-vpcs"]    
-        inventory["ec2-security-groups"] = config.global_inventory["ec2-security-groups"]    
-        inventory["ec2-internet-gateways"] = config.global_inventory["ec2-internet-gateways"]    
-        inventory["ec2-nat-gateways"] = config.global_inventory["ec2-nat-gateways"] 
-        inventory["ec2-subnets"] = config.global_inventory["ec2-subnets"] 
-        inventory["ec2-eips"] = config.global_inventory["ec2-eips"] 
-        inventory["ec2-egpu"] = config.global_inventory["ec2-egpus"] 
+        inventory["ec2"] = config.global_inventory["ec2"]
+        inventory["ec2-network-interfaces"] = config.global_inventory["ec2-network-interfaces"]
+        inventory["ec2-ebs"] = config.global_inventory["ec2-ebs"]
+        inventory["ec2-vpcs"] = config.global_inventory["ec2-vpcs"]
+        inventory["ec2-security-groups"] = config.global_inventory["ec2-security-groups"]
+        inventory["ec2-internet-gateways"] = config.global_inventory["ec2-internet-gateways"]
+        inventory["ec2-nat-gateways"] = config.global_inventory["ec2-nat-gateways"]
+        inventory["ec2-subnets"] = config.global_inventory["ec2-subnets"]
+        inventory["ec2-eips"] = config.global_inventory["ec2-eips"]
+        inventory["ec2-egpu"] = config.global_inventory["ec2-egpus"]
 
     elif (svc == "ecs"):
 
         inventory["ecs"] = {
             "ecs-clusters": config.global_inventory["ecs-clusters"],
             "ecs-tasks": config.global_inventory["ecs-tasks"]
-        }    
+        }
 
     elif (svc == "elasticbeanstalk"):
 
@@ -446,7 +451,7 @@ for svc in arguments:
     else:
 
         # General case
-        inventory[svc] = config.global_inventory[svc]    
+        inventory[svc] = config.global_inventory[svc]
 
 
 
