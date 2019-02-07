@@ -356,6 +356,12 @@ if ('cloudfront' in arguments):
 if ('elb' in arguments):
     thread_list.append(awsthread.AWSThread('elb', net.get_elb_inventory, ownerId))
 
+#
+# ----------------- Load Balancer v2 inventory
+#
+if ('elbv2' in arguments):
+    thread_list.append(awsthread.AWSThread('elbv2', net.get_elbv2_inventory, ownerId))
+
 #################################################################
 #                   BUSINESS PRODUCTIVITY                       #
 #################################################################
