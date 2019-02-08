@@ -151,6 +151,36 @@ def get_elb_inventory(oId):
         :return: ELB inventory
         :rtype: json
 
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elb.html
+
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        aws_service = "elb",
+        aws_region = "all",
+        function_name = "describe_load_balancers",
+        key_get = "LoadBalancerDescriptions",
+        pagination = True
+    )
+
+#  ------------------------------------------------------------------------
+#
+#    Elastic Load Balancer v2
+#
+#  ------------------------------------------------------------------------
+
+def get_elbv2_inventory(oId):
+
+    """
+        Returns ELBv2 inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+
+        :return: ELBv2 inventory
+        :rtype: json
+
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elbv2.html
 
     """
@@ -163,7 +193,6 @@ def get_elb_inventory(oId):
         key_get = "LoadBalancers",
         pagination = True
     )
-
 
 #
 # Hey, doc: we're in a module!
