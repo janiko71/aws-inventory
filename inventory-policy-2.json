@@ -47,7 +47,8 @@
                 "secretsmanager:ListSecrets",
                 "sns:ListPlatformApplications",
                 "elasticache:DescribeCacheSecurityGroups",
-                "elasticmapreduce:ListClusters"
+                "elasticmapreduce:ListClusters",
+                "elasticloadbalancing:DescribeLoadBalancers"
             ],
             "Resource": "*"
         }
