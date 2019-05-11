@@ -7,7 +7,7 @@ import res.utils as utils
 
 #  ------------------------------------------------------------------------
 #
-#     The MOST important functions of that project: generic inventory
+#     The MOST important function of that project: generic inventory
 #
 #  ------------------------------------------------------------------------
 
