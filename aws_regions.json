@@ -6,6 +6,11 @@
             "color": "IndianRed"
         },
         {
+            "RegionName": "ap-east-1",
+            "Endpoint": "ec2.ap-east-1.amazonaws.com",
+            "color": "IndianRed"
+        },
+        {
             "RegionName": "ap-northeast-2",
             "Endpoint": "ec2.ap-northeast-2.amazonaws.com",
             "color": "Salmon"
@@ -39,6 +44,11 @@
             "RegionName": "eu-central-1",
             "Endpoint": "ec2.eu-central-1.amazonaws.com",
             "color": "LimeGreen"
+        },
+        {
+            "RegionName": "eu-north-1",
+            "Endpoint": "ec2.eu-north-1.amazonaws.com",
+            "color": "PaleGreen"
         },
         {
             "RegionName": "eu-west-3",
