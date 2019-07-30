@@ -1,0 +1,4 @@
+jupyter-linter
+pylint
+aws
+boto3
