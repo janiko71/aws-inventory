@@ -18,6 +18,7 @@ import config
 
 # AWS Services imports
 import res.glob         as glob
+
 import res.compute      as compute
 import res.storage      as storage
 import res.db           as db
@@ -37,13 +38,9 @@ import res.awsthread    as awsthread
 ownerId = utils.get_ownerID()
 config.logger.info('OWNER ID:'+ownerId)
 
-
 # --- AWS Regions
 
-with open('aws_regions.json') as json_file:
-    aws_regions = json.load(json_file)
-regions = aws_regions.get('Regions',[] )
-
+regions = config.regions
 
 # --- Inventory initialization
 

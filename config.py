@@ -2,7 +2,9 @@ import time
 import logging
 import json
 import os
+import boto3
 from time import gmtime, strftime
+
 
 #
 # Environment Variables & File handling & logging
@@ -55,9 +57,36 @@ SUPPORTED_PARAMETERS = ["debug", "info", "warning", "error"]
 
 # --- AWS Regions 
 
-with open("aws_regions.json") as json_file:
-    aws_regions = json.load(json_file)
-regions = aws_regions.get("Regions",[]) 
+#  ------------------------------------------------------------------------
+#     Get all the AWS regions (dynamically, only "not opt-in" regions
+#     This function could be called in several modules
+#  ------------------------------------------------------------------------
+
+def get_aws_regions():
+
+    # Colors may be used in the future for display inventory. The color file must contains more colors than the number of regions.
+
+    with open("color.json","r") as f_col:
+        color_list = json.load(f_col)
+    colors = color_list["colors"]
+        
+    # We get the regions list through EC2.
+
+    client = boto3.client("ec2")
+    regions = client.describe_regions()
+    region_list = regions["Regions"]
+
+    # We assign one color to each region
+
+    for color, region in zip(colors, region_list):
+        region['color'] = color
+
+    logger.info(regions)
+
+    return regions["Regions"]
+
+
+regions = get_aws_regions()
 
 
 # --- Counters
