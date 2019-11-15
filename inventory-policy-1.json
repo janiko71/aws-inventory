@@ -7,6 +7,7 @@
             "Action": [
                 "ec2:DescribeInstances",
 				"ec2:DescribeRegions",
+                "ec2:DescribeAvailabilityZones",
                 "clouddirectory:ListDirectories",
                 "ecs:DescribeTaskDefinition",
                 "ec2:DescribeInternetGateways",
