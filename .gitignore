@@ -2,3 +2,4 @@ __pycache__
 res/__pycache__/*
 output/*
 log/*
+launch.json

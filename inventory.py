@@ -33,19 +33,6 @@ import res.business     as bus
 import res.integration  as integ
 import res.awsthread    as awsthread
 
-# --- AWS basic information
-
-ownerId = utils.get_ownerID()
-config.logger.info('OWNER ID:'+ownerId)
-
-# --- AWS Regions
-
-regions = config.regions
-
-# --- Inventory initialization
-
-inventory = {}
-
 
 # --- Argumentation. See function check_arguments.
 #
@@ -67,6 +54,20 @@ print ('Number of services   :', len(arguments))
 print ('Services List        :', str(arguments))
 print('-'*100)
 print()
+
+
+# --- AWS basic information
+
+ownerId = utils.get_ownerID()
+config.logger.info('OWNER ID:'+ownerId)
+
+# --- AWS Regions
+
+regions = config.regions
+
+# --- Inventory initialization
+
+inventory = {}
 
 
 # --- Progression counter initialization
@@ -472,11 +473,24 @@ except IOError as e:
     config.logger.error("I/O error({0}): {1}".format(e.errno, e.strerror))
 
 json_file.write(json.JSONEncoder().encode(inventory))
+json_file.close()
+
+#
+# ----------------- For Information: list of regions and availability zones
+#
+
+filename_regions_json = 'AWS_Regions_List.json'
+try:
+    json_file = open(config.filepath+filename_regions_json,'w+')
+except IOError as e:
+    config.logger.error("I/O error({0}): {1}".format(e.errno, e.strerror))
+
+json_file.write(json.JSONEncoder().encode(regions))
+json_file.close()
 
 #
 # EOF
 #
-json_file.close()
 
 #
 # This is the end
