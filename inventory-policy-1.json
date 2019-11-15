@@ -6,6 +6,7 @@
             "Effect": "Allow",
             "Action": [
                 "ec2:DescribeInstances",
+				"ec2:DescribeRegions",
                 "clouddirectory:ListDirectories",
                 "ecs:DescribeTaskDefinition",
                 "ec2:DescribeInternetGateways",
