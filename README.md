@@ -14,6 +14,8 @@ Supported AWS services is limited, but I add some regulary. **Supported services
 ## Pre-requisites
 This program needs Python 3.4 or newer. 
 
+AWS CLI must be installed and configured on the system you want to run aws-inventory. You SHOULD use a special account with minimal rights (= those in inventory*.json files). See [wiki](https://github.com/janiko71/aws-inventory/wiki) for more.
+
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
 
 # What's new in this version?
