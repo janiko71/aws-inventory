@@ -40,7 +40,7 @@ import res.awsthread    as awsthread
 # If we find no service name, we inventory all services.
 # Else we only inventory services passed in cmd line.
 
-arguments = utils.check_arguments(sys.argv[1:])
+profile_name, arguments = utils.check_arguments(sys.argv[1:])
 nb_arg = len(arguments)
 
 # if no arguments, we try all AWS services
@@ -58,12 +58,15 @@ print()
 
 # --- AWS basic information
 
-ownerId = utils.get_ownerID()
+ownerId = utils.get_ownerID(profile_name)
 config.logger.info('OWNER ID:'+ownerId)
+
 
 # --- AWS Regions
 
-regions = config.regions
+regions = utils.get_aws_regions(profile_name)
+nb_regions = len(regions)
+
 
 # --- Inventory initialization
 
