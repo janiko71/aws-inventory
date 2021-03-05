@@ -60,6 +60,8 @@ SUPPORTED_PARAMETERS = ["debug", "info", "warning", "error"]
 nb_svc = 0
 nb_units_todo = 0
 nb_units_done = 0
+regions = []
+nb_regions = 0
 
 #
 # --- Global inventory, for multithreading purpose

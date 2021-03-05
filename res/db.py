@@ -18,14 +18,15 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_rds_inventory(oId):
+def get_rds_inventory(oId, profile):
 
     """
         Returns RDS inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
-
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: RDS inventory
         :rtype: json
@@ -36,6 +37,7 @@ def get_rds_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "rds", 
         aws_region = "all", 
         function_name = "describe_db_instances", 
@@ -50,13 +52,15 @@ def get_rds_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_dynamodb_inventory(oId):
+def get_dynamodb_inventory(oId, profile):
 
     """
         Returns dynamoDB inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: dynamoDB inventory
         :rtype: json
@@ -67,6 +71,7 @@ def get_dynamodb_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "dynamodb", 
         aws_region = "all", 
         function_name = "list_tables", 
@@ -85,13 +90,15 @@ def get_dynamodb_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_neptune_inventory(oId):
+def get_neptune_inventory(oId, profile):
 
     """
         Returns neptune inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: neptune inventory
         :rtype: json
@@ -104,6 +111,7 @@ def get_neptune_inventory(oId):
 
     neptune_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "neptune", 
         aws_region = "all", 
         function_name = "describe_db_clusters", 
@@ -119,13 +127,15 @@ def get_neptune_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_elasticache_inventory(oId):
+def get_elasticache_inventory(oId, profile):
 
     """
         Returns elasticache inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: elasticache inventory
         :rtype: json
@@ -138,6 +148,7 @@ def get_elasticache_inventory(oId):
 
     elasticache_inventory['cache-clusters'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "elasticache", 
         aws_region = "all", 
         function_name = "describe_cache_clusters", 
@@ -147,6 +158,7 @@ def get_elasticache_inventory(oId):
 
     elasticache_inventory['reserved-cache-nodes'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "elasticache", 
         aws_region = "all", 
         function_name = "describe_reserved_cache_nodes", 
@@ -163,13 +175,15 @@ def get_elasticache_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_redshift_inventory(oId):
+def get_redshift_inventory(oId, profile):
 
     """
         Returns redshift inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: redshift inventory
         :rtype: json
@@ -182,6 +196,7 @@ def get_redshift_inventory(oId):
 
     redshift_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "redshift", 
         aws_region = "all", 
         function_name = "describe_clusters", 
@@ -191,6 +206,7 @@ def get_redshift_inventory(oId):
 
     redshift_inventory['reserved-nodes'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "redshift", 
         aws_region = "all", 
         function_name = "describe_reserved_nodes", 

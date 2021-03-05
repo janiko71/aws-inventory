@@ -19,13 +19,15 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_es_inventory(oId):
+def get_es_inventory(oId, profile):
 
     """
         Returns Elasticsearch details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Elasticsearch inventory
         :rtype: json
@@ -35,6 +37,7 @@ def get_es_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "es", 
         aws_region = "all", 
         function_name = "list_domain_names", 
@@ -52,13 +55,15 @@ def get_es_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudsearch_inventory(oId):
+def get_cloudsearch_inventory(oId, profile):
 
     """
         Returns cloudsearch details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string        
 
         :return: cloudsearch inventory
         :rtype: json
@@ -68,6 +73,7 @@ def get_cloudsearch_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudsearch", 
         aws_region = "all", 
         function_name = "describe_domains", 
@@ -81,13 +87,15 @@ def get_cloudsearch_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_datapipeline_inventory(oId):
+def get_datapipeline_inventory(oId, profile):
 
     """
         Returns datapipeline details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: datapipeline inventory
         :rtype: json
@@ -97,6 +105,7 @@ def get_datapipeline_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "datapipeline", 
         aws_region = "all", 
         function_name = "list_pipelines", 
@@ -115,13 +124,15 @@ def get_datapipeline_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_emr_inventory(oId):
+def get_emr_inventory(oId, profile):
 
     """
         Returns emr details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: emr inventory
         :rtype: json
@@ -131,6 +142,7 @@ def get_emr_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "emr", 
         aws_region = "all", 
         function_name = "list_clusters", 

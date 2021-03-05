@@ -11,13 +11,15 @@ import res.utils as utils
 #
 #  ------------------------------------------------------------------------
 
-def get_ce_inventory(ownerId, values):
+def get_ce_inventory(ownerId, profile, values):
 
     """
         Returns cost inventory, for a period (1 month ?)
 
         :param ownerId: ownerId (AWS account)
         :type ownerId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
         :param region_name: region name
         :type region_name: string
 

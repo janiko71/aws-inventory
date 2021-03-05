@@ -18,7 +18,7 @@ class AWSThread(Thread):
 
     """    
 
-    def __init__(self, aws_service, function_name, arg):
+    def __init__(self, aws_service, function_name, *arg):
 
         """
             Thread Class initialization.  
@@ -45,6 +45,6 @@ class AWSThread(Thread):
             Code to execute => the AWS function, in its own thread
         """
         
-        config.global_inventory[self.aws_service] = self.function_name(self.arg)
+        config.global_inventory[self.aws_service] = self.function_name(*self.arg)
 
 

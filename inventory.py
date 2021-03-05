@@ -59,13 +59,14 @@ print()
 # --- AWS basic information
 
 ownerId = utils.get_ownerID(profile_name)
-config.logger.info('OWNER ID:'+ownerId)
+config.logger.info('OWNER ID: '+ownerId)
+config.logger.info('AWS Profile: '+profile_name)
 
 
 # --- AWS Regions
 
-regions = utils.get_aws_regions(profile_name)
-nb_regions = len(regions)
+config.regions = utils.get_aws_regions(profile_name)
+config.nb_regions = len(config.regions)
 
 
 # --- Inventory initialization
@@ -98,60 +99,60 @@ t0 = time.time()
 #
 
 if ('ec2' in arguments):
-    thread_list.append(awsthread.AWSThread("ec2", compute.get_ec2_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-network-interfaces", compute.get_interfaces_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-vpcs", compute.get_vpc_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-ebs", compute.get_ebs_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-security-groups", compute.get_sg_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-internet-gateways", compute.get_igw_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-nat-gateways", compute.get_ngw_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-subnets", compute.get_subnet_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-eips", compute.get_eips_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ec2-egpus", compute.get_egpus_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ec2", compute.get_ec2_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-network-interfaces", compute.get_interfaces_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-vpcs", compute.get_vpc_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-ebs", compute.get_ebs_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-security-groups", compute.get_sg_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-internet-gateways", compute.get_igw_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-nat-gateways", compute.get_ngw_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-subnets", compute.get_subnet_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-eips", compute.get_eips_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ec2-egpus", compute.get_egpus_inventory, ownerId, profile_name))
 
 #
 # ----------------- Lambda functions
 #
 if ('lambda' in arguments):
-    thread_list.append(awsthread.AWSThread("lambda", compute.get_lambda_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("lambda", compute.get_lambda_inventory, ownerId, profile_name))
 
 #
 # ----------------- Elastic beanstalk
 #
 if ('elasticbeanstalk' in arguments):
-    thread_list.append(awsthread.AWSThread("elasticbeanstalk-environments", compute.get_elasticbeanstalk_environments_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("elasticbeanstalk-applications", compute.get_elasticbeanstalk_applications_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("elasticbeanstalk-environments", compute.get_elasticbeanstalk_environments_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("elasticbeanstalk-applications", compute.get_elasticbeanstalk_applications_inventory, ownerId, profile_name))
 
 #
 # ----------------- ECS
 #
 if ('ecs' in arguments):
-    thread_list.append(awsthread.AWSThread("ecs-clusters", compute.get_ecs_inventory, ownerId))
-    thread_list.append(awsthread.AWSThread("ecs-tasks", compute.get_ecs_tasks_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread("ecs-clusters", compute.get_ecs_inventory, ownerId, profile_name))
+    thread_list.append(awsthread.AWSThread("ecs-tasks", compute.get_ecs_tasks_inventory, ownerId, profile_name))
 
 #
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
-    thread_list.append(awsthread.AWSThread('lightsail', compute.get_lightsail_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('lightsail', compute.get_lightsail_inventory, ownerId, profile_name))
 
 #
 # ----------------- Autoscaling
 #
 if ('autoscaling' in arguments):
-    thread_list.append(awsthread.AWSThread('autoscaling', compute.get_autoscaling_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('autoscaling', compute.get_autoscaling_inventory, ownerId, profile_name))
 
 #
 # ----------------- EKS inventory
 #
 if ('eks' in arguments):
-    thread_list.append(awsthread.AWSThread('eks',compute.get_eks_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('eks',compute.get_eks_inventory, ownerId, profile_name))
 
 #
 # ----------------- Batch jobs inventory
 #
 if ('batch' in arguments):
-    thread_list.append(awsthread.AWSThread('batch', compute.get_batch_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('batch', compute.get_batch_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -161,19 +162,19 @@ if ('batch' in arguments):
 # ----------------- EFS inventory
 #
 if ('efs' in arguments):
-    thread_list.append(awsthread.AWSThread('efs', storage.get_efs_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('efs', storage.get_efs_inventory, ownerId, profile_name))
 
 #
 # ----------------- Glacier inventory
 #
 if ('glacier' in arguments):
-    thread_list.append(awsthread.AWSThread('glacier', storage.get_glacier_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('glacier', storage.get_glacier_inventory, ownerId, profile_name))
 
 #
 # ----------------- Storage gateway inventory
 #
 if ('storagegateway' in arguments):
-    thread_list.append(awsthread.AWSThread('storagegateway', storage.get_storagegateway_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('storagegateway', storage.get_storagegateway_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -183,31 +184,31 @@ if ('storagegateway' in arguments):
 # ----------------- RDS inventory
 #
 if ('rds' in arguments):
-    thread_list.append(awsthread.AWSThread('rds', db.get_rds_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('rds', db.get_rds_inventory, ownerId, profile_name))
 
 #
 # ----------------- dynamodb inventory
 #
 if ('dynamodb' in arguments):
-    thread_list.append(awsthread.AWSThread('dynamodb', db.get_dynamodb_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('dynamodb', db.get_dynamodb_inventory, ownerId, profile_name))
 
 #
 # ----------------- Neptune inventory
 #
 if ('neptune' in arguments):
-    thread_list.append(awsthread.AWSThread('neptune', db.get_neptune_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('neptune', db.get_neptune_inventory, ownerId, profile_name))
 
 #
 # ----------------- Redshift inventory
 #
 if ('redshift' in arguments):
-    thread_list.append(awsthread.AWSThread('redshift', db.get_redshift_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('redshift', db.get_redshift_inventory, ownerId, profile_name))
 
 #
 # ----------------- Elasticache inventory
 #
 if ('elasticache' in arguments):
-    thread_list.append(awsthread.AWSThread('elasticache', db.get_elasticache_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('elasticache', db.get_elasticache_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -217,37 +218,37 @@ if ('elasticache' in arguments):
 # ----------------- KMS inventory
 #
 if ('kms' in arguments):
-    thread_list.append(awsthread.AWSThread('kms', iam.get_kms_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('kms', iam.get_kms_inventory, ownerId, profile_name))
 
 #
 # ----------------- Cloud directory
 #
 if ('clouddirectory' in arguments):
-    thread_list.append(awsthread.AWSThread('clouddirectory', security.get_clouddirectory_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('clouddirectory', security.get_clouddirectory_inventory, ownerId, profile_name))
 
 #
 # ----------------- ACM (Certificates) inventory
 #
 if ('acm' in arguments):
-    thread_list.append(awsthread.AWSThread('acm', security.get_acm_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('acm', security.get_acm_inventory, ownerId, profile_name))
 
 #
 # ----------------- ACMPCA (Certificates) inventory Private Certificate Authority
 #
 if ('acm-pca' in arguments):
-    thread_list.append(awsthread.AWSThread('acm-pca', security.get_acm_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('acm-pca', security.get_acm_inventory, ownerId, profile_name))
 
 #
 # ----------------- Secrets Manager
 #
 if ('secrets' in arguments):
-    thread_list.append(awsthread.AWSThread('secrets', security.get_secrets_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('secrets', security.get_secrets_inventory, ownerId, profile_name))
 
 #
 # ----------------- Cloud HSM
 #
 if ('hsm' in arguments):
-    thread_list.append(awsthread.AWSThread('hsm', security.get_hsm_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('hsm', security.get_hsm_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -257,7 +258,7 @@ if ('hsm' in arguments):
 # ----------------- CodeStar inventory
 #
 if ('codestar' in arguments):
-    thread_list.append(awsthread.AWSThread('codestar', dev.get_codestar_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('codestar', dev.get_codestar_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -267,19 +268,19 @@ if ('codestar' in arguments):
 # ----------------- Simple Queue Service inventory
 #
 if ('sqs' in arguments):
-    thread_list.append(awsthread.AWSThread('sqs', integ.get_sqs_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('sqs', integ.get_sqs_inventory, ownerId, profile_name))
 
 #
 # ----------------- Amazon MQ inventory
 #
 if ('mq' in arguments):
-    thread_list.append(awsthread.AWSThread('mq', integ.get_mq_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('mq', integ.get_mq_inventory, ownerId, profile_name))
 
 #
 # ----------------- Simple Notification Serv ice inventory
 #
 if ('sns' in arguments):
-    thread_list.append(awsthread.AWSThread('sns', integ.get_sns_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('sns', integ.get_sns_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -289,25 +290,26 @@ if ('sns' in arguments):
 # ----------------- ElasticSearch
 #
 if ('es' in arguments):
-    thread_list.append(awsthread.AWSThread('es', analytics.get_es_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('es', analytics.get_es_inventory, ownerId, profile_name))
 
 #
 # ----------------- Cloudsearch
 #
 if ('cloudsearch' in arguments):
-    thread_list.append(awsthread.AWSThread('cloudsearch', analytics.get_cloudsearch_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('cloudsearch', analytics.get_cloudsearch_inventory, ownerId, profile_name))
 
 #
 # ----------------- Data Pipeline
 #
 if ('datapipeline' in arguments):
-    thread_list.append(awsthread.AWSThread('datapipeline', analytics.get_datapipeline_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('datapipeline', analytics.get_datapipeline_inventory, ownerId, profile_name))
 
 #
 # ----------------- Elastic MapReduce
 #
 if ('emr' in arguments):
-    thread_list.append(awsthread.AWSThread('emr', analytics.get_emr_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('emr', analytics.get_emr_inventory, ownerId, profile_name))
+
 
 #################################################################
 #                         MANAGEMENT                            #
@@ -316,18 +318,18 @@ if ('emr' in arguments):
 # ----------------- CloudFormation
 #
 if ('cloudformation' in arguments):
-    thread_list.append(awsthread.AWSThread('cloudformation', mgn.get_cloudformation_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('cloudformation', mgn.get_cloudformation_inventory, ownerId, profile_name))
 
 #
 # ----------------- CloudTrail
 #
 if ('cloudtrail' in arguments):
-    thread_list.append(awsthread.AWSThread('cloudtrail', mgn.get_cloudtrail_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('cloudtrail', mgn.get_cloudtrail_inventory, ownerId, profile_name))
 
 # ----------------- CloudWatch
 #
 if ('cloudwatch' in arguments):
-    thread_list.append(awsthread.AWSThread('cloudwatch', mgn.get_cloudwatch_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('cloudwatch', mgn.get_cloudwatch_inventory, ownerId, profile_name))
 
 
 #################################################################
@@ -337,31 +339,32 @@ if ('cloudwatch' in arguments):
 # ----------------- API Gateway inventory
 #
 if ('apigateway' in arguments):
-    thread_list.append(awsthread.AWSThread('apigateway', net.get_apigateway_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('apigateway', net.get_apigateway_inventory, ownerId, profile_name))
 
 #
 # ----------------- Route 53 inventory
 #
 if ('route53' in arguments):
-    thread_list.append(awsthread.AWSThread('route53', net.get_route53_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('route53', net.get_route53_inventory, ownerId, profile_name))
 
 #
 # ----------------- CloudFront inventory
 #
 if ('cloudfront' in arguments):
-    thread_list.append(awsthread.AWSThread('cloudfront', net.get_cloudfront_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('cloudfront', net.get_cloudfront_inventory, ownerId, profile_name))
 
 #
 # ----------------- Load Balancer inventory
 #
 if ('elb' in arguments):
-    thread_list.append(awsthread.AWSThread('elb', net.get_elb_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('elb', net.get_elb_inventory, ownerId, profile_name))
 
 #
 # ----------------- Load Balancer v2 inventory
 #
 if ('elbv2' in arguments):
-    thread_list.append(awsthread.AWSThread('elbv2', net.get_elbv2_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('elbv2', net.get_elbv2_inventory, ownerId, profile_name))
+
 
 #################################################################
 #                   BUSINESS PRODUCTIVITY                       #
@@ -370,19 +373,19 @@ if ('elbv2' in arguments):
 # ----------------- Alexa for Business
 #
 if ('alexa' in arguments):
-    thread_list.append(awsthread.AWSThread('alexa', bus.get_alexa_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('alexa', bus.get_alexa_inventory, ownerId, profile_name))
 
 #
 # ----------------- WorkDocs (not implemented)
 #
 if ('workdocs' in arguments):
-    thread_list.append(awsthread.AWSThread('workdocs', bus.get_workdocs_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('workdocs', bus.get_workdocs_inventory, ownerId, profile_name))
 
 #
 # ----------------- Workmail (not well tested, some rights issues)
 #
 if ('workmail' in arguments):
-    thread_list.append(awsthread.AWSThread('workmail', bus.get_workmail_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('workmail', bus.get_workmail_inventory, ownerId, profile_name))
 
 #
 # ----------------- Cost Explorer (experimental)
@@ -406,7 +409,7 @@ region_name = 'global'
 # ----------------- S3 quick inventory
 #
 if ('s3' in arguments):
-    thread_list.append(awsthread.AWSThread('s3', storage.get_s3_inventory, ownerId))
+    thread_list.append(awsthread.AWSThread('s3', storage.get_s3_inventory, ownerId, profile_name))
 
 
 
@@ -461,7 +464,6 @@ for svc in arguments:
         inventory[svc] = config.global_inventory[svc]
 
 
-
 execution_time = time.time() - t0
 print("\n\nAll inventories are done. Duration: {:2f} seconds\n".format(execution_time))
 
@@ -488,7 +490,7 @@ try:
 except IOError as e:
     config.logger.error("I/O error({0}): {1}".format(e.errno, e.strerror))
 
-json_file.write(json.JSONEncoder().encode(regions))
+json_file.write(json.JSONEncoder().encode(config.regions))
 json_file.close()
 
 #

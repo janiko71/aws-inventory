@@ -19,13 +19,15 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_sqs_inventory(oId):
+def get_sqs_inventory(oId, profile):
 
     """
         Returns Simple Queue Service (SQS) details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Simple Queue Service (SQS) inventory
         :rtype: json
@@ -35,6 +37,7 @@ def get_sqs_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "sqs", 
         aws_region = "all", 
         function_name = "list_queues", 
@@ -52,13 +55,15 @@ def get_sqs_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_mq_inventory(oId):
+def get_mq_inventory(oId, profile):
 
     """
         Returns Amazon MQ details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Amazon MQ inventory
         :rtype: json
@@ -70,6 +75,7 @@ def get_mq_inventory(oId):
     
     mq_inventory['brokers'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "mq", 
         aws_region = "all", 
         function_name = "list_brokers", 
@@ -82,6 +88,7 @@ def get_mq_inventory(oId):
 
     mq_inventory['configurations'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "mq", 
         aws_region = "all", 
         function_name = "list_configurations", 
@@ -97,13 +104,15 @@ def get_mq_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_sns_inventory(oId):
+def get_sns_inventory(oId, profile):
 
     """
         Returns sns (topics, applications) details
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Amazon sns inventory
         :rtype: json
@@ -115,6 +124,7 @@ def get_sns_inventory(oId):
     
     sns_inventory['topics'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "sns", 
         aws_region = "all", 
         function_name = "list_topics", 
@@ -124,6 +134,7 @@ def get_sns_inventory(oId):
 
     sns_inventory['applications'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "sns", 
         aws_region = "all", 
         function_name = "list_platform_applications", 

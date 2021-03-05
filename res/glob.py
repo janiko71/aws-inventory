@@ -11,6 +11,7 @@ import res.utils as utils
 #  ------------------------------------------------------------------------
 
 def get_inventory(ownerId, 
+                  profile,
                   aws_service, 
                   aws_region, 
                   function_name, 
@@ -29,6 +30,7 @@ def get_inventory(ownerId,
         The list of parameters is impressive but it allows to add a service in minutes without any re-coding (just testing!)
 
         :param ownerId: ownerId (AWS account). Mandatory.
+        :param profile: profile used for inventory (in .aws\credentials). Mandatory.
         :param aws_service: name of AWS service (= the name used in SDK, and defined in config.py). Mandatory.
         :param aws_region: scope of the inventory, depending on the service. Some are globalized, some needs to be executed in every AWS region. Mandatory.
         :param function_name: the name of the SDK function to call to get inventory (or the list of resources). Mandatory.
@@ -41,6 +43,7 @@ def get_inventory(ownerId,
         :param pagination_detail: tells if the detail inventory function supports pagination or not ; pagination is need for large inventory lists.
 
         :type ownerId: string
+        :type profile: string
         :type aws_service: string
         :type aws_region: string
         :type function_name: string
@@ -70,7 +73,9 @@ def get_inventory(ownerId,
                 region_name = region['RegionName']
                 utils.progress(region_name)
                 config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
-                client = boto3.client(aws_service, region_name)
+
+                session = boto3.Session(profile_name=profile)
+                client = session.client(aws_service, region_name)
 
                 if (pagination):
 
@@ -106,7 +111,9 @@ def get_inventory(ownerId,
         # inventory can be globalized
         try:
 
-            client = boto3.client(aws_service)
+            session = boto3.Session(profile_name=profile)
+            client = session.client(aws_service)
+
             config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
             utils.progress(aws_region)
             utils.display(ownerId, aws_region, aws_service, function_name)

@@ -20,13 +20,15 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_s3_inventory(oId):
+def get_s3_inventory(oId, profile):
 
     """
         Returns S3 quick inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: S3 inventory
         :rtype: json
@@ -38,6 +40,7 @@ def get_s3_inventory(oId):
 
     bucket_list = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "s3", 
         aws_region = "global", 
         function_name = "list_buckets", 
@@ -46,7 +49,8 @@ def get_s3_inventory(oId):
 
     # S3 needs some analysis (website, size)
 
-    s3 = boto3.client("s3")
+    session = boto3.Session(profile_name=profile)
+    s3 = session.client("s3")
     
     if len(bucket_list) > 0:
 
@@ -126,13 +130,15 @@ def get_s3_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_efs_inventory(oId):
+def get_efs_inventory(oId, profile):
 
     """
         Returns EFS inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: EFS inventory
         :rtype: json
@@ -142,6 +148,7 @@ def get_efs_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "efs", 
         aws_region = "all", 
         function_name = "describe_file_systems", 
@@ -156,13 +163,15 @@ def get_efs_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_glacier_inventory(oId):
+def get_glacier_inventory(oId, profile):
 
     """
         Returns Glacier inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Glacier inventory
         :rtype: json
@@ -173,6 +182,7 @@ def get_glacier_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "glacier", 
         aws_region = "all", 
         function_name = "list_vaults", 
@@ -187,13 +197,15 @@ def get_glacier_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_storagegateway_inventory(oId):
+def get_storagegateway_inventory(oId, profile):
 
     """
         Returns Storage gateway inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Storage gateway inventory
         :rtype: json
@@ -204,6 +216,7 @@ def get_storagegateway_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "storagegateway", 
         aws_region = "all", 
         function_name = "list_gateways", 

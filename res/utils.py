@@ -32,8 +32,8 @@ def get_aws_regions(profile_name):
         
     # We get the regions list through EC2.
 
-    session = boto3.Session(profile_name=profile_name)
-    client = session.client("ec2", region_name = "us-east-1")
+    session = boto3.Session(profile_name=profile_name, region_name="us-east-1")
+    client = session.client("ec2")
 
     regions = client.describe_regions(AllRegions=True)
     region_list = regions["Regions"]
@@ -46,7 +46,8 @@ def get_aws_regions(profile_name):
         # Looking for AZ? Why not? But only if you have the rights to...
         current_region = region['RegionName']
         if (region['OptInStatus'] != 'not-opted-in'):
-            client = boto3.client("ec2", region_name=current_region)
+            session = boto3.Session(profile_name=profile_name)
+            client = session.client("ec2", region_name=current_region)
             current_zones = client.describe_availability_zones()
             region['zones'] = current_zones['AvailabilityZones']
 
@@ -158,7 +159,7 @@ def check_arguments(arguments):
     return profile, services
 
 
-def get_ownerID(profile_name):
+def get_ownerID(profile):
 
     """
         Get owner ID of the AWS account we are working on
@@ -167,7 +168,7 @@ def get_ownerID(profile_name):
         :rtype: string
     """  
 
-    session = boto3.Session(profile_name=profile_name)
+    session = boto3.Session(profile_name=profile)
     sts = session.client('sts')
     identity = sts.get_caller_identity()
     ownerId = identity['Account']

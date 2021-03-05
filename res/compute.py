@@ -20,13 +20,15 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_ec2_inventory(oId):
+def get_ec2_inventory(oId, profile):
 
     """
         Returns ec2 inventory, without any analysis or any formatting
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: ec2 inventory
         :rtype: json
@@ -36,6 +38,7 @@ def get_ec2_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_instances", 
@@ -44,13 +47,15 @@ def get_ec2_inventory(oId):
     )
 
 
-def get_interfaces_inventory(oId):
+def get_interfaces_inventory(oId, profile):
 
     """
         Returns network interfaces detailed inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: network interfaces inventory
         :rtype: json
@@ -58,6 +63,7 @@ def get_interfaces_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_network_interfaces", 
@@ -65,13 +71,15 @@ def get_interfaces_inventory(oId):
     )
 
 
-def get_vpc_inventory(oId):
+def get_vpc_inventory(oId, profile):
 
     """
         Returns VPC detailed inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: VPC inventory
         :rtype: json
@@ -79,6 +87,7 @@ def get_vpc_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_vpcs", 
@@ -86,13 +95,15 @@ def get_vpc_inventory(oId):
     )
 
 
-def get_subnet_inventory(oId):
+def get_subnet_inventory(oId, profile):
 
     """
         Returns VPC subnets inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: VPC subnets inventory
         :rtype: json
@@ -100,6 +111,7 @@ def get_subnet_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_subnets", 
@@ -107,13 +119,15 @@ def get_subnet_inventory(oId):
     )
 
 
-def get_ebs_inventory(oId):
+def get_ebs_inventory(oId, profile):
 
     """
         Returns EBS detailed inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: EBS inventory
         :rtype: json
@@ -121,6 +135,7 @@ def get_ebs_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_volumes", 
@@ -129,13 +144,15 @@ def get_ebs_inventory(oId):
     )
 
 
-def get_eips_inventory(oId):
+def get_eips_inventory(oId, profile):
 
     """
         Returns Elastic IPs inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Elastic IPs inventory
         :rtype: json
@@ -143,6 +160,7 @@ def get_eips_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_addresses", 
@@ -150,13 +168,15 @@ def get_eips_inventory(oId):
     )
 
 
-def get_egpus_inventory(oId):
+def get_egpus_inventory(oId, profile):
 
     """
         Returns Elastic GPUs inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Elastic GPUs inventory
         :rtype: json
@@ -164,6 +184,7 @@ def get_egpus_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_elastic_gpus", 
@@ -171,13 +192,15 @@ def get_egpus_inventory(oId):
     )
 
 
-def get_sg_inventory(oId):
+def get_sg_inventory(oId, profile):
 
     """
         Returns Security Groups inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Security Groups inventory
         :rtype: json
@@ -185,6 +208,7 @@ def get_sg_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_security_groups", 
@@ -193,13 +217,15 @@ def get_sg_inventory(oId):
     )
 
 
-def get_igw_inventory(oId):
+def get_igw_inventory(oId, profile):
 
     """
         Returns Internet Gateways inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Internet Gateways inventory
         :rtype: json
@@ -207,6 +233,7 @@ def get_igw_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_internet_gateways", 
@@ -214,13 +241,15 @@ def get_igw_inventory(oId):
     )
 
 
-def get_ngw_inventory(oId):
+def get_ngw_inventory(oId, profile):
 
     """
         Returns Nat Gateways inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Nat Gateways inventory
         :rtype: json
@@ -228,6 +257,7 @@ def get_ngw_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_nat_gateways", 
@@ -241,13 +271,15 @@ def get_ngw_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_elasticbeanstalk_environments_inventory(oId):
+def get_elasticbeanstalk_environments_inventory(oId, profile):
 
     """
         Returns Elastic Beanstalk detailed inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Elastic Beanstalk inventory (environments)
         :rtype: json
@@ -257,6 +289,7 @@ def get_elasticbeanstalk_environments_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "elasticbeanstalk", 
         aws_region = "all", 
         function_name = "describe_environments", 
@@ -264,13 +297,15 @@ def get_elasticbeanstalk_environments_inventory(oId):
     )
 
 
-def get_elasticbeanstalk_applications_inventory(oId):
+def get_elasticbeanstalk_applications_inventory(oId, profile):
 
     """
         Returns Elastic Beanstalk detailed inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Elastic Beanstalk inventory (applications)
         :rtype: json
@@ -278,6 +313,7 @@ def get_elasticbeanstalk_applications_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "elasticbeanstalk", 
         aws_region = "all", 
         function_name = "describe_applications", 
@@ -291,13 +327,15 @@ def get_elasticbeanstalk_applications_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_ecs_inventory(oId):
+def get_ecs_inventory(oId, profile):
 
     """
         Returns ECS detailed inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: ECS inventory
         :rtype: json
@@ -307,6 +345,7 @@ def get_ecs_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ecs", 
         aws_region = "all", 
         function_name = "describe_clusters", 
@@ -318,13 +357,15 @@ def get_ecs_inventory(oId):
     #detail_get_key = ""
     
 
-def get_ecs_services_inventory(oId):
+def get_ecs_services_inventory(oId, profile):
 
     """
         Returns ECS tasks inventory  NOT WORKING YET
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: ECS tasks inventory
         :rtype: json
@@ -332,6 +373,7 @@ def get_ecs_services_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ecs", 
         aws_region = "all", 
         function_name = "list_services", 
@@ -345,13 +387,15 @@ def get_ecs_services_inventory(oId):
     )
     
 
-def get_ecs_tasks_inventory(oId):
+def get_ecs_tasks_inventory(oId, profile):
 
     """
         Returns ECS tasks inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: ECS tasks inventory
         :rtype: json
@@ -359,6 +403,7 @@ def get_ecs_tasks_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "ecs", 
         aws_region = "all", 
         function_name = "list_task_definitions", 
@@ -378,13 +423,15 @@ def get_ecs_tasks_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_eks_inventory(oId):
+def get_eks_inventory(oId, profile):
 
     """
         Returns eks inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: eks inventory
         :rtype: json
@@ -394,6 +441,7 @@ def get_eks_inventory(oId):
 
     inv = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "eks", 
         aws_region = "all", 
         function_name = "list_clusters", 
@@ -412,13 +460,15 @@ def get_eks_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_autoscaling_inventory(oId):
+def get_autoscaling_inventory(oId, profile):
 
     """
         Returns eks inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: eks inventory
         :rtype: json
@@ -430,6 +480,7 @@ def get_autoscaling_inventory(oId):
 
     autoscaling_inventory['autoscaling-groups'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "autoscaling", 
         aws_region = "all", 
         function_name = "describe_auto_scaling_groups", 
@@ -439,6 +490,7 @@ def get_autoscaling_inventory(oId):
 
     autoscaling_inventory['autoscaling-launch-configuration'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "autoscaling", 
         aws_region = "all", 
         function_name = "describe_launch_configurations", 
@@ -448,6 +500,7 @@ def get_autoscaling_inventory(oId):
 
     autoscaling_inventory['autoscaling-plans'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "autoscaling-plans", 
         aws_region = "all", 
         function_name = "describe_scaling_plans", 
@@ -463,13 +516,15 @@ def get_autoscaling_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_lambda_inventory(oId):
+def get_lambda_inventory(oId, profile):
 
     """
         Returns lambda inventory.
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: lambda inventory
         :rtype: json
@@ -479,6 +534,7 @@ def get_lambda_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "lambda", 
         aws_region = "all", 
         function_name = "list_functions", 
@@ -493,13 +549,15 @@ def get_lambda_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_batch_inventory(oId):
+def get_batch_inventory(oId, profile):
 
     """
         Returns batch jobs inventory.
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: batch inventory
         :rtype: json
@@ -510,6 +568,7 @@ def get_batch_inventory(oId):
 
     inventory['job-definitions'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "batch", 
         aws_region = "all", 
         function_name = "describe_job_definitions", 
@@ -518,6 +577,7 @@ def get_batch_inventory(oId):
 
     inventory['job-queues'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "batch", 
         aws_region = "all", 
         function_name = "describe_job_queues", 
@@ -526,6 +586,7 @@ def get_batch_inventory(oId):
 
     inventory['compute-environements'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "batch", 
         aws_region = "all", 
         function_name = "describe_compute_environments", 
@@ -542,13 +603,15 @@ def get_batch_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_lightsail_inventory(oId):
+def get_lightsail_inventory(oId, profile):
 
     """
         Returns lightsail inventory, with loadbalancers and IPs
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: lightsail inventory
         :rtype: json
@@ -560,6 +623,7 @@ def get_lightsail_inventory(oId):
 
     lightsail_inventory['lightsail-instances'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_instances", 
@@ -569,6 +633,7 @@ def get_lightsail_inventory(oId):
 
     lightsail_inventory['lightsail-loadbalancers'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_load_balancers", 
@@ -577,6 +642,7 @@ def get_lightsail_inventory(oId):
 
     lightsail_inventory['lightsail-ip'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_static_ips", 
@@ -585,6 +651,7 @@ def get_lightsail_inventory(oId):
 
     lightsail_inventory['lightsail-disks'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_disks", 

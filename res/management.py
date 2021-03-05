@@ -19,13 +19,15 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudformation_inventory(oId):
+def get_cloudformation_inventory(oId, profile):
 
     """
         Returns cloudformation inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: cloudformation inventory
         :rtype: json
@@ -35,6 +37,7 @@ def get_cloudformation_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudformation", 
         aws_region = "all", 
         function_name = "describe_stacks", 
@@ -53,13 +56,15 @@ def get_cloudformation_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudtrail_inventory(oId):
+def get_cloudtrail_inventory(oId, profile):
 
     """
         Returns cloudtrail inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: cloudtrail inventory
         :rtype: json
@@ -69,6 +74,7 @@ def get_cloudtrail_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudtrail", 
         aws_region = "all", 
         function_name = "describe_trails", 
@@ -82,13 +88,15 @@ def get_cloudtrail_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudwatch_inventory(oId):
+def get_cloudwatch_inventory(oId, profile):
 
     """
         Returns cloudwatch inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: cloudwatch inventory
         :rtype: json
@@ -98,6 +106,7 @@ def get_cloudwatch_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudwatch", 
         aws_region = "all", 
         function_name = "describe_alarms", 
