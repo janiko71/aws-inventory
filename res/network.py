@@ -74,9 +74,10 @@ def get_cloudfront_inventory(oId, profile):
         ownerId = oId,
         profile = profile,
         aws_service = "cloudfront", 
-        aws_region = "all", 
+        aws_region = "global", 
         function_name = "list_distributions", 
         key_get = "Items",
+        #key_get = "DistributionList",
         pagination = True
     )
 

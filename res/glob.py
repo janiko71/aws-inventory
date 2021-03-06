@@ -84,6 +84,9 @@ def get_inventory(ownerId,
                     utils.display(ownerId, region_name, aws_service, function_name)
 
                     for detail in page_iterator:
+                        
+                        # Anything in the detail item?
+
                         for inventory_object in detail.get(key_get):
                             detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
                             inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
@@ -100,29 +103,49 @@ def get_inventory(ownerId,
 
                 # unsupported region for efs
                 config.logger.warning("{} is not available (not supported?) in region {}.".format(aws_service, region_name))
-                config.logger.debug("Error text : {}".format(e))
+                config.logger.debug("{}, {}, {}, error text : {}".format(aws_service, region_name, function_name, e))
 
             except Exception as e:
 
-                config.logger.error("Error while processing {}, {}.\n{}".format(aws_service, region_name, e))
+                config.logger.error("Error while processing {}, {}, {}. Error: {}".format(aws_service, region_name, function_name, e))
 
     elif (aws_region == 'global'):
 
         # inventory can be globalized
         try:
 
-            session = boto3.Session(profile_name=profile)
-            client = session.client(aws_service)
-
             config.logger.info('Account {}, {} inventory for region \'{}\''.format(ownerId, aws_service, aws_region))
             utils.progress(aws_region)
             utils.display(ownerId, aws_region, aws_service, function_name)
 
-            inv_list = client.__getattribute__(function_name)().get(key_get)
-            
-            for inv in inv_list:
-                detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key)
-                inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+            session = boto3.Session(profile_name=profile)
+            client = session.client(aws_service)
+
+            if (pagination):
+
+                paginator = client.get_paginator(function_name)
+                page_iterator = paginator.paginate()
+                utils.display(ownerId, aws_region, aws_service, function_name)
+
+                for detail in page_iterator:
+
+                    # CloudFront exception
+                    if (aws_service == "cloudfront" and function_name == "list_distributions"):
+                        detail = detail.get('DistributionList')
+                    
+                    # Anything in the detail item?
+
+                    for inventory_object in detail.get(key_get):
+                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
+                        inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+
+            else:
+
+                inv_list = client.__getattribute__(function_name)().get(key_get)
+                
+                for inv in inv_list:
+                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key)
+                    inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
         except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
 
@@ -157,12 +180,13 @@ def get_inventory_detail(client,
         .. seealso:: :function:`get_inventory`
     '''
 
-    config.logger.info('{} detail function'.format(detail_function))
     detailed_inv = inventory_object
 
     # if no function is provided, not detail is needed
 
     if (detail_function != ""):
+
+        config.logger.info('{} detail function'.format(detail_function))
 
         # we set the key value; it's something that identifies the objet and that we pass to 
         # the detail function as a search key. Sometimes the upper inventory functions returns 
@@ -217,8 +241,9 @@ def get_inventory_detail(client,
             del detailed_inv[detail_get_key]['ResponseMetadata']
 
     # Sometimes we loose region name; if so, we add it 
-    if ('RegionName' not in detailed_inv):
-        detailed_inv['RegionName'] = region_name
+    if (type(detailed_inv) != str):
+        if ('RegionName' not in detailed_inv):
+            detailed_inv['RegionName'] = region_name
 
     return detailed_inv
 
