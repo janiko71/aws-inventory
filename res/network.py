@@ -19,13 +19,15 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_apigateway_inventory(oId):
+def get_apigateway_inventory(oId, profile):
 
     """
         Returns API Gateway inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: API Gateway inventory
         :rtype: json
@@ -36,6 +38,7 @@ def get_apigateway_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "apigateway", 
         aws_region = "all", 
         function_name = "get_rest_apis", 
@@ -50,13 +53,15 @@ def get_apigateway_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudfront_inventory(oId):
+def get_cloudfront_inventory(oId, profile):
 
     """
         Returns cloudfront inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: Cloudfront inventory
         :rtype: json
@@ -67,10 +72,12 @@ def get_cloudfront_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudfront", 
-        aws_region = "all", 
+        aws_region = "global", 
         function_name = "list_distributions", 
         key_get = "Items",
+        #key_get = "DistributionList",
         pagination = True
     )
 
@@ -81,7 +88,7 @@ def get_cloudfront_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_route53_inventory(oId):
+def get_route53_inventory(oId, profile):
 
     """
         Returns route 53 inventory, partial.
@@ -90,6 +97,8 @@ def get_route53_inventory(oId):
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: route 53 inventory
         :rtype: json
@@ -102,6 +111,7 @@ def get_route53_inventory(oId):
     
     inventory['zones'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "route53", 
         aws_region = "global", 
         function_name = "list_hosted_zones_by_name", 
@@ -115,6 +125,7 @@ def get_route53_inventory(oId):
 
     inventory['traffic-policies'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "route53", 
         aws_region = "global", 
         function_name = "list_traffic_policies", 
@@ -124,6 +135,7 @@ def get_route53_inventory(oId):
 
     inventory['domains'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "route53domains", 
         aws_region = "all", 
         function_name = "list_domains", 
@@ -140,13 +152,15 @@ def get_route53_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_elb_inventory(oId):
+def get_elb_inventory(oId, profile):
 
     """
         Returns ELB inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: ELB inventory
         :rtype: json
@@ -157,6 +171,7 @@ def get_elb_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "elb",
         aws_region = "all",
         function_name = "describe_load_balancers",
@@ -170,13 +185,15 @@ def get_elb_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_elbv2_inventory(oId):
+def get_elbv2_inventory(oId, profile):
 
     """
         Returns ELBv2 inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: ELBv2 inventory
         :rtype: json
@@ -187,6 +204,7 @@ def get_elbv2_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "elbv2", 
         aws_region = "all", 
         function_name = "describe_load_balancers", 

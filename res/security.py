@@ -21,13 +21,15 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_clouddirectory_inventory(oId):
+def get_clouddirectory_inventory(oId, profile):
 
     """
         Returns keys managed by KMS (global)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: clouddirectory inventory
         :rtype: json
@@ -37,6 +39,7 @@ def get_clouddirectory_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "clouddirectory", 
         aws_region = "all", 
         function_name = "list_directories", 
@@ -51,13 +54,15 @@ def get_clouddirectory_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_acm_inventory(oId):
+def get_acm_inventory(oId, profile):
 
     """
         Returns certificates managed with ACM
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: certificates inventory
         :rtype: json
@@ -67,6 +72,7 @@ def get_acm_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "acm", 
         aws_region = "all", 
         function_name = "list_certificates", 
@@ -85,13 +91,15 @@ def get_acm_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_acmpca_inventory(oId):
+def get_acmpca_inventory(oId, profile):
 
     """
         Returns certificates managed with ACM
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: certificates inventory
         :rtype: json
@@ -101,6 +109,7 @@ def get_acmpca_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "acm-pca", 
         aws_region = "all", 
         function_name = "list_certificate_authorities", 
@@ -114,13 +123,15 @@ def get_acmpca_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_secrets_inventory(oId):
+def get_secrets_inventory(oId, profile):
 
     """
         Returns all secrets managed by AWS (without values of the secrets ;-)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: secrets inventory 
         :rtype: json
@@ -130,6 +141,7 @@ def get_secrets_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "secretsmanager", 
         aws_region = "all", 
         function_name = "list_secrets", 
@@ -143,13 +155,15 @@ def get_secrets_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_hsm_inventory(oId):
+def get_hsm_inventory(oId, profile):
 
     """
         Returns cloud HSM inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: HSM inventory
         :rtype: json
@@ -160,6 +174,7 @@ def get_hsm_inventory(oId):
 
     inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudhsmv2", 
         aws_region = "all", 
         function_name = "describe_clusters", 
@@ -169,6 +184,7 @@ def get_hsm_inventory(oId):
 
     inventory['hsm'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudhsm", 
         aws_region = "all", 
         function_name = "list_hsms", 
@@ -181,6 +197,7 @@ def get_hsm_inventory(oId):
 
     inventory['luna'] = glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "cloudhsm", 
         aws_region = "all", 
         function_name = "list_luna_clients", 

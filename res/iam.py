@@ -19,13 +19,15 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_kms_inventory(oId):
+def get_kms_inventory(oId, profile):
 
     """
         Returns keys managed by KMS (global)
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: KMS inventory
         :rtype: json
@@ -35,6 +37,7 @@ def get_kms_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "kms", 
         aws_region = "all", 
         function_name = "list_keys", 

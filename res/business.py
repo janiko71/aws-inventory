@@ -19,13 +19,15 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_alexa_inventory(oId):
+def get_alexa_inventory(oId, profile):
 
     """
         Returns alexa skills
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: alexa skills inventory
         :rtype: json
@@ -35,6 +37,7 @@ def get_alexa_inventory(oId):
     
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "alexaforbusiness", 
         aws_region = "all", 
         function_name = "list_skills", 
@@ -53,14 +56,16 @@ def get_alexa_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_workdocs_inventory(oId):
+def get_workdocs_inventory(oId, profile):
 
     """
         Returns workdocs inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
-
+        :param profile: configuration profile name used for session
+        :type profile: string
+        
         :return: workdocs inventory
         :rtype: json
 
@@ -69,6 +74,7 @@ def get_workdocs_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "workdocs", 
         aws_region = "all", 
         function_name = "???", 
@@ -82,13 +88,15 @@ def get_workdocs_inventory(oId):
 #
 #  ------------------------------------------------------------------------
 
-def get_workmail_inventory(oId):
+def get_workmail_inventory(oId, profile):
 
     """
         Returns workmail inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
 
         :return: workmail inventory
         :rtype: json
@@ -98,6 +106,7 @@ def get_workmail_inventory(oId):
 
     return glob.get_inventory(
         ownerId = oId,
+        profile = profile,
         aws_service = "workmail", 
         aws_region = "all", 
         function_name = "list_organizations" ,
