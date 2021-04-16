@@ -110,7 +110,7 @@ def check_arguments(arguments):
     parser.add_argument('--log', required=False, type=str, default="error", help="Log level for output (debug, info, warning, error")
     parser.add_argument('--services', required=False, type=str, default="", nargs='+', help="List of AWS services you want to check.\n" \
         "Must be one or many within this list: " + help_str)
-
+    
     args = parser.parse_args()
 
     profile    = str(args.profile).lower()
@@ -133,8 +133,12 @@ def check_arguments(arguments):
         exit(1)
 
     #
-    # Verifying profile name
+    # Verifying profile name. In the case of a CloudShell environment, please
+    # note that there is no default profile.
     #
+
+    if ("default" == profile):
+        profile = None
 
     try:
         session = boto3.Session(profile_name=profile)

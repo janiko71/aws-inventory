@@ -59,8 +59,8 @@ print()
 # --- AWS basic information
 
 ownerId = utils.get_ownerID(profile_name)
-config.logger.info('OWNER ID: '+ownerId)
-config.logger.info('AWS Profile: '+profile_name)
+config.logger.info('OWNER ID: ' + ownerId)
+config.logger.info('AWS Profile: ' + str(profile_name))
 
 
 # --- AWS Regions
