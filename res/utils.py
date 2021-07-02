@@ -1,5 +1,6 @@
 import boto3
 import botocore
+from botocore.config import Config
 from botocore.exceptions import ClientError, ProfileNotFound
 import pprint
 import logging
@@ -91,8 +92,12 @@ def check_arguments(arguments):
         :param arguments: list of arguments
         :type arguments: list
 
-        :return: owner ID
+        :return: profile to use (can be None or 'default')
         :rtype: string
+        :return: services to inventory
+        :rtype: array of strings
+        :return: config object to use with boto3
+        :rtype: botocore.config.Config
     """   
 
     parser = argparse.ArgumentParser(description='AWS inventory may have arguments. More information at https://github.com/janiko71/aws-inventory/wiki/How-to-use-it%3F.')
@@ -146,6 +151,17 @@ def check_arguments(arguments):
         print("Profile name [" + profile + "] not found, please check.")
         exit(1)
 
+    # 
+    # For the support of CloudShell, we need to adjust retries settings
+    #
+
+    boto3_config = Config(
+        retries = {
+            'max_attempts': 5,
+            'mode': 'standard'
+        }
+    )
+
     #
     # Is a list of services provided? If yes, are they in the list of supported services?
     #
@@ -160,7 +176,7 @@ def check_arguments(arguments):
         else:
             services.append(str_service)
 
-    return profile, services
+    return profile, services, boto3_config
 
 
 def get_ownerID(profile):
