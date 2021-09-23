@@ -182,6 +182,9 @@ def get_hsm_inventory(oId, profile):
         pagination = True
     )
 
+    # The API hangs here. Issue #06
+    # Removed for it seems not working
+    """
     inventory['hsm'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
@@ -207,6 +210,8 @@ def get_hsm_inventory(oId, profile):
         detail_join_key = "ClientArn", 
         detail_get_key = ""
     )
+    """
+
 
     return inventory
 
