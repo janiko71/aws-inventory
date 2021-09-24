@@ -24,7 +24,8 @@ def get_inventory(ownerId,
                   detail_join_key = "", 
                   detail_get_key = "",
                   pagination = False,
-                  pagination_detail = False):
+                  pagination_detail = False,
+                  additional_parameters = {}):
 
     """
         Returns inventory for a service. It's a generic function, meaning that it should work for almost any AWS service,
@@ -46,6 +47,7 @@ def get_inventory(ownerId,
         :param detail_get_key: the key containing detailed information about the resource, when SDK returns a dict. Optional.
         :param pagination: tells if the inventory function supports pagination or not ; pagination is need for large inventory lists.
         :param pagination_detail: tells if the detail inventory function supports pagination or not ; pagination is need for large inventory lists.
+        :param additional_parameters: some additional parameters, if needed, like a key for searching
 
         :type ownerId: string
         :type profile: string
@@ -113,8 +115,8 @@ def get_inventory(ownerId,
                                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
     
                         else:
-
-                            inv_list = client.__getattribute__(function_name)().get(key_get)
+                            
+                            inv_list = client.__getattribute__(function_name)(**additional_parameters).get(key_get)
                             utils.display(ownerId, region_name, aws_service, function_name)
 
                             for inventory_object in inv_list:
@@ -246,6 +248,7 @@ def get_inventory_detail(client,
             # normal objet; we retrieve the value of the 'join key' field
             key = inventory_object.get(join_key)
 
+        # Now we add parameters (key) for the API Call
         param = {detail_join_key: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
 
         # now we fetch the details; again, depending on the called function, the return object may contains

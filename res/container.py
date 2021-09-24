@@ -153,6 +153,77 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
     return inv
 
 
+#  ------------------------------------------------------------------------
+#
+#    ECR
+#
+#  ------------------------------------------------------------------------
+
+def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns elastic container registry inventory (if the region is avalaible)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: eks inventory
+        :rtype: json
+
+        .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ecr.html
+    """
+
+    # Special loop here
+
+    inventory = {}
+
+    desc_repo_list =  glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "ecr", 
+        aws_region = "all", 
+        function_name = "describe_repositories", 
+        key_get = "repositories"
+    )
+
+    # Not very handy: we have to disrupt our method
+
+    images_list = {}
+    
+    for repo in desc_repo_list:
+
+        inventory[repo['repositoryName']] = {
+            'repositoryArn': repo['repositoryName'],
+            'registryId': repo['registryId'],
+            'repositoryName': repo['repositoryName'],
+            'RegionName': repo['RegionName'],
+            'repositoryUri': repo['repositoryUri'],
+            'createdAt': repo['createdAt'],
+            'imageTagMutability': repo['imageTagMutability'],
+            'imageScanningConfiguration': repo['imageScanningConfiguration'],
+            'encryptionConfiguration': repo['encryptionConfiguration'],
+            'imagesList': {}
+            }
+
+        inventory[repo['repositoryName']]['imagesList'] = glob.get_inventory(
+            ownerId = oId,
+            profile = profile,
+            boto3_config = boto3_config,
+            selected_regions = repo['RegionName'],
+            aws_service = "ecr", 
+            aws_region = "all", 
+            function_name = "list_images", 
+            key_get = "imageIds",
+            additional_parameters = {'repositoryName': repo['repositoryName']}
+        )
+
+    return inventory
+
+
 #
 # Hey, doc: we're in a module!
 #

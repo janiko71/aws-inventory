@@ -168,6 +168,12 @@ if ('ecs' in arguments):
     thread_list.append(awsthread.AWSThread("ecs-clusters", container.get_ecs_inventory, ownerId, profile_name, boto3_config, selected_regions))
     thread_list.append(awsthread.AWSThread("ecs-tasks", container.get_ecs_tasks_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- ECR
+#
+if ('ecr' in arguments):
+    thread_list.append(awsthread.AWSThread("ecr", container.get_ecr_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                           STORAGE                             #

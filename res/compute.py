@@ -8,9 +8,9 @@ import res.glob  as glob
 # to do : security groups
 # =======================================================================================================================
 #
-#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), 
+#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), AWS Outposts,
 #                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
-#  Unsupported services : AWS Outposts, EC2 Image Builder
+#  Unsupported services : EC2 Image Builder
 #
 # =======================================================================================================================
 
@@ -638,7 +638,7 @@ def get_outposts_inventory(oId, profile, boto3_config, selected_regions):
         :return: lambda inventory
         :rtype: json
 
-        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
+        .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/outposts.html
     """
 
     inventory = {}
