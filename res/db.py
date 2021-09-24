@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift
-#  Unsupported services : Amazon QLDB, Amazon DocumentDB, Amazon Keyspaces, Amazon Timestream, Amazon MemoryDB for Redis
+#  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB
+#  Unsupported services : Amazon DocumentDB, Amazon Keyspaces, Amazon Timestream, Amazon MemoryDB for Redis
 #
 # =======================================================================================================================
 
@@ -229,6 +229,51 @@ def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return redshift_inventory
+
+
+#  ------------------------------------------------------------------------
+#
+#    Amazon QLDB 
+#
+#  ------------------------------------------------------------------------
+
+def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Amazon QLDB inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: QLDB inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/qldb.html
+
+    """
+
+    qldb_inventory = {}
+
+    qldb_inventory['ledgers'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "qldb", 
+        aws_region = "all", 
+        function_name = "list_ledgers", 
+        key_get = "Ledgers",
+        detail_function = "describe_ledger",
+        join_key = "Name",
+        detail_join_key = "Name",
+        detail_get_key = "",
+        pagination = True,
+        pagination_detail = False,
+    )
+
+    return qldb_inventory
 
 
 #

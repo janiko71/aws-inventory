@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : EKS, Elastic Container Service
-#  Unsupported services : Elastic Container Registry, Red Hat Openshift
+#  Supported services   : EKS, Elastic Container Service, Elastic Container Registry
+#  Unsupported services : Red Hat Openshift
 #
 # =======================================================================================================================
 
