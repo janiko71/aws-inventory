@@ -218,7 +218,13 @@ def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
             aws_region = "all", 
             function_name = "list_images", 
             key_get = "imageIds",
-            additional_parameters = {'repositoryName': repo['repositoryName']}
+            additional_parameters = {'repositoryName': repo['repositoryName']},
+            detail_function = "describe_images",
+            join_key = "imageIds", 
+            detail_join_key = "imageIds", 
+            detail_get_key = "imageDetails",
+            pagination_detail = True
+            }
         )
 
     return inventory
