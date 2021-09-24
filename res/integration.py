@@ -9,7 +9,7 @@ import res.glob as glob
 # =======================================================================================================================
 #
 #  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), 
-#  Unsupported services : Step functions, SWF
+#  Unsupported services : Amazon AppFlow, Amazon EventBridge, Step functions, SWF, Apache Airflow 
 #
 # =======================================================================================================================
 

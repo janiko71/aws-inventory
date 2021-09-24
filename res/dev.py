@@ -9,7 +9,7 @@ import res.glob as glob
 # =======================================================================================================================
 #
 #  Supported services   : CodeStar
-#  Unsupported services : CodeCommit, CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray
+#  Unsupported services : CodeCommit, CodeArtifact, CodeBuild, CodeDeploy, CodePipeline, Cloud9, CloudShell, X-Ray, AWS FIS
 #
 # =======================================================================================================================
 

@@ -5,12 +5,12 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# to do : autoscaling, security groups
+# to do : security groups
 # =======================================================================================================================
 #
 #  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), 
-#                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch
-#  Unsupported services : None
+#                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
+#  Unsupported services : AWS Outposts, EC2 Image Builder
 #
 # =======================================================================================================================
 
@@ -345,146 +345,6 @@ def get_elasticbeanstalk_applications_inventory(oId, profile, boto3_config, sele
     )
 
 
-#  ------------------------------------------------------------------------
-#
-#    EC2 Container Service (ECS)
-#
-#  ------------------------------------------------------------------------
-
-def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
-
-    """
-        Returns ECS detailed inventory
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: ECS inventory
-        :rtype: json
-
-        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ecs.html
-    """
-
-    return glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        boto3_config = boto3_config,
-        selected_regions = selected_regions,
-        aws_service = "ecs", 
-        aws_region = "all", 
-        function_name = "describe_clusters", 
-        key_get = "clusters"
-    )
-    #detail_function = "list_container_instances",
-    #join_key = "clusterName", 
-    #detail_join_key = "cluster", 
-    #detail_get_key = ""
-    
-
-def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
-
-    """
-        Returns ECS tasks inventory  NOT WORKING YET
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: ECS tasks inventory
-        :rtype: json
-    """
-
-    return glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        boto3_config = boto3_config,
-        selected_regions = selected_regions,
-        aws_service = "ecs", 
-        aws_region = "all", 
-        function_name = "list_services", 
-        key_get = "serviceArns",
-        detail_function = "describe_services", 
-        join_key = "", 
-        detail_join_key = "services", 
-        detail_get_key = "services",
-        pagination = True,
-        pagination_detail = True
-    )
-    
-
-def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
-
-    """
-        Returns ECS tasks inventory
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: ECS tasks inventory
-        :rtype: json
-    """
-
-    return glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        boto3_config = boto3_config,
-        selected_regions = selected_regions,
-        aws_service = "ecs", 
-        aws_region = "all", 
-        function_name = "list_task_definitions", 
-        key_get = "taskDefinitionArns",
-        detail_function = "describe_task_definition", 
-        join_key = "taskDefinitionArn", 
-        detail_join_key = "taskDefinition", 
-        detail_get_key = "taskDefinition",
-        pagination = True,
-        pagination_detail = True
-    )
-
-
-#  ------------------------------------------------------------------------
-#
-#    EKS
-#
-#  ------------------------------------------------------------------------
-
-def get_eks_inventory(oId, profile, boto3_config, selected_regions):
-
-    """
-        Returns eks inventory (if the region is avalaible)
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: eks inventory
-        :rtype: json
-
-        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
-    """
-
-    inv = glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        boto3_config = boto3_config,
-        selected_regions = selected_regions,
-        aws_service = "eks", 
-        aws_region = "all", 
-        function_name = "list_clusters", 
-        key_get = "clusters",
-        detail_function = "describe_cluster", 
-        join_key = "", 
-        detail_join_key = "name", 
-        detail_get_key = "cluster"
-    )
-    return inv
-
 
 #  ------------------------------------------------------------------------
 #
@@ -582,6 +442,50 @@ def get_lambda_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
+
+#  ------------------------------------------------------------------------
+#
+#    Serverless Application Repository
+#
+#  ------------------------------------------------------------------------
+
+def get_serverlessrepo_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns serverlessrepo inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: serverlessrepo inventory
+        :rtype: json
+
+        .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/serverlessrepo.html
+    """
+    inventory = {}
+
+    inventory = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "serverlessrepo", 
+        aws_region = "all", 
+        function_name = "list_applications", 
+        key_get = "Applications",
+        detail_function = "get_application", 
+        join_key = "ApplicationId", 
+        detail_join_key = "ApplicationId", 
+        detail_get_key = "",
+        pagination = True,
+        pagination_detail = False        
+    )
+
+
+    return inventory
+    
 
 #  ------------------------------------------------------------------------
 #
@@ -714,6 +618,59 @@ def get_lightsail_inventory(oId, profile, boto3_config, selected_regions):
 
     return lightsail_inventory
 
+
+#  ------------------------------------------------------------------------
+#
+#    AWS Outposts
+#
+#  ------------------------------------------------------------------------
+
+def get_outposts_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns lambda inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: lambda inventory
+        :rtype: json
+
+        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/lambda.html
+    """
+
+    inventory = {}
+
+    inventory['outposts'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "outposts", 
+        aws_region = "all", 
+        function_name = "list_outposts", 
+        key_get = "Outposts",
+        pagination = False,
+        detail_get_key = "Outpost",
+        detail_join_key = "OutpostId",
+        pagination_detail = False
+    )
+
+    inventory['outposts_sites'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "outposts", 
+        aws_region = "all", 
+        function_name = "list_sites", 
+        key_get = "Sites",
+        pagination = False
+    )
+
+    return inventory
 
 #
 # Hey, doc: we're in a module!

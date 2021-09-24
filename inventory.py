@@ -20,6 +20,7 @@ import config
 import res.glob         as glob
 
 import res.compute      as compute
+import res.container    as container
 import res.storage      as storage
 import res.db           as db
 import res.dev          as dev
@@ -121,13 +122,6 @@ if ('elasticbeanstalk' in arguments):
     thread_list.append(awsthread.AWSThread("elasticbeanstalk-applications", compute.get_elasticbeanstalk_applications_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
-# ----------------- ECS
-#
-if ('ecs' in arguments):
-    thread_list.append(awsthread.AWSThread("ecs-clusters", compute.get_ecs_inventory, ownerId, profile_name, boto3_config, selected_regions))
-    thread_list.append(awsthread.AWSThread("ecs-tasks", compute.get_ecs_tasks_inventory, ownerId, profile_name, boto3_config, selected_regions))
-
-#
 # ----------------- Lighstail instances
 #
 if ('lightsail' in arguments):
@@ -140,16 +134,39 @@ if ('autoscaling' in arguments):
     thread_list.append(awsthread.AWSThread('autoscaling', compute.get_autoscaling_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
-# ----------------- EKS inventory
+# ----------------- Serverless repository
 #
-if ('eks' in arguments):
-    thread_list.append(awsthread.AWSThread('eks',compute.get_eks_inventory, ownerId, profile_name, boto3_config, selected_regions))
+if ('serverlessrepo' in arguments):
+    thread_list.append(awsthread.AWSThread('serverlessrepo',compute.get_serverlessrepo_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- AWS Outposts
+#
+if ('outposts' in arguments):
+    thread_list.append(awsthread.AWSThread('outposts',compute.get_outposts_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
 # ----------------- Batch jobs inventory
 #
 if ('batch' in arguments):
     thread_list.append(awsthread.AWSThread('batch', compute.get_batch_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+
+#################################################################
+#                          CONTAINER                            #
+#################################################################
+#
+# ----------------- EKS inventory
+#
+if ('eks' in arguments):
+    thread_list.append(awsthread.AWSThread('eks',container.get_eks_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- ECS
+#
+if ('ecs' in arguments):
+    thread_list.append(awsthread.AWSThread("ecs-clusters", container.get_ecs_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread("ecs-tasks", container.get_ecs_tasks_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 
 #################################################################

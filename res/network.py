@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, Cloud Front
-#  Unsupported services : Direct Connect
+#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
+#  Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
 #
 # =======================================================================================================================
 

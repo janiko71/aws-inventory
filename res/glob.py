@@ -83,8 +83,8 @@ def get_inventory(ownerId,
 
             region_name = region['RegionName']
             utils.progress(region_name)
-            config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
             utils.display(ownerId, region_name, aws_service, function_name)
+            config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
 
             if (region_name in svc_list):
 
@@ -99,24 +99,27 @@ def get_inventory(ownerId,
                         client = session.client(aws_service, region_name, config=boto3_config)
 
                         if (pagination):
-
+                            
                             paginator = client.get_paginator(function_name)
                             page_iterator = paginator.paginate()
 
                             for detail in page_iterator:
-                                
-                                # Anything in the detail item?
 
+                                # Anything in the detail item?
+                                
                                 for inventory_object in detail.get(key_get):
-                                    detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
+                                     
+                                    detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
-                        
+    
                         else:
 
                             inv_list = client.__getattribute__(function_name)().get(key_get)
                             utils.display(ownerId, region_name, aws_service, function_name)
+
                             for inventory_object in inv_list:
-                                detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
+
+                                detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                                 inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
                     except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
@@ -173,7 +176,7 @@ def get_inventory(ownerId,
                     # Anything in the detail item?
 
                     for inventory_object in detail.get(key_get):
-                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
+                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                         inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
             else:
@@ -181,7 +184,7 @@ def get_inventory(ownerId,
                 inv_list = client.__getattribute__(function_name)().get(key_get)
                 
                 for inv in inv_list:
-                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key)
+                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
         except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
@@ -277,7 +280,6 @@ def get_inventory_detail(client,
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                paginator = client.get_paginator(detail_function)
                 detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param)
 
         if ("ResponseMetadata" in detailed_inv[detail_get_key]):
