@@ -224,7 +224,6 @@ def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
             detail_join_key = "imageIds", 
             detail_get_key = "imageDetails",
             pagination_detail = True
-            }
         )
 
     return inventory
