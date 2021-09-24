@@ -18,6 +18,9 @@ AWS CLI must be installed and configured on the system you want to run aws-inven
 
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
 
+# What's new in the sept-21 version?
+Some services added (docDB, QLDB, containers...) but a **very important update** with a better handling of non-existant services (some tests added, and HSM v1 deleted). Execution time is now 60-70 sec. (instead of 200-220).
+
 # What's new in this version?
 This is an attempt to use multithreading in order to accelerate the script. And, at first sight, it looks better: 230 seconds instead of 960 (for the same inventory) on my first test. A lot of services has been added, with some improvements (like for Lightsail).
 
