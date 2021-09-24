@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB
-#  Unsupported services : Amazon DocumentDB, Amazon Keyspaces, Amazon Timestream, Amazon MemoryDB for Redis
+#  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB, DocumentDB
+#  Unsupported services : Amazon Keyspaces, Amazon Timestream, Amazon MemoryDB for Redis
 #
 # =======================================================================================================================
 
@@ -275,6 +275,61 @@ def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
 
     return qldb_inventory
 
+
+#  ------------------------------------------------------------------------
+#
+#    DocumentDB 
+#
+#  ------------------------------------------------------------------------
+
+def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Amazon DocumentDB (docdb) inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: DocumentDB inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/docdb.html
+
+    """
+
+    docdb_inventory = {}
+
+    # Looking for instances
+
+    docdb_inventory['instances'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "docdb", 
+        aws_region = "all", 
+        function_name = "describe_db_instances", 
+        key_get = "DBInstances",
+        pagination = True
+    )
+
+    # Looking for clusters
+
+    docdb_inventory['clusters'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "docdb", 
+        aws_region = "all", 
+        function_name = "describe_db_clusters", 
+        key_get = "DBClusters",
+        pagination = True
+    )
+
+    return docdb_inventory
 
 #
 # Hey, doc: we're in a module!

@@ -230,6 +230,18 @@ if ('redshift' in arguments):
 if ('elasticache' in arguments):
     thread_list.append(awsthread.AWSThread('elasticache', db.get_elasticache_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- QLDB inventory
+#
+if ('qldb' in arguments):
+    thread_list.append(awsthread.AWSThread('qldb', db.get_qldb_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- DocDB inventory
+#
+if ('docdb' in arguments):
+    thread_list.append(awsthread.AWSThread('docdb', db.get_docdb_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                      SECURITY & IAM                           #
