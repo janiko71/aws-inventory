@@ -19,7 +19,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_es_inventory(oId, profile):
+def get_es_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Elasticsearch details
@@ -38,6 +38,8 @@ def get_es_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "es", 
         aws_region = "all", 
         function_name = "list_domain_names", 
@@ -55,7 +57,7 @@ def get_es_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudsearch_inventory(oId, profile):
+def get_cloudsearch_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloudsearch details
@@ -74,6 +76,8 @@ def get_cloudsearch_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudsearch", 
         aws_region = "all", 
         function_name = "describe_domains", 
@@ -87,7 +91,7 @@ def get_cloudsearch_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_datapipeline_inventory(oId, profile):
+def get_datapipeline_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns datapipeline details
@@ -106,6 +110,8 @@ def get_datapipeline_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "datapipeline", 
         aws_region = "all", 
         function_name = "list_pipelines", 
@@ -124,7 +130,7 @@ def get_datapipeline_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_emr_inventory(oId, profile):
+def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns emr details
@@ -143,6 +149,8 @@ def get_emr_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "emr", 
         aws_region = "all", 
         function_name = "list_clusters", 

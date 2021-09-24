@@ -18,7 +18,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_rds_inventory(oId, profile):
+def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns RDS inventory
@@ -38,6 +38,8 @@ def get_rds_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "rds", 
         aws_region = "all", 
         function_name = "describe_db_instances", 
@@ -52,7 +54,7 @@ def get_rds_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_dynamodb_inventory(oId, profile):
+def get_dynamodb_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns dynamoDB inventory
@@ -72,6 +74,8 @@ def get_dynamodb_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "dynamodb", 
         aws_region = "all", 
         function_name = "list_tables", 
@@ -90,7 +94,7 @@ def get_dynamodb_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_neptune_inventory(oId, profile):
+def get_neptune_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns neptune inventory (instances & clusters). Instances are listed in RDS inventory.
@@ -112,6 +116,8 @@ def get_neptune_inventory(oId, profile):
     neptune_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "neptune", 
         aws_region = "all", 
         function_name = "describe_db_clusters", 
@@ -127,7 +133,7 @@ def get_neptune_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_elasticache_inventory(oId, profile):
+def get_elasticache_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns elasticache inventory (instances & clusters). Instances are listed in RDS inventory.
@@ -149,6 +155,8 @@ def get_elasticache_inventory(oId, profile):
     elasticache_inventory['cache-clusters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "elasticache", 
         aws_region = "all", 
         function_name = "describe_cache_clusters", 
@@ -159,6 +167,8 @@ def get_elasticache_inventory(oId, profile):
     elasticache_inventory['reserved-cache-nodes'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "elasticache", 
         aws_region = "all", 
         function_name = "describe_reserved_cache_nodes", 
@@ -175,7 +185,7 @@ def get_elasticache_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_redshift_inventory(oId, profile):
+def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns redshift inventory (instances & clusters). Instances are listed in RDS inventory.
@@ -197,6 +207,8 @@ def get_redshift_inventory(oId, profile):
     redshift_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "redshift", 
         aws_region = "all", 
         function_name = "describe_clusters", 
@@ -207,6 +219,8 @@ def get_redshift_inventory(oId, profile):
     redshift_inventory['reserved-nodes'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "redshift", 
         aws_region = "all", 
         function_name = "describe_reserved_nodes", 

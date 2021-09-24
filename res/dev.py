@@ -19,7 +19,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_codestar_inventory(oId, profile):
+def get_codestar_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns codestar details
@@ -38,6 +38,8 @@ def get_codestar_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "codestar", 
         aws_region = "all", 
         function_name = "list_projects", 

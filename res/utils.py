@@ -113,6 +113,7 @@ def check_arguments(arguments):
 
     parser.add_argument('--profile', required=False, type=str, default="default", help="Name of the AWS profile to use in {USER_DIR}\.aws\credentials")
     parser.add_argument('--log', required=False, type=str, default="error", help="Log level for output (debug, info, warning, error")
+    parser.add_argument('--regions', required=False, type=str, default="", nargs='+', help="Selected regions for inventory, in string format")
     parser.add_argument('--services', required=False, type=str, default="", nargs='+', help="List of AWS services you want to check.\n" \
         "Must be one or many within this list: " + help_str)
     
@@ -176,7 +177,29 @@ def check_arguments(arguments):
         else:
             services.append(str_service)
 
-    return profile, services, boto3_config
+    #
+    # Is the regions parameter provided? If yes, we check if it's one region or a list, and if they are existing regions
+
+    selected_regions = []
+
+    # --- We need the AWS Regions list at this point
+    config.regions = get_aws_regions(profile)
+    config.nb_regions = len(config.regions)
+
+    known_regions_list = []
+    for region in config.regions:
+        region_name = region['RegionName']
+        known_regions_list.append(region_name)
+
+    for arg in args.regions:
+        region_name = str(arg).lower()
+        if (region_name not in known_regions_list):
+            print('Unknown region [' + region_name + ']')
+            exit(1)
+        else:
+            selected_regions.append(region_name)
+
+    return profile, services, boto3_config, selected_regions
 
 
 def get_ownerID(profile):
