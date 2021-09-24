@@ -3,3 +3,4 @@ res/__pycache__/*
 output/*
 log/*
 launch.json
+venv
