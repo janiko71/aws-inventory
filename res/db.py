@@ -8,7 +8,8 @@ import res.glob  as glob
 # =======================================================================================================================
 #
 #  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB, DocumentDB
-#  Unsupported services : Amazon Keyspaces, Amazon Timestream, Amazon MemoryDB for Redis
+#                           Amazon MemoryDB for Redis, Amazon Timestream (but with a bug )
+#  Unsupported services : Amazon Keyspaces
 #
 # =======================================================================================================================
 
@@ -330,6 +331,86 @@ def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return docdb_inventory
+
+
+#  ------------------------------------------------------------------------
+#
+#    MemoryDB 
+#
+#  ------------------------------------------------------------------------
+
+def get_memorydb_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns MemoryDB clusters (memorydb) inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: MemoryDB clusters inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/memorydb.html
+
+    """
+
+    inventory = {}
+
+    inventory['clusters'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "memorydb", 
+        aws_region = "all", 
+        function_name = "describe_clusters", 
+        key_get = "Clusters"
+    )
+
+    return inventory
+
+
+#  ------------------------------------------------------------------------
+#
+#    Timestream 
+#
+#  ------------------------------------------------------------------------
+
+def get_timestream_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Timestream databases inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: Timestream databases inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/timestream-write.html
+
+    """
+
+    inventory = {}
+
+    inventory['databases'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "timestream-write", 
+        aws_region = "all", 
+        function_name = "list_databases", 
+        key_get = "Databases",
+        pagination = False,
+    )
+
+    return inventory
+
 
 #
 # Hey, doc: we're in a module!
