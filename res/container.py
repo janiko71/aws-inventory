@@ -193,38 +193,44 @@ def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
     # Not very handy: we have to disrupt our method
 
     images_list = {}
+
+    if (len(desc_repo_list) > 0):
     
-    for repo in desc_repo_list:
+        for repo in desc_repo_list:
 
-        inventory[repo['repositoryName']] = {
-            'repositoryArn': repo['repositoryName'],
-            'registryId': repo['registryId'],
-            'repositoryName': repo['repositoryName'],
-            'RegionName': repo['RegionName'],
-            'repositoryUri': repo['repositoryUri'],
-            'createdAt': repo['createdAt'],
-            'imageTagMutability': repo['imageTagMutability'],
-            'imageScanningConfiguration': repo['imageScanningConfiguration'],
-            'encryptionConfiguration': repo['encryptionConfiguration'],
-            'imagesList': {}
-            }
+            inventory[repo['repositoryName']] = {
+                'repositoryArn': repo['repositoryName'],
+                'registryId': repo['registryId'],
+                'repositoryName': repo['repositoryName'],
+                'RegionName': repo['RegionName'],
+                'repositoryUri': repo['repositoryUri'],
+                'createdAt': repo['createdAt'],
+                'imageTagMutability': repo['imageTagMutability'],
+                'imageScanningConfiguration': repo['imageScanningConfiguration'],
+                'encryptionConfiguration': repo['encryptionConfiguration'],
+                'imagesList': {}
+                }
 
-        inventory[repo['repositoryName']]['imagesList'] = glob.get_inventory(
-            ownerId = oId,
-            profile = profile,
-            boto3_config = boto3_config,
-            selected_regions = repo['RegionName'],
-            aws_service = "ecr", 
-            aws_region = "all", 
-            function_name = "list_images", 
-            key_get = "imageIds",
-            additional_parameters = {'repositoryName': repo['repositoryName']},
-            detail_function = "describe_images",
-            join_key = "imageIds", 
-            detail_join_key = "imageIds", 
-            detail_get_key = "imageDetails",
-            pagination_detail = True
-        )
+            inventory[repo['repositoryName']]['imagesList'] = glob.get_inventory(
+                ownerId = oId,
+                profile = profile,
+                boto3_config = boto3_config,
+                selected_regions = repo['RegionName'],
+                aws_service = "ecr", 
+                aws_region = "all", 
+                function_name = "list_images", 
+                key_get = "imageIds",
+                additional_parameters = {'repositoryName': repo['repositoryName']},
+                detail_function = "describe_images",
+                join_key = "imageIds", 
+                detail_join_key = "imageIds", 
+                detail_get_key = "imageDetails",
+                pagination_detail = True
+            )
+
+    else:
+
+        config.nb_units_done = config.nb_units_done + 2 * config.nb_regions
 
     return inventory
 

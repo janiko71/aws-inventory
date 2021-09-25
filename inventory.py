@@ -303,6 +303,11 @@ if ('hsm' in arguments):
 #
 if ('codestar' in arguments):
     thread_list.append(awsthread.AWSThread('codestar', dev.get_codestar_inventory, ownerId, profile_name, boto3_config, selected_regions))
+#
+# ----------------- CodeCommit inventory
+#
+if ('codecommit' in arguments):
+    thread_list.append(awsthread.AWSThread('codecommit', dev.get_codecommit_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 
 #################################################################
