@@ -10,7 +10,7 @@ import res.glob  as glob
 #
 #  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), AWS Outposts,
 #                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
-#  Unsupported services : EC2 Image Builder
+#  Unsupported services : EC2 Image Builder, App Runner
 #
 # =======================================================================================================================
 

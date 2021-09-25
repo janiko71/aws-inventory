@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : CodeStar
-#  Unsupported services : CodeCommit, CodeArtifact, CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray, AWS FIS
+#  Supported services   : CodeStar, CodeCommit
+#  Unsupported services : CodeArtifact, CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray, AWS FIS
 #  Not scriptable: CloudShell
 #
 # =======================================================================================================================
@@ -88,6 +88,65 @@ def get_codecommit_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "repositoryName", 
         detail_get_key = "repositoryMetadata"
     )
+
+
+#  ------------------------------------------------------------------------
+#
+#    CodeArtifact
+#
+#  ------------------------------------------------------------------------
+
+def get_codeartifact_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns codeartifact details (domains, repositories)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: codeartifact inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codeartifact.html
+    """ 
+    
+    inventory = {}
+
+    inventory['domains'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "codeartifact", 
+        aws_region = "all", 
+        function_name = "list_domains", 
+        key_get = "domains",
+        pagination = True,
+        detail_function = "describe_domain", 
+        join_key = "name", 
+        detail_join_key = "name", 
+        detail_get_key = "domain"
+    )
+
+    inventory['repositories'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "codeartifact", 
+        aws_region = "all", 
+        function_name = "list_repositories", 
+        key_get = "repositories",
+        pagination = True,
+        detail_function = "describe_repository", 
+        join_key = "name", 
+        detail_join_key = "domain", 
+        detail_get_key = "repository"
+    )
+
+    return inventory
 
 
 #
