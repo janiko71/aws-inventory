@@ -184,6 +184,11 @@ def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
         aws_region = "all", 
         function_name = "list_state_machines", 
         key_get = "stateMachines",
+        detail_function = "describe_state_machine",
+        join_key = "stateMachineArn",
+        detail_join_key = "stateMachineArn",
+        detail_get_key = "",
+        pagination_detail = False,
         pagination = True
     )
 
