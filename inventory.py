@@ -326,6 +326,12 @@ if ('mq' in arguments):
 if ('sns' in arguments):
     thread_list.append(awsthread.AWSThread('sns', integ.get_sns_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- Step Functions inventory
+#
+if ('stepfunctions' in arguments):
+    thread_list.append(awsthread.AWSThread('stepfunctions', integ.get_stepfunctions_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                         ANALYTICS                             #

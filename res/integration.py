@@ -151,8 +151,55 @@ def get_sns_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "PlatformApplications",
         pagination = True
     )
+#  ------------------------------------------------------------------------
+#
+#    Step functions
+#
+#  ------------------------------------------------------------------------
+
+def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns stepfunctions (machines, activities) details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: stepfunctions (machines, activities) inventory
+        :rtype: json
+
+        ..note:: not documented yet
+    """ 
+
+    inventory = {}
     
-    return sns_inventory
+    inventory['machines'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "stepfunctions", 
+        aws_region = "all", 
+        function_name = "list_state_machines", 
+        key_get = "stateMachines",
+        pagination = True
+    )
+
+    inventory['activities'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "stepfunctions", 
+        aws_region = "all", 
+        function_name = "list_activities", 
+        key_get = "activities",
+        pagination = True
+    )
+    
+    return inventory
 
 
 #
