@@ -20,6 +20,7 @@ Make sure that you have the latest boto3 version. Older versions may lead to sig
 
 # What's new in the sept-21 version?
 Some services added (docDB, QLDB, containers...) but a **very important update** with a better handling of non-existant services (some tests added, and HSM v1 deleted). Execution time is now 60-70 sec. (instead of 200-220).
+There's a bug with 'timestream-write', so there's an ugly "wart" to prevent long timeouts: the get_available_regions() function returns an empty array for this service.
 
 # What's new in this version?
 This is an attempt to use multithreading in order to accelerate the script. And, at first sight, it looks better: 230 seconds instead of 960 (for the same inventory) on my first test. A lot of services has been added, with some improvements (like for Lightsail).

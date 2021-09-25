@@ -242,6 +242,18 @@ if ('qldb' in arguments):
 if ('docdb' in arguments):
     thread_list.append(awsthread.AWSThread('docdb', db.get_docdb_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- MemoryDB inventory
+#
+if ('memorydb' in arguments):
+    thread_list.append(awsthread.AWSThread('memorydb', db.get_memorydb_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- Timestream inventory
+#
+if ('timestream' in arguments):
+    thread_list.append(awsthread.AWSThread('timestream', db.get_timestream_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                      SECURITY & IAM                           #

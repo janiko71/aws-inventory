@@ -79,6 +79,11 @@ def get_inventory(ownerId,
 
         session = boto3.Session(profile_name=profile)
         svc_list = session.get_available_regions(aws_service)
+
+        # Bug AWS: get_available_regions("timestream-write") returns an empty array.
+        if (aws_service == "timestream-write"):
+            svc_list = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-central-1', 'eu-west-1']
+            
         config.logger.info("Supported regions for service {}: {}".format(aws_service, svc_list))
 
         for region in config.regions:

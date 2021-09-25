@@ -8,7 +8,7 @@ import res.glob  as glob
 # =======================================================================================================================
 #
 #  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB, DocumentDB
-#                           Amazon MemoryDB for Redis, Amazon Timestream (but with a bug )
+#                           Amazon MemoryDB for Redis, Amazon Timestream (but with a bug)
 #  Unsupported services : Amazon Keyspaces
 #
 # =======================================================================================================================
