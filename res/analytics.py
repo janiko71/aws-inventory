@@ -146,9 +146,9 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/emr.html
     """ 
     
-    inventory = {}
+    emr_inventory = {}
 
-    inventory['clusters'] = glob.get_inventory(
+    emr_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
         boto3_config = boto3_config,
@@ -164,11 +164,13 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = ""
     )
     
-    if (len(inventory['clusters']) > 0):
+    emr_cluster = {}
 
-        for cluster in inventory['clusters']:
+    if (len(emr_inventory['clusters']) > 0):
+
+        for cluster in emr_inventory['clusters']:
             
-            cluster['fleets'] = glob.get_inventory(
+            emr_cluster['fleets'] = glob.get_inventory(
                 ownerId = oId,
                 profile = profile,
                 boto3_config = boto3_config,
@@ -180,7 +182,7 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
                 additional_parameters = {'ClusterId': cluster['Id']}
             )
 
-            cluster['instance_groups'] = glob.get_inventory(
+            emr_cluster['instance_groups'] = glob.get_inventory(
                 ownerId = oId,
                 profile = profile,
                 boto3_config = boto3_config,
@@ -200,7 +202,9 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 
         config.nb_units_done = config.nb_units_done + 2 * config.nb_regions
 
-    return inventory
+    emr_inventory['clusters'] = emr_cluster
+
+    return emr_inventory
 
 #
 # Hey, doc: we're in a module!
