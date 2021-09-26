@@ -44,7 +44,7 @@ class AWSThread(Thread):
         """
             Code to execute => the AWS function, in its own thread
         """
-        
+        config.logger.info("Inventoring service " + self.aws_service)
         config.global_inventory[self.aws_service] = self.function_name(*self.arg)
 
 

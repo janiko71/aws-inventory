@@ -270,7 +270,7 @@ def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
         join_key = "Name",
         detail_join_key = "Name",
         detail_get_key = "",
-        pagination = True,
+        pagination = False,
         pagination_detail = False,
     )
 
