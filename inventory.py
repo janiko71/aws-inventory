@@ -205,6 +205,7 @@ if ('storagegateway' in arguments):
 #
 if ('rds' in arguments):
     thread_list.append(awsthread.AWSThread('rds', db.get_rds_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread('rds-clusters', db.get_aurora_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
 # ----------------- dynamodb inventory
@@ -519,6 +520,10 @@ for svc in arguments:
             "elasticbeanstalk-environments": config.global_inventory["elasticbeanstalk-environments"],
             "elasticbeanstalk-applications": config.global_inventory["elasticbeanstalk-applications"]
         }
+
+    elif (svc == "rds"):
+        inventory[svc] = config.global_inventory[svc]
+        inventory["rds-clusters"] = config.global_inventory["rds-clusters"]
 
     else:
 

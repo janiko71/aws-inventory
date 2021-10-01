@@ -51,6 +51,42 @@ def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
 #  ------------------------------------------------------------------------
 #
+#    RDS Aurora
+#
+#  ------------------------------------------------------------------------
+
+def get_aurora_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns RDS inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: RDS inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/rds.html
+
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "rds",
+        aws_region = "all",
+        function_name = "describe_db_clusters",
+        key_get = "DBClusters",
+        pagination = True
+    )
+
+
+#  ------------------------------------------------------------------------
+#
 #    DynamoDB 
 #
 #  ------------------------------------------------------------------------
