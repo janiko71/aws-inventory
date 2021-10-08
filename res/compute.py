@@ -584,7 +584,7 @@ def get_batch_inventory(oId, profile):
         key_get = "jobQueues"
     )
 
-    inventory['compute-environements'] = glob.get_inventory(
+    inventory['compute-environments'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
         aws_service = "batch", 
