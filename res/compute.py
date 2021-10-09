@@ -532,7 +532,7 @@ def get_batch_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "jobQueues"
     )
 
-    inventory['compute-environements'] = glob.get_inventory(
+    inventory['compute-environments'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
         boto3_config = boto3_config,
