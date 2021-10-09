@@ -5,18 +5,23 @@ This python script lists all the main resources of your AWS account. This invent
 
 Intended for personal use (even if I added some professional features like logging), and for only one account. For more information on multiple accounts, read the [wiki](https://github.com/janiko71/aws-inventory/wiki). 
 
-[**TESTERS WANTED! If you test this code, please send me feedback**](https://github.com/janiko71/aws-inventory/discussions/39): I can't test every configuration (especially when there are a lot of items in inventories), so either if it works or not, let me know what is fine and what needs to be corrected (use [issues](https://github.com/janiko71/aws-inventory/issues)).
-
-Supported AWS services is limited, but I add some regulary. **Supported services are detailed [here (wiki)](https://github.com/janiko71/aws-inventory/wiki/Supported-services)**:
-
-
-~~Derived from https://github.com/powerupcloud/AWSInventoryLambda but not forked because it has been too much modified.~~ Rewritten from scratch to be more _pythonified_.
 ## Pre-requisites
 This program needs Python 3.4 or newer. 
 
 AWS CLI must be installed and configured on the system you want to run aws-inventory. You SHOULD use a special account with minimal rights (= those in inventory*.json files). See [wiki](https://github.com/janiko71/aws-inventory/wiki) for more.
 
 Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
+
+## How to contribute?
+[**TESTERS WANTED! If you test this code, please send me feedback**](https://github.com/janiko71/aws-inventory/discussions/39): I can't test every configuration (especially when there are a lot of items in inventories), so either if it works or not, let me know what is fine and what needs to be corrected (use [issues](https://github.com/janiko71/aws-inventory/issues)).
+
+Supported AWS services is limited, but I add some regulary. **Supported services are detailed [here (wiki)](https://github.com/janiko71/aws-inventory/wiki/Supported-services)**:
+
+If you want to add services, you're welcome but keep two things in mind: 
+* Use the 'dev' branch to commit your changes;
+* Please follow the general coding style and structure (to keep all functionnalities like progression status).
+
+~~Derived from https://github.com/powerupcloud/AWSInventoryLambda but not forked because it has been too much modified.~~ Rewritten from scratch to be more _pythonified_.
 
 # What's new in the sept-21 version?
 Some services added (docDB, QLDB, containers...) but a **very important update** with a better handling of non-existant services (some tests added, and HSM v1 deleted). Execution time is now 60-70 sec. (instead of 200-220).
