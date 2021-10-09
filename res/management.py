@@ -19,7 +19,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudformation_inventory(oId, profile):
+def get_cloudformation_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloudformation inventory (if the region is avalaible)
@@ -38,6 +38,8 @@ def get_cloudformation_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudformation", 
         aws_region = "all", 
         function_name = "describe_stacks", 
@@ -56,7 +58,7 @@ def get_cloudformation_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudtrail_inventory(oId, profile):
+def get_cloudtrail_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloudtrail inventory (if the region is avalaible)
@@ -75,6 +77,8 @@ def get_cloudtrail_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudtrail", 
         aws_region = "all", 
         function_name = "describe_trails", 
@@ -88,7 +92,7 @@ def get_cloudtrail_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudwatch_inventory(oId, profile):
+def get_cloudwatch_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloudwatch inventory (if the region is avalaible)
@@ -107,6 +111,8 @@ def get_cloudwatch_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudwatch", 
         aws_region = "all", 
         function_name = "describe_alarms", 

@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, 
-#  Unsupported services : Athena, EMR, Kinesis, Quicksight (not scriptable), Glue
+#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, EMR
+#  Unsupported services : Athena, Kinesis, Quicksight (not scriptable), Glue
 #
 # =======================================================================================================================
 
@@ -19,7 +19,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_es_inventory(oId, profile):
+def get_es_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Elasticsearch details
@@ -38,6 +38,8 @@ def get_es_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "es", 
         aws_region = "all", 
         function_name = "list_domain_names", 
@@ -55,7 +57,7 @@ def get_es_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudsearch_inventory(oId, profile):
+def get_cloudsearch_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloudsearch details
@@ -74,6 +76,8 @@ def get_cloudsearch_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudsearch", 
         aws_region = "all", 
         function_name = "describe_domains", 
@@ -87,7 +91,7 @@ def get_cloudsearch_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_datapipeline_inventory(oId, profile):
+def get_datapipeline_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns datapipeline details
@@ -106,6 +110,8 @@ def get_datapipeline_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "datapipeline", 
         aws_region = "all", 
         function_name = "list_pipelines", 
@@ -124,7 +130,7 @@ def get_datapipeline_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_emr_inventory(oId, profile):
+def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns emr details
@@ -140,9 +146,13 @@ def get_emr_inventory(oId, profile):
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/emr.html
     """ 
     
-    return glob.get_inventory(
+    emr_inventory = {}
+
+    emr_inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "emr", 
         aws_region = "all", 
         function_name = "list_clusters", 
@@ -153,7 +163,48 @@ def get_emr_inventory(oId, profile):
         detail_function = "describe_cluster",
         detail_get_key = ""
     )
+    
+    emr_cluster = {}
 
+    if (len(emr_inventory['clusters']) > 0):
+
+        for cluster in emr_inventory['clusters']:
+            
+            emr_cluster['fleets'] = glob.get_inventory(
+                ownerId = oId,
+                profile = profile,
+                boto3_config = boto3_config,
+                selected_regions = selected_regions,
+                aws_service = "emr", 
+                aws_region = "all", 
+                function_name = "list_instance_fleets", 
+                key_get = "InstanceFleets",
+                additional_parameters = {'ClusterId': cluster['Id']}
+            )
+
+            emr_cluster['instance_groups'] = glob.get_inventory(
+                ownerId = oId,
+                profile = profile,
+                boto3_config = boto3_config,
+                selected_regions = selected_regions,
+                aws_service = "emr", 
+                aws_region = "all", 
+                function_name = "list_instance_groups", 
+                key_get = "InstanceGroups",
+                pagination = True,
+                join_key = "Id",
+                detail_join_key = "ClusterId",
+                detail_function = "describe_cluster",
+                detail_get_key = ""
+            )
+
+    else:
+
+        config.nb_units_done = config.nb_units_done + 2 * config.nb_regions
+
+    emr_inventory['clusters'] = emr_cluster
+
+    return emr_inventory
 
 #
 # Hey, doc: we're in a module!

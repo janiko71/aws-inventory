@@ -15,14 +15,17 @@ def get_inventory(ownerId,
                   profile,
                   aws_service, 
                   aws_region, 
-                  function_name, 
+                  function_name,
+                  boto3_config,
+                  selected_regions,
                   key_get = "", 
                   detail_function = "", 
                   join_key = "", 
                   detail_join_key = "", 
                   detail_get_key = "",
                   pagination = False,
-                  pagination_detail = False):
+                  pagination_detail = False,
+                  additional_parameters = {}):
 
     """
         Returns inventory for a service. It's a generic function, meaning that it should work for almost any AWS service,
@@ -35,6 +38,8 @@ def get_inventory(ownerId,
         :param aws_service: name of AWS service (= the name used in SDK, and defined in config.py). Mandatory.
         :param aws_region: scope of the inventory, depending on the service. Some are globalized, some needs to be executed in every AWS region. Mandatory.
         :param function_name: the name of the SDK function to call to get inventory (or the list of resources). Mandatory.
+        :param boto3_config: configuration for the boto3 client, if needed.
+        :param selected_regions: regions for inventory, if passed in arguments
         :param key_get: the key containing information about the resource, when SDK returns a dict. Optional.
         :param detail_function: the SDK function to call to get details, if needed. Optional.
         :param join_key: Id of the resource you for which you want details.
@@ -42,12 +47,15 @@ def get_inventory(ownerId,
         :param detail_get_key: the key containing detailed information about the resource, when SDK returns a dict. Optional.
         :param pagination: tells if the inventory function supports pagination or not ; pagination is need for large inventory lists.
         :param pagination_detail: tells if the detail inventory function supports pagination or not ; pagination is need for large inventory lists.
+        :param additional_parameters: some additional parameters, if needed, like a key for searching
 
         :type ownerId: string
         :type profile: string
         :type aws_service: string
         :type aws_region: string
         :type function_name: string
+        :type boto3_config: botocore.config.Config
+        :type selected_regions: list
         :type key_get: string
         :type detail_function: string
         :type join_key: string
@@ -71,63 +79,80 @@ def get_inventory(ownerId,
 
         session = boto3.Session(profile_name=profile)
         svc_list = session.get_available_regions(aws_service)
+
+        # Bug AWS: get_available_regions("timestream-write") returns an empty array.
+        if (aws_service == "timestream-write"):
+            svc_list = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-central-1', 'eu-west-1']
+            
         config.logger.info("Supported regions for service {}: {}".format(aws_service, svc_list))
 
         for region in config.regions:
 
             region_name = region['RegionName']
             utils.progress(region_name)
+            utils.display(ownerId, region_name, aws_service, function_name)
             config.logger.info('Account {}, {} inventory for region {}'.format(ownerId, aws_service, region_name))
 
             if (region_name in svc_list):
 
-                t_try = datetime.datetime.now()
+                # Here the region should be supported. Let's see if it's in a selected regions (in cmd line argument)
+            
+                if (region_name in selected_regions) or (len(selected_regions) == 0):
 
-                try:
+                    t_try = datetime.datetime.now()
 
-                    client = session.client(aws_service, region_name)
+                    try:
 
-                    if (pagination):
+                        client = session.client(aws_service, region_name, config=boto3_config)
 
-                        paginator = client.get_paginator(function_name)
-                        page_iterator = paginator.paginate()
-                        utils.display(ownerId, region_name, aws_service, function_name)
-
-                        for detail in page_iterator:
+                        if (pagination):
                             
-                            # Anything in the detail item?
+                            paginator = client.get_paginator(function_name)
+                            page_iterator = paginator.paginate()
 
-                            for inventory_object in detail.get(key_get):
-                                detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
+                            for detail in page_iterator:
+
+                                # Anything in the detail item?
+                                
+                                for inventory_object in detail.get(key_get):
+                                     
+                                    detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
+                                    inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+    
+                        else:
+                            
+                            inv_list = client.__getattribute__(function_name)(**additional_parameters).get(key_get)
+                            utils.display(ownerId, region_name, aws_service, function_name)
+
+                            for inventory_object in inv_list:
+
+                                detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                                 inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
-                    
-                    else:
 
-                        inv_list = client.__getattribute__(function_name)().get(key_get)
-                        utils.display(ownerId, region_name, aws_service, function_name)
-                        for inventory_object in inv_list:
-                            detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
-                            inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
+                    except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
 
-                except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
+                        # unsupported region for efs
+                        config.logger.warning("{} is not available (not supported ?) in region {}.".format(aws_service, region_name))
+                        config.logger.debug("aws service:{}, region:{}, function:{}, error type: {}, error text: {}".format(aws_service, region_name, function_name, type(e), e))
 
-                    # unsupported region for efs
-                    config.logger.warning("{} is not available (not supported?) in region {}.".format(aws_service, region_name))
-                    config.logger.debug("aws service:{}, region:{}, function:{}, error type: {}, error text: {}".format(aws_service, region_name, function_name, type(e), e))
+                    except Exception as e:
 
-                except Exception as e:
+                        config.logger.error("Error while processing {}, {}, {}. Error: {}".format(aws_service, region_name, function_name, e))
 
-                    config.logger.error("Error while processing {}, {}, {}. Error: {}".format(aws_service, region_name, function_name, e))
+                    finally:
 
-                finally:
+                        t_fin = datetime.datetime.now() - t_try
+                        config.logger.debug("Overall exec time for {} {} {}: {}".format(aws_service, region_name, function_name, t_fin.total_seconds()))
 
-                    t_fin = datetime.datetime.now() - t_try
-                    config.logger.debug("Overall exec time for {} {} {}: {}".format(aws_service, region_name, function_name, t_fin.total_seconds()))
+                else:
+
+                    # Region not in argument => skipped
+                    config.logger.debug("Service {} in region {} skipped (not in argument list).".format(aws_service, region_name))
 
             else:
 
                 # Region not in list => not supported
-                config.logger.info("Service {} not supported or not existing in region {}.".format(aws_service, aws_region))
+                config.logger.info("Service {} not supported or not existing in region {}.".format(aws_service, region_name))
 
     elif (aws_region == 'global'):
 
@@ -141,7 +166,7 @@ def get_inventory(ownerId,
             utils.display(ownerId, aws_region, aws_service, function_name)
 
             session = boto3.Session(profile_name=profile)
-            client = session.client(aws_service)
+            client = session.client(aws_service, config=boto3_config)
 
             if (pagination):
 
@@ -158,7 +183,7 @@ def get_inventory(ownerId,
                     # Anything in the detail item?
 
                     for inventory_object in detail.get(key_get):
-                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key)
+                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                         inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
             else:
@@ -166,7 +191,7 @@ def get_inventory(ownerId,
                 inv_list = client.__getattribute__(function_name)().get(key_get)
                 
                 for inv in inv_list:
-                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key)
+                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
         except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
@@ -228,6 +253,7 @@ def get_inventory_detail(client,
             # normal objet; we retrieve the value of the 'join key' field
             key = inventory_object.get(join_key)
 
+        # Now we add parameters (key) for the API Call
         param = {detail_join_key: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
 
         # now we fetch the details; again, depending on the called function, the return object may contains
@@ -262,7 +288,6 @@ def get_inventory_detail(client,
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                paginator = client.get_paginator(detail_function)
                 detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param)
 
         if ("ResponseMetadata" in detailed_inv[detail_get_key]):

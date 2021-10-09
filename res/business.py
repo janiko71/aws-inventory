@@ -19,7 +19,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_alexa_inventory(oId, profile):
+def get_alexa_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns alexa skills
@@ -38,6 +38,8 @@ def get_alexa_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "alexaforbusiness", 
         aws_region = "all", 
         function_name = "list_skills", 
@@ -56,7 +58,7 @@ def get_alexa_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_workdocs_inventory(oId, profile):
+def get_workdocs_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns workdocs inventory
@@ -75,6 +77,8 @@ def get_workdocs_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "workdocs", 
         aws_region = "all", 
         function_name = "???", 
@@ -88,7 +92,7 @@ def get_workdocs_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_workmail_inventory(oId, profile):
+def get_workmail_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns workmail inventory
@@ -107,6 +111,8 @@ def get_workmail_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "workmail", 
         aws_region = "all", 
         function_name = "list_organizations" ,

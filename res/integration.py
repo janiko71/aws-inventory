@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), 
-#  Unsupported services : Step functions, SWF
+#  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), Step functions,
+#  Unsupported services : Amazon AppFlow, Amazon EventBridge SWF, Apache Airflow 
 #
 # =======================================================================================================================
 
@@ -19,7 +19,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_sqs_inventory(oId, profile):
+def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Simple Queue Service (SQS) details
@@ -38,6 +38,8 @@ def get_sqs_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "sqs", 
         aws_region = "all", 
         function_name = "list_queues", 
@@ -55,7 +57,7 @@ def get_sqs_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_mq_inventory(oId, profile):
+def get_mq_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Amazon MQ details
@@ -76,6 +78,8 @@ def get_mq_inventory(oId, profile):
     mq_inventory['brokers'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "mq", 
         aws_region = "all", 
         function_name = "list_brokers", 
@@ -89,6 +93,8 @@ def get_mq_inventory(oId, profile):
     mq_inventory['configurations'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "mq", 
         aws_region = "all", 
         function_name = "list_configurations", 
@@ -104,7 +110,7 @@ def get_mq_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_sns_inventory(oId, profile):
+def get_sns_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns sns (topics, applications) details
@@ -125,6 +131,8 @@ def get_sns_inventory(oId, profile):
     sns_inventory['topics'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "sns", 
         aws_region = "all", 
         function_name = "list_topics", 
@@ -135,14 +143,68 @@ def get_sns_inventory(oId, profile):
     sns_inventory['applications'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "sns", 
         aws_region = "all", 
         function_name = "list_platform_applications", 
         key_get = "PlatformApplications",
         pagination = True
     )
+#  ------------------------------------------------------------------------
+#
+#    Step functions
+#
+#  ------------------------------------------------------------------------
+
+def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns stepfunctions (machines, activities) details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: stepfunctions (machines, activities) inventory
+        :rtype: json
+
+        ..note:: not documented yet
+    """ 
+
+    inventory = {}
     
-    return sns_inventory
+    inventory['machines'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "stepfunctions", 
+        aws_region = "all", 
+        function_name = "list_state_machines", 
+        key_get = "stateMachines",
+        detail_function = "describe_state_machine",
+        join_key = "stateMachineArn",
+        detail_join_key = "stateMachineArn",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = True
+    )
+
+    inventory['activities'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "stepfunctions", 
+        aws_region = "all", 
+        function_name = "list_activities", 
+        key_get = "activities",
+        pagination = True
+    )
+    
+    return inventory
 
 
 #

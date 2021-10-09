@@ -10,7 +10,7 @@ import res.glob as glob
 # =======================================================================================================================
 #
 #  Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway
-#  Unsupported services : None
+#  Unsupported services : AWS Backup
 #
 # =======================================================================================================================
 
@@ -20,7 +20,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_s3_inventory(oId, profile):
+def get_s3_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns S3 quick inventory
@@ -41,6 +41,8 @@ def get_s3_inventory(oId, profile):
     bucket_list = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "s3", 
         aws_region = "global", 
         function_name = "list_buckets", 
@@ -130,7 +132,7 @@ def get_s3_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_efs_inventory(oId, profile):
+def get_efs_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns EFS inventory
@@ -149,6 +151,8 @@ def get_efs_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "efs", 
         aws_region = "all", 
         function_name = "describe_file_systems", 
@@ -163,7 +167,7 @@ def get_efs_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_glacier_inventory(oId, profile):
+def get_glacier_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Glacier inventory
@@ -183,6 +187,8 @@ def get_glacier_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "glacier", 
         aws_region = "all", 
         function_name = "list_vaults", 
@@ -197,7 +203,7 @@ def get_glacier_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_storagegateway_inventory(oId, profile):
+def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Storage gateway inventory
@@ -217,6 +223,8 @@ def get_storagegateway_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "storagegateway", 
         aws_region = "all", 
         function_name = "list_gateways", 

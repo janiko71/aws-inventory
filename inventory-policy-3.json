@@ -1,0 +1,37 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "states:ListStateMachines",
+                "states:DescribeStateMachine",
+                "ecr:ListImages",
+                "codecommit:ListRepositories",
+                "codeartifact:ListDomains",
+                "elasticmapreduce:ListInstanceGroups",
+                "outposts:ListSites",
+                "timestream:ListDatabases",
+                "elasticmapreduce:ListClusters",
+                "ecr:DescribeRepositories",
+                "timestream:DescribeDatabase",
+                "states:DescribeActivity",
+                "states:ListActivities",
+                "outposts:GetOutpost",
+                "timestream:ListTables",
+                "codeartifact:DescribeRepository",
+                "codeartifact:DescribeDomain",
+                "elasticmapreduce:ListInstanceFleets",
+                "timestream:DescribeEndpoints",
+                "memorydb:DescribeClusters",
+                "codeartifact:ListRepositories",
+                "outposts:ListOutposts",
+                "codecommit:GetRepository",
+                "ecr:DescribeImages",
+                "timestream:DescribeTable"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

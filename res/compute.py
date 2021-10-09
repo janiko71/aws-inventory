@@ -5,12 +5,12 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# to do : autoscaling, security groups
+# to do : security groups
 # =======================================================================================================================
 #
-#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), 
-#                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch
-#  Unsupported services : None
+#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), AWS Outposts,
+#                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
+#  Unsupported services : EC2 Image Builder, App Runner
 #
 # =======================================================================================================================
 
@@ -20,7 +20,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_ec2_inventory(oId, profile):
+def get_ec2_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns ec2 inventory, without any analysis or any formatting
@@ -39,6 +39,8 @@ def get_ec2_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_instances", 
@@ -47,7 +49,7 @@ def get_ec2_inventory(oId, profile):
     )
 
 
-def get_interfaces_inventory(oId, profile):
+def get_interfaces_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns network interfaces detailed inventory
@@ -64,6 +66,8 @@ def get_interfaces_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_network_interfaces", 
@@ -71,7 +75,7 @@ def get_interfaces_inventory(oId, profile):
     )
 
 
-def get_vpc_inventory(oId, profile):
+def get_vpc_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns VPC detailed inventory
@@ -88,6 +92,8 @@ def get_vpc_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_vpcs", 
@@ -95,7 +101,7 @@ def get_vpc_inventory(oId, profile):
     )
 
 
-def get_subnet_inventory(oId, profile):
+def get_subnet_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns VPC subnets inventory
@@ -112,6 +118,8 @@ def get_subnet_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_subnets", 
@@ -119,7 +127,7 @@ def get_subnet_inventory(oId, profile):
     )
 
 
-def get_ebs_inventory(oId, profile):
+def get_ebs_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns EBS detailed inventory
@@ -136,6 +144,8 @@ def get_ebs_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_volumes", 
@@ -144,7 +154,7 @@ def get_ebs_inventory(oId, profile):
     )
 
 
-def get_eips_inventory(oId, profile):
+def get_eips_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Elastic IPs inventory
@@ -161,6 +171,8 @@ def get_eips_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_addresses", 
@@ -168,7 +180,7 @@ def get_eips_inventory(oId, profile):
     )
 
 
-def get_egpus_inventory(oId, profile):
+def get_egpus_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Elastic GPUs inventory
@@ -185,6 +197,8 @@ def get_egpus_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_elastic_gpus", 
@@ -192,7 +206,7 @@ def get_egpus_inventory(oId, profile):
     )
 
 
-def get_sg_inventory(oId, profile):
+def get_sg_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Security Groups inventory
@@ -209,6 +223,8 @@ def get_sg_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_security_groups", 
@@ -217,7 +233,7 @@ def get_sg_inventory(oId, profile):
     )
 
 
-def get_igw_inventory(oId, profile):
+def get_igw_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Internet Gateways inventory
@@ -234,6 +250,8 @@ def get_igw_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_internet_gateways", 
@@ -241,7 +259,7 @@ def get_igw_inventory(oId, profile):
     )
 
 
-def get_ngw_inventory(oId, profile):
+def get_ngw_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Nat Gateways inventory
@@ -258,6 +276,8 @@ def get_ngw_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "ec2", 
         aws_region = "all", 
         function_name = "describe_nat_gateways", 
@@ -271,7 +291,7 @@ def get_ngw_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_elasticbeanstalk_environments_inventory(oId, profile):
+def get_elasticbeanstalk_environments_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Elastic Beanstalk detailed inventory
@@ -290,6 +310,8 @@ def get_elasticbeanstalk_environments_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "elasticbeanstalk", 
         aws_region = "all", 
         function_name = "describe_environments", 
@@ -297,7 +319,7 @@ def get_elasticbeanstalk_environments_inventory(oId, profile):
     )
 
 
-def get_elasticbeanstalk_applications_inventory(oId, profile):
+def get_elasticbeanstalk_applications_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns Elastic Beanstalk detailed inventory
@@ -314,144 +336,14 @@ def get_elasticbeanstalk_applications_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "elasticbeanstalk", 
         aws_region = "all", 
         function_name = "describe_applications", 
         key_get = "Applications"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    EC2 Container Service (ECS)
-#
-#  ------------------------------------------------------------------------
-
-def get_ecs_inventory(oId, profile):
-
-    """
-        Returns ECS detailed inventory
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: ECS inventory
-        :rtype: json
-
-        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ecs.html
-    """
-
-    return glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        aws_service = "ecs", 
-        aws_region = "all", 
-        function_name = "describe_clusters", 
-        key_get = "clusters"
-    )
-    #detail_function = "list_container_instances",
-    #join_key = "clusterName", 
-    #detail_join_key = "cluster", 
-    #detail_get_key = ""
-    
-
-def get_ecs_services_inventory(oId, profile):
-
-    """
-        Returns ECS tasks inventory  NOT WORKING YET
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: ECS tasks inventory
-        :rtype: json
-    """
-
-    return glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        aws_service = "ecs", 
-        aws_region = "all", 
-        function_name = "list_services", 
-        key_get = "serviceArns",
-        detail_function = "describe_services", 
-        join_key = "", 
-        detail_join_key = "services", 
-        detail_get_key = "services",
-        pagination = True,
-        pagination_detail = True
-    )
-    
-
-def get_ecs_tasks_inventory(oId, profile):
-
-    """
-        Returns ECS tasks inventory
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: ECS tasks inventory
-        :rtype: json
-    """
-
-    return glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        aws_service = "ecs", 
-        aws_region = "all", 
-        function_name = "list_task_definitions", 
-        key_get = "taskDefinitionArns",
-        detail_function = "describe_task_definition", 
-        join_key = "taskDefinitionArn", 
-        detail_join_key = "taskDefinition", 
-        detail_get_key = "taskDefinition",
-        pagination = True,
-        pagination_detail = True
-    )
-
-
-#  ------------------------------------------------------------------------
-#
-#    EKS
-#
-#  ------------------------------------------------------------------------
-
-def get_eks_inventory(oId, profile):
-
-    """
-        Returns eks inventory (if the region is avalaible)
-
-        :param oId: ownerId (AWS account)
-        :type oId: string
-        :param profile: configuration profile name used for session
-        :type profile: string
-
-        :return: eks inventory
-        :rtype: json
-
-        .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
-    """
-
-    inv = glob.get_inventory(
-        ownerId = oId,
-        profile = profile,
-        aws_service = "eks", 
-        aws_region = "all", 
-        function_name = "list_clusters", 
-        key_get = "clusters",
-        detail_function = "describe_cluster", 
-        join_key = "", 
-        detail_join_key = "name", 
-        detail_get_key = "cluster"
-    )
-    return inv
 
 
 #  ------------------------------------------------------------------------
@@ -460,7 +352,7 @@ def get_eks_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_autoscaling_inventory(oId, profile):
+def get_autoscaling_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns eks inventory (if the region is avalaible)
@@ -481,6 +373,8 @@ def get_autoscaling_inventory(oId, profile):
     autoscaling_inventory['autoscaling-groups'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "autoscaling", 
         aws_region = "all", 
         function_name = "describe_auto_scaling_groups", 
@@ -491,6 +385,8 @@ def get_autoscaling_inventory(oId, profile):
     autoscaling_inventory['autoscaling-launch-configuration'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "autoscaling", 
         aws_region = "all", 
         function_name = "describe_launch_configurations", 
@@ -501,6 +397,8 @@ def get_autoscaling_inventory(oId, profile):
     autoscaling_inventory['autoscaling-plans'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "autoscaling-plans", 
         aws_region = "all", 
         function_name = "describe_scaling_plans", 
@@ -516,7 +414,7 @@ def get_autoscaling_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_lambda_inventory(oId, profile):
+def get_lambda_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns lambda inventory.
@@ -535,6 +433,8 @@ def get_lambda_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "lambda", 
         aws_region = "all", 
         function_name = "list_functions", 
@@ -545,11 +445,55 @@ def get_lambda_inventory(oId, profile):
 
 #  ------------------------------------------------------------------------
 #
+#    Serverless Application Repository
+#
+#  ------------------------------------------------------------------------
+
+def get_serverlessrepo_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns serverlessrepo inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: serverlessrepo inventory
+        :rtype: json
+
+        .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/serverlessrepo.html
+    """
+    inventory = {}
+
+    inventory = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "serverlessrepo", 
+        aws_region = "all", 
+        function_name = "list_applications", 
+        key_get = "Applications",
+        detail_function = "get_application", 
+        join_key = "ApplicationId", 
+        detail_join_key = "ApplicationId", 
+        detail_get_key = "",
+        pagination = True,
+        pagination_detail = False        
+    )
+
+
+    return inventory
+    
+
+#  ------------------------------------------------------------------------
+#
 #    Batch
 #
 #  ------------------------------------------------------------------------
 
-def get_batch_inventory(oId, profile):
+def get_batch_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns batch jobs inventory.
@@ -569,6 +513,8 @@ def get_batch_inventory(oId, profile):
     inventory['job-definitions'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "batch", 
         aws_region = "all", 
         function_name = "describe_job_definitions", 
@@ -578,15 +524,19 @@ def get_batch_inventory(oId, profile):
     inventory['job-queues'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "batch", 
         aws_region = "all", 
         function_name = "describe_job_queues", 
         key_get = "jobQueues"
     )
 
-    inventory['compute-environements'] = glob.get_inventory(
+    inventory['compute-environments'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "batch", 
         aws_region = "all", 
         function_name = "describe_compute_environments", 
@@ -603,7 +553,7 @@ def get_batch_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_lightsail_inventory(oId, profile):
+def get_lightsail_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns lightsail inventory, with loadbalancers and IPs
@@ -624,6 +574,8 @@ def get_lightsail_inventory(oId, profile):
     lightsail_inventory['lightsail-instances'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_instances", 
@@ -634,6 +586,8 @@ def get_lightsail_inventory(oId, profile):
     lightsail_inventory['lightsail-loadbalancers'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_load_balancers", 
@@ -643,6 +597,8 @@ def get_lightsail_inventory(oId, profile):
     lightsail_inventory['lightsail-ip'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_static_ips", 
@@ -652,6 +608,8 @@ def get_lightsail_inventory(oId, profile):
     lightsail_inventory['lightsail-disks'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "lightsail", 
         aws_region = "all", 
         function_name = "get_disks", 
@@ -660,6 +618,59 @@ def get_lightsail_inventory(oId, profile):
 
     return lightsail_inventory
 
+
+#  ------------------------------------------------------------------------
+#
+#    AWS Outposts
+#
+#  ------------------------------------------------------------------------
+
+def get_outposts_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns lambda inventory.
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: lambda inventory
+        :rtype: json
+
+        .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/outposts.html
+    """
+
+    inventory = {}
+
+    inventory['outposts'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "outposts", 
+        aws_region = "all", 
+        function_name = "list_outposts", 
+        key_get = "Outposts",
+        pagination = False,
+        detail_get_key = "Outpost",
+        detail_join_key = "OutpostId",
+        pagination_detail = False
+    )
+
+    inventory['outposts_sites'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "outposts", 
+        aws_region = "all", 
+        function_name = "list_sites", 
+        key_get = "Sites",
+        pagination = False
+    )
+
+    return inventory
 
 #
 # Hey, doc: we're in a module!

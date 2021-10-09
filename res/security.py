@@ -21,7 +21,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_clouddirectory_inventory(oId, profile):
+def get_clouddirectory_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns keys managed by KMS (global)
@@ -40,6 +40,8 @@ def get_clouddirectory_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "clouddirectory", 
         aws_region = "all", 
         function_name = "list_directories", 
@@ -54,7 +56,7 @@ def get_clouddirectory_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_acm_inventory(oId, profile):
+def get_acm_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns certificates managed with ACM
@@ -73,6 +75,8 @@ def get_acm_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "acm", 
         aws_region = "all", 
         function_name = "list_certificates", 
@@ -91,7 +95,7 @@ def get_acm_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_acmpca_inventory(oId, profile):
+def get_acmpca_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns certificates managed with ACM
@@ -110,6 +114,8 @@ def get_acmpca_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "acm-pca", 
         aws_region = "all", 
         function_name = "list_certificate_authorities", 
@@ -123,7 +129,7 @@ def get_acmpca_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_secrets_inventory(oId, profile):
+def get_secrets_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns all secrets managed by AWS (without values of the secrets ;-)
@@ -142,6 +148,8 @@ def get_secrets_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "secretsmanager", 
         aws_region = "all", 
         function_name = "list_secrets", 
@@ -155,7 +163,7 @@ def get_secrets_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_hsm_inventory(oId, profile):
+def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloud HSM inventory
@@ -175,6 +183,8 @@ def get_hsm_inventory(oId, profile):
     inventory['clusters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudhsmv2", 
         aws_region = "all", 
         function_name = "describe_clusters", 
@@ -188,6 +198,8 @@ def get_hsm_inventory(oId, profile):
     inventory['hsm'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudhsm", 
         aws_region = "all", 
         function_name = "list_hsms", 
@@ -201,6 +213,8 @@ def get_hsm_inventory(oId, profile):
     inventory['luna'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudhsm", 
         aws_region = "all", 
         function_name = "list_luna_clients", 

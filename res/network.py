@@ -7,8 +7,8 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, Cloud Front
-#  Unsupported services : Direct Connect
+#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
+#  Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
 #
 # =======================================================================================================================
 
@@ -19,7 +19,7 @@ import res.glob  as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_apigateway_inventory(oId, profile):
+def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns API Gateway inventory
@@ -39,6 +39,8 @@ def get_apigateway_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "apigateway", 
         aws_region = "all", 
         function_name = "get_rest_apis", 
@@ -53,7 +55,7 @@ def get_apigateway_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_cloudfront_inventory(oId, profile):
+def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns cloudfront inventory
@@ -73,6 +75,8 @@ def get_cloudfront_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "cloudfront", 
         aws_region = "global", 
         function_name = "list_distributions", 
@@ -88,7 +92,7 @@ def get_cloudfront_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_route53_inventory(oId, profile):
+def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns route 53 inventory, partial.
@@ -112,6 +116,8 @@ def get_route53_inventory(oId, profile):
     inventory['zones'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "route53", 
         aws_region = "global", 
         function_name = "list_hosted_zones_by_name", 
@@ -126,6 +132,8 @@ def get_route53_inventory(oId, profile):
     inventory['traffic-policies'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "route53", 
         aws_region = "global", 
         function_name = "list_traffic_policies", 
@@ -136,6 +144,8 @@ def get_route53_inventory(oId, profile):
     inventory['domains'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "route53domains", 
         aws_region = "all", 
         function_name = "list_domains", 
@@ -152,7 +162,7 @@ def get_route53_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_elb_inventory(oId, profile):
+def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns ELB inventory
@@ -172,6 +182,8 @@ def get_elb_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "elb",
         aws_region = "all",
         function_name = "describe_load_balancers",
@@ -185,7 +197,7 @@ def get_elb_inventory(oId, profile):
 #
 #  ------------------------------------------------------------------------
 
-def get_elbv2_inventory(oId, profile):
+def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns ELBv2 inventory
@@ -205,6 +217,8 @@ def get_elbv2_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "elbv2", 
         aws_region = "all", 
         function_name = "describe_load_balancers", 

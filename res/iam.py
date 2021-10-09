@@ -19,7 +19,7 @@ import res.glob as glob
 #
 #  ------------------------------------------------------------------------
 
-def get_kms_inventory(oId, profile):
+def get_kms_inventory(oId, profile, boto3_config, selected_regions):
 
     """
         Returns keys managed by KMS (global)
@@ -38,6 +38,8 @@ def get_kms_inventory(oId, profile):
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
         aws_service = "kms", 
         aws_region = "all", 
         function_name = "list_keys", 
