@@ -47,7 +47,7 @@ S3_INVENTORY_BUCKET="s3-bucket"
 
 # --- Arguments/Supported commands
 
-SUPPORTED_INVENTORIES = {"s3": 1, "ec2": 10, "lambda": 1 , "lightsail": 4, "efs": 1, "glacier": 1, "rds": 1, "ce": 1, "kms": 1, "dynamodb": 1, "apigateway": 1,
+SUPPORTED_INVENTORIES = {"s3": 1, "ec2": 10, "lambda": 1 , "lightsail": 4, "efs": 1, "glacier": 1, "rds": 2, "ce": 1, "kms": 1, "dynamodb": 1, "apigateway": 1,
     "ecs": 2, "elasticbeanstalk": 2, "clouddirectory": 1, "codestar": 1, "alexa": 1, "workmail": 1, "neptune": 1, "acm": 1, "acm-pca": 1, "autoscaling": 3,
     "cloudformation": 1, "cloudtrail": 1, "cloudwatch": 1, "eks": 1, "batch": 3, "route53": 3, "cloudfront": 1, "secrets": 1, "hsm": 1, "elasticache": 2,
 	"redshift": 2, "storagegateway": 1, "sqs": 1, "mq": 2, "sns": 2, "es": 1, "cloudsearch": 1, "datapipeline": 1, "elb": 1, "elbv2": 1, "emr": 3,
