@@ -9,7 +9,7 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway
+#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway, FSx
 #  Unsupported services : AWS Backup
 #
 # =======================================================================================================================
@@ -235,6 +235,94 @@ def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "GatewayARN",
         pagination = True
     )
+
+
+#  ------------------------------------------------------------------------
+#
+#    FSx (File Storage)
+#
+#  ------------------------------------------------------------------------
+
+def get_fsx_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns FSx (File Storage) inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: FSx (File Storage) inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/fsx.html
+
+    """
+
+    fsx_inventory = {}
+    
+    fsx_inventory['fsx-backups'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "fsx", 
+        aws_region = "all", 
+        function_name = "describe_backups", 
+        key_get = "Backups",
+        pagination = True
+    )
+    
+    fsx_inventory['fsx-data-repository-tasks'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "fsx", 
+        aws_region = "all", 
+        function_name = "describe_data_repository_tasks", 
+        key_get = "DataRepositoryTasks",
+        pagination = False
+    )
+    
+    fsx_inventory['fsx-file-systems'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "fsx", 
+        aws_region = "all", 
+        function_name = "describe_file_systems", 
+        key_get = "FileSystems",
+        pagination = True
+    )
+    
+    fsx_inventory['fsx-storage-virtual-machines'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "fsx", 
+        aws_region = "all", 
+        function_name = "describe_storage_virtual_machines", 
+        key_get = "StorageVirtualMachines",
+        pagination = False
+    )
+    
+    fsx_inventory['fsx-volumes'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "fsx", 
+        aws_region = "all", 
+        function_name = "describe_volumes", 
+        key_get = "Volumes",
+        pagination = False
+    )
+
+    return fsx_inventory
 
 
 #

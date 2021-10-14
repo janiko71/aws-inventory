@@ -196,6 +196,12 @@ if ('glacier' in arguments):
 if ('storagegateway' in arguments):
     thread_list.append(awsthread.AWSThread('storagegateway', storage.get_storagegateway_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- FSx inventory
+#
+if ('fsx' in arguments):
+    thread_list.append(awsthread.AWSThread('fsx', storage.get_fsx_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                          DATABASES                            #
