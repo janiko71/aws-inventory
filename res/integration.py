@@ -9,7 +9,8 @@ import res.glob as glob
 # =======================================================================================================================
 #
 #  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), Step functions,
-#  Unsupported services : Amazon AppFlow, Amazon EventBridge SWF, Apache Airflow 
+#                         Amazon AppFlow, Amazon EventBridge SWF
+#  Unsupported services : Apache Airflow 
 #
 # =======================================================================================================================
 
@@ -245,6 +246,50 @@ def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
         detail_function = "describe_flow",
         join_key = "flowName",
         detail_join_key = "flowName",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
+    )
+    
+    return inventory
+
+    
+#  ------------------------------------------------------------------------
+#
+#    EventBridge
+#
+#  ------------------------------------------------------------------------
+
+def get_eventbridge_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns EventBridge (rules) details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: EventBridge (rules) inventory
+        :rtype: json
+
+        ..note:: not documented yet
+    """ 
+
+    inventory = {}
+    
+    inventory['rules'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "events", 
+        aws_region = "all", 
+        function_name = "list_rules", 
+        key_get = "Rules",
+        detail_function = "describe_rule",
+        join_key = "Name",
+        detail_join_key = "Name",
         detail_get_key = "",
         pagination_detail = False,
         pagination = False

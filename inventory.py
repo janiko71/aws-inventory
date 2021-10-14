@@ -356,6 +356,12 @@ if ('stepfunctions' in arguments):
 if ('appflow' in arguments):
     thread_list.append(awsthread.AWSThread('appflow', integ.get_appflow_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- EventBridge inventory
+#
+if ('events' in arguments):
+    thread_list.append(awsthread.AWSThread('events', integ.get_eventbridge_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                         ANALYTICS                             #
