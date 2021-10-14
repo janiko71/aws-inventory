@@ -350,6 +350,12 @@ if ('sns' in arguments):
 if ('stepfunctions' in arguments):
     thread_list.append(awsthread.AWSThread('stepfunctions', integ.get_stepfunctions_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- Appflow inventory
+#
+if ('appflow' in arguments):
+    thread_list.append(awsthread.AWSThread('appflow', integ.get_appflow_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                         ANALYTICS                             #

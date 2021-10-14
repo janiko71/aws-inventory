@@ -151,6 +151,8 @@ def get_sns_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "PlatformApplications",
         pagination = True
     )
+
+    
 #  ------------------------------------------------------------------------
 #
 #    Step functions
@@ -202,6 +204,50 @@ def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
         function_name = "list_activities", 
         key_get = "activities",
         pagination = True
+    )
+    
+    return inventory
+
+    
+#  ------------------------------------------------------------------------
+#
+#    Appflow
+#
+#  ------------------------------------------------------------------------
+
+def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns appflow (flows, connectors) details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: appflow (flows, connectors) inventory
+        :rtype: json
+
+        ..note:: not documented yet
+    """ 
+
+    inventory = {}
+    
+    inventory['flows'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "appflow", 
+        aws_region = "all", 
+        function_name = "list_flows", 
+        key_get = "flows",
+        detail_function = "describe_flow",
+        join_key = "flowName",
+        detail_join_key = "flowName",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
     )
     
     return inventory

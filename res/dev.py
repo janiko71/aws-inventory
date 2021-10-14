@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : CodeStar, CodeCommit
-#  Unsupported services : CodeArtifact, CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray, AWS FIS
+#  Supported services   : CodeStar, CodeCommit, CodeArtifact
+#  Unsupported services : CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray, AWS FIS
 #  Not scriptable: CloudShell
 #
 # =======================================================================================================================
