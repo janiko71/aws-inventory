@@ -23,6 +23,9 @@ If you want to add services, you're welcome but keep two things in mind:
 
 ~~Derived from https://github.com/powerupcloud/AWSInventoryLambda but not forked because it has been too much modified.~~ Rewritten from scratch to be more _pythonified_.
 
+# What's new in the oct-21 version?
+Serviced added, not always fully tested (ForeCast, SageMaker, GuardDuty, WAF/WAFv2/WAF-Regional...). See here for the [supported services](https://github.com/janiko71/aws-inventory/wiki/Supported-services).
+
 # What's new in the sept-21 version?
 Some services added (docDB, QLDB, containers...) but a **very important update** with a better handling of non-existant services (some tests added, and HSM v1 deleted). Execution time is now 60-70 sec. (instead of 200-220).
 There's a bug with 'timestream-write', so there's an ugly "wart" to prevent long timeouts: the get_available_regions() function returns an empty array for this service.
