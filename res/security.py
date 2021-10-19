@@ -7,9 +7,10 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM, WAF & Shield
-#  Unsupported services : Cognito, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
-#                           Artifact
+#  Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM, WAF & Shield, GuardDuty
+#  Unsupported services : Cognito, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
+#                           Artifact, Security Hub, Detective, AWS Audit Manager, Directory Service, AWS Signer,
+#                           AWS Network Firewall
 #
 #  Note: IAM has its own module
 #
