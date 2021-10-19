@@ -306,6 +306,12 @@ if ('hsm' in arguments):
 if ('waf' in arguments):
     thread_list.append(awsthread.AWSThread('waf', security.get_waf_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- GuardDuty
+#
+if ('guardduty' in arguments):
+    thread_list.append(awsthread.AWSThread('guardduty', security.get_guardduty_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                      DEVELOPER TOOLS                          #

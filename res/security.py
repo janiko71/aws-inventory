@@ -7,9 +7,9 @@ import res.glob  as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM 
+#  Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM, WAF & Shield
 #  Unsupported services : Cognito, GuardDuty, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
-#                           WAF & Shield, Artifact
+#                           Artifact
 #
 #  Note: IAM has its own module
 #
@@ -239,7 +239,7 @@ def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
 def get_waf_inventory(oId, profile, boto3_config, selected_regions):
 
     """
-        Returns WAF, WAFv2 & WAF Regional  inventory
+        Returns WAF, WAFv2 & WAF Regional inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -281,7 +281,6 @@ def get_waf_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
     inventory['waf-regional'] = {}
     
     inventory['waf-regional']['web_acls'] = glob.get_inventory(
@@ -307,6 +306,67 @@ def get_waf_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "Rules",
         pagination = False
     )
+
+    return inventory
+
+
+#  ------------------------------------------------------------------------
+#
+#    GuardDuty (detectors, filters, )
+#
+#  ------------------------------------------------------------------------
+
+def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns GuardDuty inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: GuardDuty inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/guardduty.html
+        
+    """ 
+    inventory = {}
+
+    inventory['detectors'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "guardduty", 
+        aws_region = "all", 
+        function_name = "list_detectors", 
+        key_get = "DetectorIds",
+        detail_function = "get_detector", 
+        join_key = "DetectorId", 
+        detail_join_key = "DetectorId", 
+        detail_get_key = "",
+        pagination = True
+    )
+    
+    """
+    inventory['filters'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "guardduty", 
+        aws_region = "all", 
+        function_name = "list_members", 
+        key_get = "",
+        detail_function = "get_filter", 
+        join_key = "FilterNames", 
+        detail_join_key = "Name", 
+        detail_get_key = "",
+        pagination = True
+    )
+    """
 
     return inventory
 
