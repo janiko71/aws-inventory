@@ -256,7 +256,7 @@ def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
     
 #  ------------------------------------------------------------------------
 #
-#    EventBridge
+#    EventBridge (archives, connections, event_buses, event_sources, replays, rules)
 #
 #  ------------------------------------------------------------------------
 
@@ -277,7 +277,92 @@ def get_eventbridge_inventory(oId, profile, boto3_config, selected_regions):
     """ 
 
     inventory = {}
+
+    inventory['archives'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "events", 
+        aws_region = "all", 
+        function_name = "list_archives", 
+        key_get = "Archives",
+        detail_function = "describe_archive",
+        join_key = "ArchiveName",
+        detail_join_key = "ArchiveName",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
+    )
+
+    inventory['connections'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "events", 
+        aws_region = "all", 
+        function_name = "list_connections", 
+        key_get = "Connections",
+        detail_function = "describe_connection",
+        join_key = "Name",
+        detail_join_key = "Name",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
+    )
+
+    inventory['event_buses'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "events", 
+        aws_region = "all", 
+        function_name = "list_event_buses", 
+        key_get = "EventBuses",
+        detail_function = "describe_event_bus",
+        join_key = "Name",
+        detail_join_key = "Name",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
+    )
+ 
+    inventory['event_sources'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "events", 
+        aws_region = "all", 
+        function_name = "list_event_sources", 
+        key_get = "EventSources",
+        detail_function = "describe_event_source",
+        join_key = "Name",
+        detail_join_key = "Name",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
+    )
     
+    inventory['replays'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "events", 
+        aws_region = "all", 
+        function_name = "list_replays", 
+        key_get = "ReplayName",
+        detail_function = "describe_replay",
+        join_key = "Name",
+        detail_join_key = "ReplayName",
+        detail_get_key = "",
+        pagination_detail = False,
+        pagination = False
+    )
+      
     inventory['rules'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
