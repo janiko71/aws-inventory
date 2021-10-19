@@ -300,6 +300,12 @@ if ('secrets' in arguments):
 if ('hsm' in arguments):
     thread_list.append(awsthread.AWSThread('hsm', security.get_hsm_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- WAF, WAFv2 & WAF Regional
+#
+if ('waf' in arguments):
+    thread_list.append(awsthread.AWSThread('waf', security.get_waf_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                      DEVELOPER TOOLS                          #

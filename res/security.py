@@ -230,6 +230,87 @@ def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
     return inventory
 
 
+#  ------------------------------------------------------------------------
+#
+#    WAF, WAFv2 & WAF Regional - NO DETAILS for security reasons
+#
+#  ------------------------------------------------------------------------
+
+def get_waf_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns WAF, WAFv2 & WAF Regional  inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: HSM inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/waf.html
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/wafv2.html
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/waf-regional.html
+        
+    """ 
+    inventory = {}
+
+    inventory['waf'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "waf", 
+        aws_region = "global", 
+        function_name = "list_rules", 
+        key_get = "Rules",
+        pagination = True
+    )
+
+
+    inventory['wafv2'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "wafv2", 
+        aws_region = "global", 
+        function_name = "list_rule_groups", 
+        key_get = "RuleGroups",
+        pagination = True
+    )
+
+
+    inventory['waf-regional'] = {}
+    
+    inventory['waf-regional']['web_acls'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "waf-regional", 
+        aws_region = "all", 
+        function_name = "list_web_acls", 
+        key_get = "WebACLs",
+        pagination = False
+    )
+    
+    inventory['waf-regional']['rules'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "waf-regional", 
+        aws_region = "all", 
+        function_name = "list_rules", 
+        key_get = "Rules",
+        pagination = False
+    )
+
+    return inventory
+
+
 #
 # Hey, doc: we're in a module!
 #
