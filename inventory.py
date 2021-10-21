@@ -17,22 +17,23 @@ import res.utils as utils
 import config
 
 # AWS Services imports
-import res.glob         as glob
+import res.glob            as glob
 
-import res.compute      as compute
-import res.container    as container
-import res.storage      as storage
-import res.db           as db
-import res.dev          as dev
-import res.iam          as iam
-import res.network      as net
-import res.fact         as fact
-import res.security     as security
-import res.analytics    as analytics
-import res.management   as mgn
-import res.business     as bus
-import res.integration  as integ
-import res.awsthread    as awsthread
+import res.compute         as compute
+import res.container       as container
+import res.storage         as storage
+import res.db              as db
+import res.dev             as dev
+import res.iam             as iam
+import res.network         as net
+import res.fact            as fact
+import res.security        as security
+import res.analytics       as analytics
+import res.management      as mgn
+import res.business        as bus
+import res.integration     as integ
+import res.awsthread       as awsthread
+import res.machinelearning as machinelearning
 
 
 
@@ -196,6 +197,12 @@ if ('glacier' in arguments):
 if ('storagegateway' in arguments):
     thread_list.append(awsthread.AWSThread('storagegateway', storage.get_storagegateway_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- FSx inventory
+#
+if ('fsx' in arguments):
+    thread_list.append(awsthread.AWSThread('fsx', storage.get_fsx_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                          DATABASES                            #
@@ -294,6 +301,34 @@ if ('secrets' in arguments):
 if ('hsm' in arguments):
     thread_list.append(awsthread.AWSThread('hsm', security.get_hsm_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- WAF, WAFv2 & WAF Regional
+#
+if ('waf' in arguments):
+    thread_list.append(awsthread.AWSThread('waf', security.get_waf_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- GuardDuty
+#
+if ('guardduty' in arguments):
+    thread_list.append(awsthread.AWSThread('guardduty', security.get_guardduty_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+
+#################################################################
+#                      MACHINE LEARNING                         #
+#################################################################
+#
+# ----------------- SageMaker inventory
+#
+if ('sagemaker' in arguments):
+    thread_list.append(awsthread.AWSThread('sagemaker', machinelearning.get_sagemaker_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- ForeCast inventory
+#
+if ('forecast' in arguments):
+    thread_list.append(awsthread.AWSThread('forecast', machinelearning.get_forecast_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 
 #################################################################
 #                      DEVELOPER TOOLS                          #
@@ -343,6 +378,18 @@ if ('sns' in arguments):
 #
 if ('stepfunctions' in arguments):
     thread_list.append(awsthread.AWSThread('stepfunctions', integ.get_stepfunctions_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- Appflow inventory
+#
+if ('appflow' in arguments):
+    thread_list.append(awsthread.AWSThread('appflow', integ.get_appflow_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- EventBridge inventory
+#
+if ('events' in arguments):
+    thread_list.append(awsthread.AWSThread('events', integ.get_eventbridge_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 
 #################################################################

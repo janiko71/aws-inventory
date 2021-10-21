@@ -36,7 +36,9 @@ def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
     """
 
-    return glob.get_inventory(
+    rds_inventory = {}
+
+    rds_inventory['rds-instances'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
         boto3_config = boto3_config,
@@ -47,6 +49,20 @@ def get_rds_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "DBInstances",
         pagination = True
     )
+
+    rds_inventory['rds-clusters'] = glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "rds",
+        aws_region = "all",
+        function_name = "describe_db_clusters",
+        key_get = "DBClusters",
+        pagination = True
+    )
+
+    return rds_inventory
 
 
 #  ------------------------------------------------------------------------
