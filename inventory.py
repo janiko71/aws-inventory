@@ -25,6 +25,7 @@ import res.storage         as storage
 import res.db              as db
 import res.dev             as dev
 import res.iam             as iam
+import res.kms             as kms
 import res.network         as net
 import res.fact            as fact
 import res.security        as security
@@ -269,9 +270,12 @@ if ('timestream' in arguments):
 # ----------------- KMS inventory
 #
 if ('kms' in arguments):
-    thread_list.append(awsthread.AWSThread('kms', iam.get_kms_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread('kms', kms.get_kms_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
-#
+if ('iam' in arguments):
+    thread_list.append(awsthread.AWSThread('iam', iam.get_iam_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread('iam-groups', iam.get_group_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 # ----------------- Cloud directory
 #
 if ('clouddirectory' in arguments):
@@ -566,6 +570,14 @@ for svc in arguments:
             "elasticbeanstalk-environments": config.global_inventory["elasticbeanstalk-environments"],
             "elasticbeanstalk-applications": config.global_inventory["elasticbeanstalk-applications"]
         }
+    elif (svc == "iam"):
+
+        inventory["iam"] = {
+            "iam-groups": config.global_inventory["iam-groups"],
+            "iam-users": config.global_inventory["iam"]
+   
+        }
+
 
     else:
 
