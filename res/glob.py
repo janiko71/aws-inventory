@@ -5,11 +5,9 @@ import config
 import datetime
 import res.utils as utils
 
-#  ------------------------------------------------------------------------
-#
-#     The MOST important function of that project: generic inventory
-#
-#  ------------------------------------------------------------------------
+"""
+The MOST important function of that project: generic inventory
+"""
 
 def get_inventory(ownerId, 
                   profile,
@@ -43,7 +41,7 @@ def get_inventory(ownerId,
         :param key_get: the key containing information about the resource, when SDK returns a dict. Optional.
         :param detail_function: the SDK function to call to get details, if needed. Optional.
         :param join_key: Id of the resource you for which you want details.
-        :param detail_join_key: When needed, field name of the paramater to include in de detail_function to get the right resource instance.
+        :param detail_join_key: When needed, field name of the paramater to include in the detail_function to get the right resource instance.
         :param detail_get_key: the key containing detailed information about the resource, when SDK returns a dict. Optional.
         :param pagination: tells if the inventory function supports pagination or not ; pagination is need for large inventory lists.
         :param pagination_detail: tells if the detail inventory function supports pagination or not ; pagination is need for large inventory lists.

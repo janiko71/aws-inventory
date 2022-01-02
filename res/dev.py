@@ -6,19 +6,11 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : CodeStar, CodeCommit, CodeArtifact
-#  Unsupported services : CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray, AWS FIS
-#  Not scriptable: CloudShell
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    CodeStar
-#
-#  ------------------------------------------------------------------------
+"""
+Supported services   : CodeStar, CodeCommit, CodeArtifact
+Unsupported services : CodeBuild, CodeDeploy, CodePipeline, Cloud9, X-Ray, AWS FIS
+Not scriptable: CloudShell
+"""
 
 def get_codestar_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -51,12 +43,6 @@ def get_codestar_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = ""
     )
 
-#  ------------------------------------------------------------------------
-#
-#    CodeCommit
-#
-#  ------------------------------------------------------------------------
-
 def get_codecommit_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -88,13 +74,6 @@ def get_codecommit_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "repositoryName", 
         detail_get_key = "repositoryMetadata"
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    CodeArtifact
-#
-#  ------------------------------------------------------------------------
 
 def get_codeartifact_inventory(oId, profile, boto3_config, selected_regions):
 

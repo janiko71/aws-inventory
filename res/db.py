@@ -5,19 +5,11 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB, DocumentDB
-#                           Amazon MemoryDB for Redis, Amazon Timestream (but with a bug)
-#  Unsupported services : Amazon Keyspaces
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    RDS 
-#
-#  ------------------------------------------------------------------------
+"""
+    Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB, DocumentDB
+                           Amazon MemoryDB for Redis, Amazon Timestream (but with a bug)
+    Unsupported services : Amazon Keyspaces
+"""
 
 def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -64,13 +56,6 @@ def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
     return rds_inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    DynamoDB 
-#
-#  ------------------------------------------------------------------------
-
 def get_dynamodb_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -104,13 +89,6 @@ def get_dynamodb_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Neptune 
-#
-#  ------------------------------------------------------------------------
-
 def get_neptune_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -142,13 +120,6 @@ def get_neptune_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return neptune_inventory
-   
-
-#  ------------------------------------------------------------------------
-#
-#    ElastiCache
-#
-#  ------------------------------------------------------------------------
 
 def get_elasticache_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -196,12 +167,6 @@ def get_elasticache_inventory(oId, profile, boto3_config, selected_regions):
     return elasticache_inventory
    
 
-#  ------------------------------------------------------------------------
-#
-#    Redshift
-#
-#  ------------------------------------------------------------------------
-
 def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -247,13 +212,6 @@ def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
 
     return redshift_inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    Amazon QLDB 
-#
-#  ------------------------------------------------------------------------
-
 def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -291,13 +249,6 @@ def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return qldb_inventory
-
-
-#  ------------------------------------------------------------------------
-#
-#    DocumentDB 
-#
-#  ------------------------------------------------------------------------
 
 def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -348,13 +299,6 @@ def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
 
     return docdb_inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    MemoryDB 
-#
-#  ------------------------------------------------------------------------
-
 def get_memorydb_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -386,13 +330,6 @@ def get_memorydb_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return inventory
-
-
-#  ------------------------------------------------------------------------
-#
-#    Timestream 
-#
-#  ------------------------------------------------------------------------
 
 def get_timestream_inventory(oId, profile, boto3_config, selected_regions):
 

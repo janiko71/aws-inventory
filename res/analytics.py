@@ -6,18 +6,9 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, EMR
-#  Unsupported services : Athena, Kinesis, Quicksight (not scriptable), Glue
-#
-# =======================================================================================================================
+""" Unsupported services : Athena, Kinesis, Quicksight (not scriptable), Glue  """
 
-#  ------------------------------------------------------------------------
-#
-#    Elasticsearch
-#
-#  ------------------------------------------------------------------------
+""" Elasticsearch """
 
 def get_es_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -50,13 +41,9 @@ def get_es_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = "DomainStatus"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Cloudsearch
-#
-#  ------------------------------------------------------------------------
-
+"""
+    Cloudsearch
+"""
 def get_cloudsearch_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -84,12 +71,9 @@ def get_cloudsearch_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "DomainStatusList"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Data Pipeline
-#
-#  ------------------------------------------------------------------------
+"""
+    Data Pipeline
+"""
 
 def get_datapipeline_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -123,12 +107,9 @@ def get_datapipeline_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = ""
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Elastic MapReduce
-#
-#  ------------------------------------------------------------------------
+"""
+    Elastic MapReduce
+"""
 
 def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 

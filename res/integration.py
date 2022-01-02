@@ -6,19 +6,11 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), Step functions,
-#                         Amazon AppFlow, Amazon EventBridge SWF
-#  Unsupported services : Apache Airflow 
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    Simple Queue Service. Not sure that the API works well (strange responses in aws cli)
-#
-#  ------------------------------------------------------------------------
+"""
+Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), Step functions,
+                       Amazon AppFlow, Amazon EventBridge SWF
+Unsupported services : Apache Airflow 
+"""
 
 def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -50,13 +42,6 @@ def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "QueueUrl", 
         detail_get_key = "Attributes"
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    Amazon MQ
-#
-#  ------------------------------------------------------------------------
 
 def get_mq_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -104,13 +89,6 @@ def get_mq_inventory(oId, profile, boto3_config, selected_regions):
     
     return mq_inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    Simple Notification Service (SNS)
-#
-#  ------------------------------------------------------------------------
-
 def get_sns_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -153,12 +131,6 @@ def get_sns_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-    
-#  ------------------------------------------------------------------------
-#
-#    Step functions
-#
-#  ------------------------------------------------------------------------
 
 def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -209,12 +181,6 @@ def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
     
     return inventory
 
-    
-#  ------------------------------------------------------------------------
-#
-#    Appflow
-#
-#  ------------------------------------------------------------------------
 
 def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -252,13 +218,6 @@ def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
     )
     
     return inventory
-
-    
-#  ------------------------------------------------------------------------
-#
-#    EventBridge (archives, connections, event_buses, event_sources, replays, rules)
-#
-#  ------------------------------------------------------------------------
 
 def get_eventbridge_inventory(oId, profile, boto3_config, selected_regions):
 

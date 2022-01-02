@@ -6,19 +6,12 @@ import res.utils as utils
 import res.glob  as glob
 
 # to do : security groups
-# =======================================================================================================================
-#
-#  Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), AWS Outposts,
-#                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
-#  Unsupported services : EC2 Image Builder, App Runner
-#
-# =======================================================================================================================
 
-#  ------------------------------------------------------------------------
-#
-#    EC2 
-#
-#  ------------------------------------------------------------------------
+"""
+    Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), AWS Outposts,
+                           Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
+    Unsupported services : EC2 Image Builder, App Runner
+"""
 
 def get_ec2_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -284,13 +277,6 @@ def get_ngw_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "NatGateways"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Elastic Beanstalk 
-#
-#  ------------------------------------------------------------------------
-
 def get_elasticbeanstalk_environments_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -345,17 +331,10 @@ def get_elasticbeanstalk_applications_inventory(oId, profile, boto3_config, sele
     )
 
 
-
-#  ------------------------------------------------------------------------
-#
-#    Autoscaling
-#
-#  ------------------------------------------------------------------------
-
 def get_autoscaling_inventory(oId, profile, boto3_config, selected_regions):
 
     """
-        Returns eks inventory (if the region is avalaible)
+        Returns autoscaling inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -407,13 +386,6 @@ def get_autoscaling_inventory(oId, profile, boto3_config, selected_regions):
 
     return autoscaling_inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    Lambda
-#
-#  ------------------------------------------------------------------------
-
 def get_lambda_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -441,13 +413,6 @@ def get_lambda_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "Functions",
         pagination = True
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    Serverless Application Repository
-#
-#  ------------------------------------------------------------------------
 
 def get_serverlessrepo_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -482,17 +447,8 @@ def get_serverlessrepo_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True,
         pagination_detail = False        
     )
-
-
     return inventory
     
-
-#  ------------------------------------------------------------------------
-#
-#    Batch
-#
-#  ------------------------------------------------------------------------
-
 def get_batch_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -544,14 +500,6 @@ def get_batch_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return inventory
-
-
-
-#  ------------------------------------------------------------------------
-#
-#    Lightsail
-#
-#  ------------------------------------------------------------------------
 
 def get_lightsail_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -617,13 +565,6 @@ def get_lightsail_inventory(oId, profile, boto3_config, selected_regions):
     )    
 
     return lightsail_inventory
-
-
-#  ------------------------------------------------------------------------
-#
-#    AWS Outposts
-#
-#  ------------------------------------------------------------------------
 
 def get_outposts_inventory(oId, profile, boto3_config, selected_regions):
 

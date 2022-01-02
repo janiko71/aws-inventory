@@ -5,19 +5,10 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
-#  Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
-#
-# =======================================================================================================================
-
-
-#  ------------------------------------------------------------------------
-#
-#    API Gateway (simple) 
-#
-#  ------------------------------------------------------------------------
+"""
+    Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
+    Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
+"""
 
 def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -48,13 +39,6 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    CloudFront
-#
-#  ------------------------------------------------------------------------
-
 def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -84,13 +68,6 @@ def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
         #key_get = "DistributionList",
         pagination = True
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    Route 53
-#
-#  ------------------------------------------------------------------------
 
 def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -153,14 +130,6 @@ def get_route53_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return inventory
-
-
-
-#  ------------------------------------------------------------------------
-#
-#    Elastic Load Balancer
-#
-#  ------------------------------------------------------------------------
 
 def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 

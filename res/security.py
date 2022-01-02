@@ -5,27 +5,19 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM, WAF & Shield, GuardDuty
-#  Unsupported services : Cognito, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
-#                           Artifact, Security Hub, Detective, AWS Audit Manager, Directory Service, AWS Signer,
-#                           AWS Network Firewall
-#
-#  Note: IAM has its own module
-#
-# =======================================================================================================================
 
-#  ------------------------------------------------------------------------
-#
-#    Cloud Directory (simple)
-#
-#  ------------------------------------------------------------------------
+"""
+    Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM (broken for now), WAF & Shield, GuardDuty
+    Unsupported services : Cognito, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
+                           Artifact, Security Hub, Detective, AWS Audit Manager, Directory Service, AWS Signer,
+                           AWS Network Firewall
+    Note: IAM has its own module
+"""
 
 def get_clouddirectory_inventory(oId, profile, boto3_config, selected_regions):
 
     """
-        Returns keys managed by KMS (global)
+        Returns clouddirectory inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -49,13 +41,6 @@ def get_clouddirectory_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "Directories",
         pagination = True
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    ACM (Certificate Manager)
-#
-#  ------------------------------------------------------------------------
 
 def get_acm_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -90,12 +75,6 @@ def get_acm_inventory(oId, profile, boto3_config, selected_regions):
     )
 
 
-#  ------------------------------------------------------------------------
-#
-#    ACMPCA (Certificate Manager Private Certificate Authority). Not implemented yet.
-#
-#  ------------------------------------------------------------------------
-
 def get_acmpca_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -123,13 +102,6 @@ def get_acmpca_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "CertificateAuthorities"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Secrets Manager
-#
-#  ------------------------------------------------------------------------
-
 def get_secrets_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -156,13 +128,6 @@ def get_secrets_inventory(oId, profile, boto3_config, selected_regions):
         function_name = "list_secrets", 
         key_get = "SecretList"
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    CloudHSM 
-#
-#  ------------------------------------------------------------------------
 
 def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -226,16 +191,8 @@ def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = ""
     )
     """
-
-
     return inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    WAF, WAFv2 & WAF Regional - NO DETAILS for security reasons
-#
-#  ------------------------------------------------------------------------
 
 def get_waf_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -309,13 +266,6 @@ def get_waf_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return inventory
-
-
-#  ------------------------------------------------------------------------
-#
-#    GuardDuty (detectors, filters, )
-#
-#  ------------------------------------------------------------------------
 
 def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
 

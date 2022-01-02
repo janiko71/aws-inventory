@@ -5,18 +5,10 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : EKS, Elastic Container Service, Elastic Container Registry
-#  Unsupported services : Red Hat Openshift
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    EC2 Container Service (ECS)
-#
-#  ------------------------------------------------------------------------
+"""
+    Supported services   : EKS, Elastic Container Service, Elastic Container Registry
+    Unsupported services : Red Hat Openshift
+"""
 
 def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -113,13 +105,6 @@ def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
         pagination_detail = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    EKS
-#
-#  ------------------------------------------------------------------------
-
 def get_eks_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -151,13 +136,6 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = "cluster"
     )
     return inv
-
-
-#  ------------------------------------------------------------------------
-#
-#    ECR
-#
-#  ------------------------------------------------------------------------
 
 def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
 

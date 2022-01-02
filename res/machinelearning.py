@@ -6,22 +6,13 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : SageMaker, Forecast
-#  Unsupported services : Augmented AI, CodeGuru, DevOps Guru, Comprehend, Fraud Detector,
-#                           Kendra, Lex, Personalize, Polly, Rekognition, Textract, Transcribe, Translate, DeepComposer,
-#                           DeepLens, DeepRacer, Panorama, Monitron, HealthLake, Lookout for Vision,  
-#                           Lookout for Equipments, Lookout for Metrics
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    SageMaker
-#
-#  ------------------------------------------------------------------------
-
+"""
+    Supported services   : SageMaker, Forecast
+    Unsupported services : Augmented AI, CodeGuru, DevOps Guru, Comprehend, Fraud Detector,
+                           Kendra, Lex, Personalize, Polly, Rekognition, Textract, Transcribe, Translate, DeepComposer,
+                           DeepLens, DeepRacer, Panorama, Monitron, HealthLake, Lookout for Vision,  
+                           Lookout for Equipments, Lookout for Metrics
+"""
 def get_sagemaker_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -90,13 +81,6 @@ def get_sagemaker_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return inventory
-
-
-#  ------------------------------------------------------------------------
-#
-#    ForeCast
-#
-#  ------------------------------------------------------------------------
 
 def get_forecast_inventory(oId, profile, boto3_config, selected_regions):
 

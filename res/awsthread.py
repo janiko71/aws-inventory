@@ -2,11 +2,9 @@ import sys
 from threading import Thread
 import config
 
-# =======================================================================================================================
-#
-#   Class created for (simple) multithreading
-#
-# =======================================================================================================================
+"""
+    Class created for (simple) multithreading
+"""
 
 class AWSThread(Thread):
 

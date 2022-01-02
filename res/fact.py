@@ -4,13 +4,9 @@ import json
 import config
 import res.utils as utils
 
-
-#  ------------------------------------------------------------------------
-#
-#    Cost explorer (ce) ==> Still experimental!
-#
-#  ------------------------------------------------------------------------
-
+"""
+    Cost explorer (ce) ==> Still experimental!
+"""
 def get_ce_inventory(ownerId, profile, values):
 
     """

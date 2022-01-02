@@ -5,19 +5,11 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : CloudFormation, CloudTrail, CloudWatch, AWS Auto Scaling 
-#  Unsupported services : Config, OpsWork, Service Catalog, 
-#                               Systems Manager, Trusted Advisor, Managed Services
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    CloudFormation
-#
-#  ------------------------------------------------------------------------
+"""
+Supported services   : CloudFormation, CloudTrail, CloudWatch, AWS Auto Scaling 
+Unsupported services : Config, OpsWork, Service Catalog, 
+                       Systems Manager, Trusted Advisor, Managed Services
+"""
 
 def get_cloudformation_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -51,13 +43,6 @@ def get_cloudformation_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    CloudTrail
-#
-#  ------------------------------------------------------------------------
-
 def get_cloudtrail_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -84,13 +69,6 @@ def get_cloudtrail_inventory(oId, profile, boto3_config, selected_regions):
         function_name = "describe_trails", 
         key_get = "trailList"
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    CloudWatch
-#
-#  ------------------------------------------------------------------------
 
 def get_cloudwatch_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -119,7 +97,6 @@ def get_cloudwatch_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "MetricAlarms",
         pagination = True
     )
-
 
 #
 # Hey, doc: we're in a module!

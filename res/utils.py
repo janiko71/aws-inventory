@@ -12,17 +12,6 @@ from dateutil.tz import tzutc
 import config
 import argparse
 
-#
-#  Useful functions
-#
-
-# --- AWS Regions 
-
-#  ------------------------------------------------------------------------
-#     Get all the AWS regions (dynamically, only "not opt-in" regions
-#     This function could be called in several modules
-#  ------------------------------------------------------------------------
-
 def get_aws_regions(profile_name):
 
     # Colors may be used in the future for display inventory. The color file must contains more colors than the number of regions.

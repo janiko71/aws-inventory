@@ -7,18 +7,11 @@ import json
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway, FSx
-#  Unsupported services : AWS Backup
-#
-# =======================================================================================================================
 
-#  ------------------------------------------------------------------------
-#
-#    S3
-#
-#  ------------------------------------------------------------------------
+"""
+    Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway, FSx
+    Unsupported services : AWS Backup
+"""
 
 def get_s3_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -125,13 +118,6 @@ def get_s3_inventory(oId, profile, boto3_config, selected_regions):
 
     return inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    EFS (Elastic File System)
-#
-#  ------------------------------------------------------------------------
-
 def get_efs_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -159,13 +145,6 @@ def get_efs_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "FileSystems",
         pagination = True
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    Glacier
-#
-#  ------------------------------------------------------------------------
 
 def get_glacier_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -196,12 +175,6 @@ def get_glacier_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Storage Gateway
-#
-#  ------------------------------------------------------------------------
 
 def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -235,13 +208,6 @@ def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "GatewayARN",
         pagination = True
     )
-
-
-#  ------------------------------------------------------------------------
-#
-#    FSx (File Storage)
-#
-#  ------------------------------------------------------------------------
 
 def get_fsx_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -323,7 +289,6 @@ def get_fsx_inventory(oId, profile, boto3_config, selected_regions):
     )
 
     return fsx_inventory
-
 
 #
 # Hey, doc: we're in a module!
