@@ -69,7 +69,10 @@
                 "timestream:DescribeEndpoints",
                 "outposts:ListOutposts",
                 "sagemaker:DescribeDomain",
-                "waf:ListRules"
+                "waf:ListRules",
+                "athena:ListDataCatalogs",
+                "athena:ListDatabases",
+		"iam:List*"
             ],
             "Resource": "*"
         }
