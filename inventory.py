@@ -281,7 +281,9 @@ if ('workdocs' in arguments):
 if ('workmail' in arguments):
     thread_list.append(awsthread.AWSThread('workmail', bus.get_workmail_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
-
+if ('athena' in arguments):
+    thread_list.append(awsthread.AWSThread('athena-db', analytics.get_athena_db_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread('athena-data-catalog', analytics.get_athena_data_catalog_inventory, ownerId, profile_name, boto3_config, selected_regions))
 ''' Cost Explorer (experimental) '''
 
 if ('ce' in arguments):
@@ -340,7 +342,6 @@ for svc in arguments:
             "elasticbeanstalk-applications": config.global_inventory["elasticbeanstalk-applications"]
         }
     elif (svc == "iam"):
-
         inventory["iam"] = {
             "iam-groups": config.global_inventory["iam-groups"],
             "iam-users": config.global_inventory["iam"]
@@ -348,6 +349,11 @@ for svc in arguments:
         }
 
 
+    elif (svc == "athena"):
+        inventory["athena"] = {
+            "athena-data-catalog": config.global_inventory["athena-data-catalog"],
+            "athena-db": config.global_inventory["athena-db"],
+        }
     else:
 
         # General case

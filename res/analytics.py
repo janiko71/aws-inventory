@@ -6,9 +6,7 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-""" Unsupported services : Athena, Kinesis, Quicksight (not scriptable), Glue  """
-
-""" Elasticsearch """
+""" Unsupported services : Kinesis, Quicksight (not scriptable), Glue  """
 
 def get_es_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -187,6 +185,60 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 
     return emr_inventory
 
+
+def get_athena_db_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Athena databases details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: Athena inventory
+        :rtype: json
+
+        ..note:: https://docs.aws.amazon.com/cli/latest/reference/athena/
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "athena", 
+        aws_region = "all", 
+        function_name = "list_databases", 
+        key_get = "DatabaseList",
+    )
+
+def get_athena_data_catalog_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Athena databases details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: Athena inventory
+        :rtype: json
+
+        ..note:: https://docs.aws.amazon.com/cli/latest/reference/athena/
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "athena", 
+        aws_region = "all", 
+        function_name = "list_data_catalogs", 
+        key_get = "DataCatalogSummary",
+    )
 
 ''' Hey, doc: we're in a module! '''
 
