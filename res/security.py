@@ -321,6 +321,40 @@ def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
 
     return inventory
 
+def get_shield_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns all secrets managed by AWS (without values of the secrets ;-)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: secrets inventory 
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/shield.html#
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "shield", 
+        aws_region = "all", 
+        function_name = "list_protections", 
+        key_get = "Protections"
+    )
+
+
+
+
+
+
+
+
 ''' Hey, doc: we're in a module! '''
 
 if (__name__ == '__main__'):

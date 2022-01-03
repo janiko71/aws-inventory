@@ -197,6 +197,9 @@ if ('hsm' in arguments):
 if ('waf' in arguments):
     thread_list.append(awsthread.AWSThread('waf', security.get_waf_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+if ('shield' in arguments):
+    thread_list.append(awsthread.AWSThread('shield', security.get_shield_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 if ('guardduty' in arguments):
     thread_list.append(awsthread.AWSThread('guardduty', security.get_guardduty_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
@@ -214,6 +217,15 @@ if ('codecommit' in arguments):
 
 if ('codeartifact' in arguments):
     thread_list.append(awsthread.AWSThread('codeartifact', dev.get_codeartifact_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+if ('codebuild' in arguments):
+    thread_list.append(awsthread.AWSThread('codebuild', dev.get_codebuild_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+if ('deploy' in arguments):
+    thread_list.append(awsthread.AWSThread('deploy', dev.get_deploy_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+if ('codepipeline' in arguments):
+    thread_list.append(awsthread.AWSThread('codepipeline', dev.get_codepipeline_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 if ('sqs' in arguments):
     thread_list.append(awsthread.AWSThread('sqs', integ.get_sqs_inventory, ownerId, profile_name, boto3_config, selected_regions))
@@ -245,6 +257,10 @@ if ('datapipeline' in arguments):
 if ('emr' in arguments):
     thread_list.append(awsthread.AWSThread('emr', analytics.get_emr_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+
+if ('kinesis' in arguments):
+    thread_list.append(awsthread.AWSThread('kinesis-streams', analytics.get_kinesis_streams_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
 if ('cloudformation' in arguments):
     thread_list.append(awsthread.AWSThread('cloudformation', mgn.get_cloudformation_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
@@ -256,6 +272,7 @@ if ('cloudwatch' in arguments):
 
 if ('apigateway' in arguments):
     thread_list.append(awsthread.AWSThread('apigateway', net.get_apigateway_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread('apigatewayv2', net.get_apigatewayv2_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 if ('route53' in arguments):
     thread_list.append(awsthread.AWSThread('route53', net.get_route53_inventory, ownerId, profile_name, boto3_config, selected_regions))
@@ -341,18 +358,23 @@ for svc in arguments:
             "elasticbeanstalk-environments": config.global_inventory["elasticbeanstalk-environments"],
             "elasticbeanstalk-applications": config.global_inventory["elasticbeanstalk-applications"]
         }
+
     elif (svc == "iam"):
         inventory["iam"] = {
             "iam-groups": config.global_inventory["iam-groups"],
             "iam-users": config.global_inventory["iam"]
-   
-        }
+           }
 
 
     elif (svc == "athena"):
         inventory["athena"] = {
             "athena-data-catalog": config.global_inventory["athena-data-catalog"],
-            "athena-db": config.global_inventory["athena-db"],
+            "athena-db": config.global_inventory["athena-db"]
+        }
+
+    elif (svc == "kinesis"):
+        inventory["kinesis"] = {
+            "kinesis-streams": config.global_inventory["kinesis-streams"]
         }
     else:
 

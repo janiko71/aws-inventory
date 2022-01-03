@@ -39,6 +39,35 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
+def get_apigatewayv2_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns API Gateway inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: API Gateway inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2.html
+        ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
+    """
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "apigatewayv2", 
+        aws_region = "all", 
+        function_name = "get_apis", 
+        key_get = "Items",
+        pagination = True
+    )
+
 def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
     """
