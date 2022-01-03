@@ -5,8 +5,9 @@ This repo exists as its own entity as I have particular goals to reach with this
 I also have an alergy for hashtags :) so a different formatting style all over.
 
 # Usage.
-Create policies and attach the policies stated in inventory-policy- JSONs
-Create a dedicated user and attach only those policies (all read-only to avoid unnecessary permissions escalation)
+* Create policies and attach the policies stated in inventory-policy-\* JSON files.
+* Create a dedicated user and attach only those policies (all read-only to avoid unnecessary permissions escalation)
+
 For now, the tested method is to run it locally, but the code has the potential to run as lambda + output to s3 bucket.
 
 # progress so far.
@@ -18,7 +19,7 @@ For now, the tested method is to run it locally, but the code has the potential 
 * codepipeline
 * codebuild
 * (code)deploy
-* fixed permissions creep (sqs.*)
+* fixed permissions creep (sqs.\*)
 # TODO:
 * merge IAM users and groups into one (break-down one way or the other)
 
