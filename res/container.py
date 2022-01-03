@@ -5,14 +5,14 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-"""
+'''
     Supported services   : EKS, Elastic Container Service, Elastic Container Registry
     Unsupported services : Red Hat Openshift
-"""
+'''
 
 def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ECS detailed inventory
 
         :param oId: ownerId (AWS account)
@@ -24,7 +24,7 @@ def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ecs.html
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -44,7 +44,7 @@ def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ECS tasks inventory  NOT WORKING YET
 
         :param oId: ownerId (AWS account)
@@ -54,7 +54,7 @@ def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
 
         :return: ECS tasks inventory
         :rtype: json
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -76,7 +76,7 @@ def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ECS tasks inventory
 
         :param oId: ownerId (AWS account)
@@ -86,7 +86,7 @@ def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
 
         :return: ECS tasks inventory
         :rtype: json
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -107,7 +107,7 @@ def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_eks_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns eks inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -119,7 +119,7 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
-    """
+    '''
 
     inv = glob.get_inventory(
         ownerId = oId,
@@ -139,7 +139,7 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns elastic container registry inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -151,7 +151,7 @@ def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ecr.html
-    """
+    '''
 
     # Special loop here
 

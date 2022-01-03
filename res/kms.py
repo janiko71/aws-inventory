@@ -6,13 +6,13 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-"""
+'''
 Supported services   : KMS
-"""
+'''
 
 def get_kms_inventory(oId, profile,boto3_config,selected_regions):
 
-    """
+    '''
         Returns keys managed by KMS (global)
 
         :param oId: ownerId (AWS account)
@@ -24,7 +24,7 @@ def get_kms_inventory(oId, profile,boto3_config,selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kms.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,

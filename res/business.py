@@ -6,13 +6,13 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-"""
+'''
     Supported services   : Alexa (very light), WorkMail
     Unsupported services : Amazon Chime, WorkDocs
-"""
+'''
 def get_alexa_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns alexa skills
 
         :param oId: ownerId (AWS account)
@@ -24,7 +24,7 @@ def get_alexa_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/alexaforbusiness.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -44,7 +44,7 @@ def get_alexa_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_workdocs_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns workdocs inventory
 
         :param oId: ownerId (AWS account)
@@ -56,7 +56,7 @@ def get_workdocs_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/workdocs.html
-    """ 
+    ''' 
 
     return glob.get_inventory(
         ownerId = oId,
@@ -71,7 +71,7 @@ def get_workdocs_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_workmail_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns workmail inventory
 
         :param oId: ownerId (AWS account)
@@ -83,7 +83,7 @@ def get_workmail_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/workmail.html
-    """ 
+    ''' 
 
     return glob.get_inventory(
         ownerId = oId,

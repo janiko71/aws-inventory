@@ -5,9 +5,9 @@ import config
 import datetime
 import res.utils as utils
 
-"""
+'''
 The MOST important function of that project: generic inventory
-"""
+'''
 
 def get_inventory(ownerId, 
                   profile,
@@ -25,7 +25,7 @@ def get_inventory(ownerId,
                   pagination_detail = False,
                   additional_parameters = {}):
 
-    """
+    '''
         Returns inventory for a service. It's a generic function, meaning that it should work for almost any AWS service,
         except for specialized ones or for those who don't have AWS CLI/SDK equivalent. 
         
@@ -64,7 +64,7 @@ def get_inventory(ownerId,
 
         :return: inventory
         :rtype: json
-    """
+    '''
 
     ''' aws_region = all, global '''
 

@@ -8,14 +8,14 @@ import res.utils as utils
 import res.glob as glob
 
 
-"""
+'''
     Supported services   : S3 (detail), EFS (Elastic File System), Glacier, Storage Gateway, FSx
     Unsupported services : AWS Backup
-"""
+'''
 
 def get_s3_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns S3 quick inventory
 
         :param oId: ownerId (AWS account)
@@ -27,7 +27,7 @@ def get_s3_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/s3.html#client
-    """
+    '''
        
     inventory = []
 
@@ -120,7 +120,7 @@ def get_s3_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_efs_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns EFS inventory
 
         :param oId: ownerId (AWS account)
@@ -132,7 +132,7 @@ def get_efs_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: #http://boto3.readthedocs.io/en/latest/reference/services/efs.html
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -148,7 +148,7 @@ def get_efs_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_glacier_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Glacier inventory
 
         :param oId: ownerId (AWS account)
@@ -161,7 +161,7 @@ def get_glacier_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/glacier.html
 
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -178,7 +178,7 @@ def get_glacier_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Storage gateway inventory
 
         :param oId: ownerId (AWS account)
@@ -191,7 +191,7 @@ def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/storagegateway.html
 
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -211,7 +211,7 @@ def get_storagegateway_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_fsx_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns FSx (File Storage) inventory
 
         :param oId: ownerId (AWS account)
@@ -224,7 +224,7 @@ def get_fsx_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/fsx.html
 
-    """
+    '''
 
     fsx_inventory = {}
     

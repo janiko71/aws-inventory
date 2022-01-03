@@ -5,14 +5,14 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-"""
+'''
     Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
     Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
-"""
+'''
 
 def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns API Gateway inventory
 
         :param oId: ownerId (AWS account)
@@ -25,7 +25,7 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -41,7 +41,7 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_apigatewayv2_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns API Gateway inventory
 
         :param oId: ownerId (AWS account)
@@ -54,7 +54,7 @@ def get_apigatewayv2_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -70,7 +70,7 @@ def get_apigatewayv2_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloudfront inventory
 
         :param oId: ownerId (AWS account)
@@ -83,7 +83,7 @@ def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/cloudfront.html
 
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -100,7 +100,7 @@ def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns route 53 inventory, partial.
 
         Traffic policies are not detailed because the detail function needs 2 arguments.
@@ -115,7 +115,7 @@ def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/route53.html
 
-    """
+    '''
     
     inventory = {}
     
@@ -162,7 +162,7 @@ def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ELB inventory
 
         :param oId: ownerId (AWS account)
@@ -175,7 +175,7 @@ def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elb.html
 
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -191,7 +191,7 @@ def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ELBv2 inventory
 
         :param oId: ownerId (AWS account)
@@ -204,7 +204,7 @@ def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elbv2.html
 
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,

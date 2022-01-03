@@ -6,15 +6,15 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-"""
+'''
 Supported services   : CodeStar, CodeCommit, CodeArtifact, CodeBuild, CodeDeploy,CodePipeline
 Unsupported services : Cloud9, X-Ray, AWS FIS
 Not scriptable: CloudShell
-"""
+'''
 
 def get_codestar_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns codestar details
 
         :param oId: ownerId (AWS account)
@@ -26,7 +26,7 @@ def get_codestar_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/codestar.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -45,7 +45,7 @@ def get_codestar_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_codebuild_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns codestar details
 
         :param oId: ownerId (AWS account)
@@ -57,7 +57,7 @@ def get_codebuild_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://docs.aws.amazon.com/cli/latest/reference/codebuild/index.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -72,7 +72,7 @@ def get_codebuild_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_codepipeline_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns codestar details
 
         :param oId: ownerId (AWS account)
@@ -84,7 +84,7 @@ def get_codepipeline_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://docs.aws.amazon.com/cli/latest/reference/codebuild/index.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -99,7 +99,7 @@ def get_codepipeline_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_deploy_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns codestar details
 
         :param oId: ownerId (AWS account)
@@ -111,7 +111,7 @@ def get_deploy_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://docs.aws.amazon.com/cli/latest/reference/deploy/
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -125,7 +125,7 @@ def get_deploy_inventory(oId, profile, boto3_config, selected_regions):
     )
 def get_codecommit_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns codecommit details
 
         :param oId: ownerId (AWS account)
@@ -137,7 +137,7 @@ def get_codecommit_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codecommit.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -157,7 +157,7 @@ def get_codecommit_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_codeartifact_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns codeartifact details (domains, repositories)
 
         :param oId: ownerId (AWS account)
@@ -169,7 +169,7 @@ def get_codeartifact_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codeartifact.html
-    """ 
+    ''' 
     
     inventory = {}
 

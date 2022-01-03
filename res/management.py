@@ -5,15 +5,15 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-"""
+'''
 Supported services   : CloudFormation, CloudTrail, CloudWatch, AWS Auto Scaling 
 Unsupported services : Config, OpsWork, Service Catalog, 
                        Systems Manager, Trusted Advisor, Managed Services
-"""
+'''
 
 def get_cloudformation_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloudformation inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -25,7 +25,7 @@ def get_cloudformation_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudformation.html
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -45,7 +45,7 @@ def get_cloudformation_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_cloudtrail_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloudtrail inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -57,7 +57,7 @@ def get_cloudtrail_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudtrail.html
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -72,7 +72,7 @@ def get_cloudtrail_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_cloudwatch_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloudwatch inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -84,7 +84,7 @@ def get_cloudwatch_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: https://boto3.readthedocs.io/en/latest/reference/services/cloudwatch.html
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,

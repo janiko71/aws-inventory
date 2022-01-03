@@ -62,31 +62,24 @@ print()
 
 
 """ AWS basic information """
-
 ownerId = utils.get_ownerID(profile_name)
 config.logger.info('OWNER ID: ' + ownerId)
 config.logger.info('AWS Profile: ' + str(profile_name))
 
 
 """ Inventory initialization """
-
 inventory = {}
 
 
 """ Progression counter initialization """
-
 config.nb_units_done = 0
 for svc in arguments:
     config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])
 
-
-
 ''' Let's rock'n roll '''
-
-
 thread_list = []
 
-# Execution time, for information
+''' Execution time, for information '''
 t0 = time.time()
 
 if ('ec2' in arguments):
@@ -256,7 +249,6 @@ if ('datapipeline' in arguments):
 
 if ('emr' in arguments):
     thread_list.append(awsthread.AWSThread('emr', analytics.get_emr_inventory, ownerId, profile_name, boto3_config, selected_regions))
-
 
 if ('kinesis' in arguments):
     thread_list.append(awsthread.AWSThread('kinesis-streams', analytics.get_kinesis_streams_inventory, ownerId, profile_name, boto3_config, selected_regions))

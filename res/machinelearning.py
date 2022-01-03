@@ -6,16 +6,16 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-"""
+'''
     Supported services   : SageMaker, Forecast
     Unsupported services : Augmented AI, CodeGuru, DevOps Guru, Comprehend, Fraud Detector,
                            Kendra, Lex, Personalize, Polly, Rekognition, Textract, Transcribe, Translate, DeepComposer,
                            DeepLens, DeepRacer, Panorama, Monitron, HealthLake, Lookout for Vision,  
                            Lookout for Equipments, Lookout for Metrics
-"""
+'''
 def get_sagemaker_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns SageMaker details
 
         :param oId: ownerId (AWS account)
@@ -27,7 +27,7 @@ def get_sagemaker_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html
-    """ 
+    ''' 
     
     inventory = {}
 
@@ -84,7 +84,7 @@ def get_sagemaker_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_forecast_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Forecast details
 
         :param oId: ownerId (AWS account)
@@ -96,7 +96,7 @@ def get_forecast_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/forecast.html
-    """ 
+    ''' 
     
     inventory = {}
 

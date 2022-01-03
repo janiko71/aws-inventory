@@ -4,12 +4,12 @@ import json
 import config
 import res.utils as utils
 
-"""
+'''
     Cost explorer (ce) ==> Still experimental!
-"""
+'''
 def get_ce_inventory(ownerId, profile, values):
 
-    """
+    '''
         Returns cost inventory, for a period (1 month ?)
 
         :param ownerId: ownerId (AWS account)
@@ -29,7 +29,7 @@ def get_ce_inventory(ownerId, profile, values):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ce.html
 
-    """
+    '''
     
     config.logger.info('RDS inventory, all regions, get_rds_inventory')
 

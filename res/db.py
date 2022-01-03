@@ -5,15 +5,15 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-"""
+'''
     Supported services   : RDS, DynamoDB, ElastiCache, Neptune, Amazon Redshift, Amazon QLDB, DocumentDB
                            Amazon MemoryDB for Redis, Amazon Timestream (but with a bug)
     Unsupported services : Amazon Keyspaces
-"""
+'''
 
 def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns RDS inventory
 
         :param oId: ownerId (AWS account)
@@ -26,7 +26,7 @@ def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/rds.html
 
-    """
+    '''
 
     rds_inventory = {}
 
@@ -58,7 +58,7 @@ def get_rds_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_dynamodb_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns dynamoDB inventory
 
         :param oId: ownerId (AWS account)
@@ -71,7 +71,7 @@ def get_dynamodb_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/dynamodb.html
 
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -91,7 +91,7 @@ def get_dynamodb_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_neptune_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns neptune inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
@@ -104,7 +104,7 @@ def get_neptune_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/neptune.html
 
-    """
+    '''
 
     neptune_inventory = {}
 
@@ -123,7 +123,7 @@ def get_neptune_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_elasticache_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns elasticache inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
@@ -136,7 +136,7 @@ def get_elasticache_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html
 
-    """
+    '''
 
     elasticache_inventory = {}
 
@@ -169,7 +169,7 @@ def get_elasticache_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns redshift inventory (instances & clusters). Instances are listed in RDS inventory.
 
         :param oId: ownerId (AWS account)
@@ -182,7 +182,7 @@ def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/redshift.html
 
-    """
+    '''
 
     redshift_inventory = {}
 
@@ -214,7 +214,7 @@ def get_redshift_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Amazon QLDB inventory.
 
         :param oId: ownerId (AWS account)
@@ -227,7 +227,7 @@ def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/qldb.html
 
-    """
+    '''
 
     qldb_inventory = {}
 
@@ -252,7 +252,7 @@ def get_qldb_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Amazon DocumentDB (docdb) inventory.
 
         :param oId: ownerId (AWS account)
@@ -265,7 +265,7 @@ def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/docdb.html
 
-    """
+    '''
 
     docdb_inventory = {}
 
@@ -301,7 +301,7 @@ def get_docdb_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_memorydb_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns MemoryDB clusters (memorydb) inventory.
 
         :param oId: ownerId (AWS account)
@@ -314,7 +314,7 @@ def get_memorydb_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/memorydb.html
 
-    """
+    '''
 
     inventory = {}
 
@@ -333,7 +333,7 @@ def get_memorydb_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_timestream_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Timestream databases inventory.
 
         :param oId: ownerId (AWS account)
@@ -346,7 +346,7 @@ def get_timestream_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/timestream-write.html
 
-    """
+    '''
 
     inventory = {}
 
