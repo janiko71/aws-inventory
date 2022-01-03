@@ -32,7 +32,7 @@
                 "mq:ListBrokers",
                 "sns:ListTopics",
                 "cloudsearch:ListTags",
-                "sqs:*",
+                "sqs:ListQueues",
                 "cloudhsm:DescribeClusters",
                 "storagegateway:ListGateways",
                 "batch:DescribeJobs",
