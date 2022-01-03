@@ -5,8 +5,6 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# to do : security groups
-
 """
     Supported services   : EC2 (instances, EBS, Network interfaces, vpc), lambda, lightsail (full), AWS Outposts,
                            Elastic Container Service (ECS), Elastic Beanstalk, EKS, Batch, Serverless Application Repository
@@ -40,7 +38,6 @@ def get_ec2_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "Reservations",
         pagination = True
     )
-
 
 def get_interfaces_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -613,8 +610,8 @@ def get_outposts_inventory(oId, profile, boto3_config, selected_regions):
 
     return inventory
 
-#
-# Hey, doc: we're in a module!
-#
+
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')

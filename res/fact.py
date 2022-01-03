@@ -42,9 +42,7 @@ def get_ce_inventory(ownerId, profile, values):
 
     return ce_list
 
+''' Hey, doc: we're in a module! '''
 
-#
-# Hey, doc: we're in a module!
-#
 if (__name__ == '__main__'):
     print('Module => Do not execute')

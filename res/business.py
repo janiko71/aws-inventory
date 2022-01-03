@@ -6,19 +6,10 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Alexa (very light), WorkMail
-#  Unsupported services : Amazon Chime, WorkDocs
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    Alexa for Business
-#
-#  ------------------------------------------------------------------------
-
+"""
+    Supported services   : Alexa (very light), WorkMail
+    Unsupported services : Amazon Chime, WorkDocs
+"""
 def get_alexa_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -51,13 +42,6 @@ def get_alexa_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#   WorkDocs (to be continued...)
-#
-#  ------------------------------------------------------------------------
-
 def get_workdocs_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -84,13 +68,6 @@ def get_workdocs_inventory(oId, profile, boto3_config, selected_regions):
         function_name = "???", 
         key_get = "???"
     )    
-
-
-#  ------------------------------------------------------------------------
-#
-#   Workmail
-#
-#  ------------------------------------------------------------------------
 
 def get_workmail_inventory(oId, profile, boto3_config, selected_regions):
 
@@ -125,8 +102,8 @@ def get_workmail_inventory(oId, profile, boto3_config, selected_regions):
     )    
 
 
-#
-# Hey, doc: we're in a module!
-#
+
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')

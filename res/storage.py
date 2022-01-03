@@ -290,8 +290,7 @@ def get_fsx_inventory(oId, profile, boto3_config, selected_regions):
 
     return fsx_inventory
 
-#
-# Hey, doc: we're in a module!
-#
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')

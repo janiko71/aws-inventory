@@ -160,12 +160,6 @@ def get_elb_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-#  ------------------------------------------------------------------------
-#
-#    Elastic Load Balancer v2
-#
-#  ------------------------------------------------------------------------
-
 def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
 
     """
@@ -195,8 +189,7 @@ def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-#
-# Hey, doc: we're in a module!
-#
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')

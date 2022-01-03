@@ -14,13 +14,13 @@ import argparse
 
 def get_aws_regions(profile_name):
 
-    # Colors may be used in the future for display inventory. The color file must contains more colors than the number of regions.
+    '''  Colors may be used in the future for display inventory. The color file must contains more colors than the number of regions. '''
 
     with open("color.json","r") as f_col:
         color_list = json.load(f_col)
     colors = color_list["colors"]
         
-    # We get the regions list through EC2.
+    ''' We get the regions list through EC2. '''
 
     session = boto3.Session(profile_name=profile_name, region_name="us-east-1")
     client = session.client("ec2")
@@ -28,12 +28,12 @@ def get_aws_regions(profile_name):
     regions = client.describe_regions(AllRegions=True)
     region_list = regions["Regions"]
 
-    # We assign one color to each region
+    ''' We assign one color to each region '''
 
     for color, region in zip(colors, region_list):
         region['color'] = color
         
-        # Looking for AZ? Why not? But only if you have the rights to...
+        ''' Looking for AZ? Why not? But only if you have the rights to... '''
         current_region = region['RegionName']
         if (region['OptInStatus'] != 'not-opted-in'):
             session = boto3.Session(profile_name=profile_name)
@@ -49,9 +49,9 @@ def get_aws_regions(profile_name):
 
 def display(ownerId, function, region_name, function_name):
 
-    """
+    '''
         Formatting display output, with progression (in %)
-    """
+    '''
 
     progression = (config.nb_units_done / config.nb_units_todo * 100)
     print(config.display.format(ownerId, progression, function, region_name, function_name, " "*20), end="\r", flush=True)
@@ -59,9 +59,9 @@ def display(ownerId, function, region_name, function_name):
 
 def progress(region_name):
 
-    """
+    '''
         Shows job progression, depending on services passed in arguments
-    """
+    '''
 
     if (region_name == "global"):
         config.nb_units_done = config.nb_units_done + config.nb_regions
@@ -73,21 +73,18 @@ def progress(region_name):
 
 def check_arguments(arguments):
 
-    """
+    '''
         Check if the arguments (in command line) are known. If not, we raise an exception.
-
         We also look for the debug level. If we found it, we adjust the log level but we don't include it in the service list.
-
         :param arguments: list of arguments
         :type arguments: list
-
         :return: profile to use (can be None or 'default')
         :rtype: string
         :return: services to inventory
         :rtype: array of strings
         :return: config object to use with boto3
         :rtype: botocore.config.Config
-    """   
+    '''   
 
     parser = argparse.ArgumentParser(description='AWS inventory may have arguments. More information at https://github.com/janiko71/aws-inventory/wiki/How-to-use-it%3F.')
 
@@ -96,9 +93,7 @@ def check_arguments(arguments):
         help_str = help_str + arg_elem + ", "
     help_str = help_str[:-2]
 
-    #
-    # Declaring allowed parameters
-    #
+    ''' Declaring allowed parameters '''
 
     parser.add_argument('--profile', required=False, type=str, default="default", help="Name of the AWS profile to use in {USER_DIR}\.aws\credentials")
     parser.add_argument('--log', required=False, type=str, default="error", help="Log level for output (debug, info, warning, error")
@@ -111,9 +106,7 @@ def check_arguments(arguments):
     profile    = str(args.profile).lower()
     log_level  = str(args.log).lower()
 
-    #
-    # Checking log argument
-    #
+    ''' Checking log argument '''
 
     if (log_level == "debug"):
         config.logger.setLevel(logging.DEBUG)
@@ -127,10 +120,10 @@ def check_arguments(arguments):
         print('Unknown argument for log level [' + args.log + ']')
         exit(1)
 
-    #
-    # Verifying profile name. In the case of a CloudShell environment, please
-    # note that there is no default profile.
-    #
+    '''
+        Verifying profile name. In the case of a CloudShell environment, please
+        note that there is no default profile.
+    '''
 
     if ("default" == profile):
         profile = None
@@ -141,10 +134,9 @@ def check_arguments(arguments):
         print("Profile name [" + profile + "] not found, please check.")
         exit(1)
 
-    # 
-    # For the support of CloudShell, we need to adjust retries settings
-    #
-
+    
+    ''' For the support of CloudShell, we need to adjust retries settings '''
+    
     boto3_config = Config(
         retries = {
             'max_attempts': 5,
@@ -152,9 +144,7 @@ def check_arguments(arguments):
         }
     )
 
-    #
-    # Is a list of services provided? If yes, are they in the list of supported services?
-    #
+    ''' Is a list of services provided? If yes, are they in the list of supported services? '''
 
     services = []
 
@@ -166,12 +156,12 @@ def check_arguments(arguments):
         else:
             services.append(str_service)
 
-    #
-    # Is the regions parameter provided? If yes, we check if it's one region or a list, and if they are existing regions
+    
+    ''' Is the regions parameter provided? If yes, we check if it's one region or a list, and if they are existing regions '''
 
     selected_regions = []
 
-    # --- We need the AWS Regions list at this point
+    ''' We need the AWS Regions list at this point '''
     config.regions = get_aws_regions(profile)
     config.nb_regions = len(config.regions)
 
@@ -193,12 +183,11 @@ def check_arguments(arguments):
 
 def get_ownerID(profile):
 
-    """
+    '''
         Get owner ID of the AWS account we are working on
-
         :return: owner ID
         :rtype: string
-    """  
+    '''  
 
     session = boto3.Session(profile_name=profile)
     sts = session.client('sts')
@@ -209,15 +198,13 @@ def get_ownerID(profile):
 
 def datetime_converter(dt):
 
-    """
+    '''
         Converts a python datetime object (returned by AWS SDK) into a readable and SERIALIZABLE string
-
         :param dt: datetime
         :type dt: datetime
-
         :return: datetime in a good format
         :rtype: str
-    """
+    '''
 
     if isinstance(dt, datetime.datetime):
         return dt.__str__()  
@@ -225,20 +212,18 @@ def datetime_converter(dt):
 
 def json_datetime_converter(json_text):
 
-    """
+    '''
         Parses a json object and converts all datetime objects (returned by AWS SDK) into str objects
-
         :param json_text: json with datetime objects
         :type json_text: json
-
         :return: json with date in string format
         :rtype: json
-    """
+    '''
 
     return json.dumps(json_text, default = datetime_converter)      
 
-#
-# Hey, doc: we're in a module!
-#
+
+    ''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')
