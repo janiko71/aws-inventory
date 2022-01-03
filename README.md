@@ -4,6 +4,11 @@ This is a fork of [aws-inventory](https://github.com/janiko71/aws-inventory/).
 This repo exists as its own entity as I have particular goals to reach with this tool that might not be in line with anyone else's (e.g. products that don't cost money, or cost ridiculous amount of money, so private user won't care about those).
 I also have an alergy for hashtags :) so a different formatting style all over.
 
+# Usage.
+Create policies and attach the policies stated in inventory-policy- JSONs
+Create a dedicated user and attach only those policies (all read-only to avoid unnecessary permissions escalation)
+For now, the tested method is to run it locally, but the code has the potential to run as lambda + output to s3 bucket.
+
 # progress so far.
 * IAM (users, groups)
 * kinesis
@@ -13,7 +18,7 @@ I also have an alergy for hashtags :) so a different formatting style all over.
 * codepipeline
 * codebuild
 * (code)deploy
-
+* fixed permissions creep (sqs.*)
 # TODO:
 * merge IAM users and groups into one (break-down one way or the other)
 
