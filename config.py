@@ -48,10 +48,9 @@ S3_INVENTORY_BUCKET="s3-bucket"
 
 SUPPORTED_INVENTORIES = {
   	"ec2": 10,
-	"elb": 1,
-	"elbv2": 1,
+	"elb": 2,
 	"autoscaling": 3,
-	"ecs": 2,
+	"ecs": 3,
 	"elasticbeanstalk": 2,
 	"lambda": 1,
 	"lightsail": 4,
