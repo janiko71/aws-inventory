@@ -23,6 +23,6 @@ For now, the tested method is to run it locally, but the code has the potential 
 * fixed permissions creep (sqs.\*)
 
 # TODO:
-* merge IAM users and groups into one (break-down one way or the other)
+* merge IAM users and groups into one (break-down one way or the other) with policies. End goal - have a break-down of what policies are attached to each group/user
 
 
