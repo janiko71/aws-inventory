@@ -3,7 +3,7 @@ This tool is designed to generate a (possibly) complete list (in JSON format) of
 It is a fork of [aws-inventory](https://github.com/janiko71/aws-inventory/).
 
 This repo exists as its own entity as I have particular goals to reach with this tool that might not be in line with anyone else's (e.g. products that don't cost money, or cost ridiculous amount of money, so private user won't care about those).
-I also have an alergy for hashtags :) so a different formatting style all over.
+I also have an alergy to hashtags :) so a different formatting style all over.
 
 # Usage.
 * Create policies and attach the policies stated in inventory-policy-\* JSON files.
