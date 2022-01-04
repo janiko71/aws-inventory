@@ -35,25 +35,25 @@ import res.integration     as integ
 import res.awsthread       as awsthread
 import res.machinelearning as machinelearning
 
-"""
+'''
     Argumentation. See function check_arguments.
 
     If we find log level parameter, we adjust log level.
     If we find no service name, we inventory all services.
     Else we only inventory services passed in cmd line.
     We need the region list for the 'regions' argument.
-"""
+'''
 
 profile_name, arguments, boto3_config, selected_regions = utils.check_arguments(sys.argv[1:])
 nb_arg = len(arguments)
 
 
-""" if no arguments, we try all AWS services """
+''' if no arguments, we try all AWS services '''
 if (nb_arg == 0):
     arguments = config.SUPPORTED_COMMANDS
     arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 
-""" Displaying execution parameters """
+ Displaying execution parameters '''
 print('-'*100)
 print ('Number of services   :', len(arguments))
 print ('Services List        :', str(arguments))
@@ -61,17 +61,17 @@ print('-'*100)
 print()
 
 
-""" AWS basic information """
+''' AWS basic information """
 ownerId = utils.get_ownerID(profile_name)
 config.logger.info('OWNER ID: ' + ownerId)
 config.logger.info('AWS Profile: ' + str(profile_name))
 
 
-""" Inventory initialization """
+''' Inventory initialization """
 inventory = {}
 
 
-""" Progression counter initialization """
+''' Progression counter initialization """
 config.nb_units_done = 0
 for svc in arguments:
     config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])
@@ -274,8 +274,6 @@ if ('cloudfront' in arguments):
 
 if ('elb' in arguments):
     thread_list.append(awsthread.AWSThread('elb', net.get_elb_inventory, ownerId, profile_name, boto3_config, selected_regions))
-
-if ('elbv2' in arguments):
     thread_list.append(awsthread.AWSThread('elbv2', net.get_elbv2_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 if ('alexa' in arguments):
@@ -297,11 +295,11 @@ if ('athena' in arguments):
 
 if ('ce' in arguments):
     ce_inventory = []
-    """utils.display(ownerId, 'global', "cost explorer inventory", "")
+    '''utils.display(ownerId, 'global', "cost explorer inventory", "")
     list_ce = fact.get_ce_inventory(ownerId, None).get('ResultsByTime')
     for item in list_ce:
         ce_inventory.append(json.loads(utils.json_datetime_converter(item)))
-    inventory['cost-explorer'] = ce_inventory"""
+    inventory['cost-explorer'] = ce_inventory'''
 
 
 ''' International Resources (no region) '''
