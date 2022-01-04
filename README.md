@@ -3,7 +3,7 @@ This tool is designed to generate a (possibly) complete list (in JSON format) of
 It is a fork of [aws-inventory](https://github.com/janiko71/aws-inventory/).
 
 This repo exists as its own entity as I have particular goals to reach with this tool that might not be in line with anyone else's (e.g. products that don't cost money, or cost ridiculous amount of money, so private user won't care about those).
-I also have an alergy for hashtags :) so a different formatting style all over.
+I also have an alergy to hashtags :) so a different formatting style all over.
 
 # Usage.
 * Create policies and attach the policies stated in inventory-policy-\* JSON files.
@@ -20,9 +20,15 @@ For now, the tested method is to run it locally, but the code has the potential 
 * codepipeline
 * codebuild
 * (code)deploy
-* fixed permissions creep (sqs.\*)
+* fixed permissions creap (sqs.\*)
 
 # TODO:
-* merge IAM users and groups into one (break-down one way or the other)
+* merge IAM users and groups into one (break-down one way or the other) with policies. End goal - have a break-down of what policies are attached to each group/user
 
 
+# Known issues.
+Happened on some Windows machines - incompatible versions of the modules that just don't get updated automatically for some reason.
+
+```
+pip install --upgrade --force urllib3 chardet requests
+```
