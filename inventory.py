@@ -48,12 +48,11 @@ profile_name, arguments, boto3_config, selected_regions = utils.check_arguments(
 nb_arg = len(arguments)
 
 
-''' if no arguments, we try all AWS services '''
 if (nb_arg == 0):
     arguments = config.SUPPORTED_COMMANDS
     arguments.remove('ce')  # For it's not free, cost explorer is removed from defaults inventory. You need to call it explicitly.
 
- Displaying execution parameters '''
+'''Displaying execution parameters '''
 print('-'*100)
 print ('Number of services   :', len(arguments))
 print ('Services List        :', str(arguments))
@@ -61,17 +60,17 @@ print('-'*100)
 print()
 
 
-''' AWS basic information """
+''' AWS basic information '''
 ownerId = utils.get_ownerID(profile_name)
 config.logger.info('OWNER ID: ' + ownerId)
 config.logger.info('AWS Profile: ' + str(profile_name))
 
 
-''' Inventory initialization """
+''' Inventory initialization '''
 inventory = {}
 
 
-''' Progression counter initialization """
+''' Progression counter initialization '''
 config.nb_units_done = 0
 for svc in arguments:
     config.nb_units_todo += (config.nb_regions * config.SUPPORTED_INVENTORIES[svc])

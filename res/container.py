@@ -121,7 +121,7 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
     '''
 
-    inv = glob.get_inventory(
+    return glob.get_inventory(
         ownerId = oId,
         profile = profile,
         boto3_config = boto3_config,
@@ -135,7 +135,6 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "name", 
         detail_get_key = "cluster"
     )
-    return inv
 
 def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
 
