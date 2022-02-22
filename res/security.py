@@ -5,27 +5,19 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM, WAF & Shield, GuardDuty
-#  Unsupported services : Cognito, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
-#                           Artifact, Security Hub, Detective, AWS Audit Manager, Directory Service, AWS Signer,
-#                           AWS Network Firewall
-#
-#  Note: IAM has its own module
-#
-# =======================================================================================================================
 
-#  ------------------------------------------------------------------------
-#
-#    Cloud Directory (simple)
-#
-#  ------------------------------------------------------------------------
+'''
+    Supported services   : Directory Service, Secrets Manager, Certificate Manager, CloudHSM (broken for now), WAF & Shield, GuardDuty
+    Unsupported services : Cognito, Inspector, Amazon Macie, AWS Single Sign-On, Certificate Manager PCA, 
+                           Artifact, Security Hub, Detective, AWS Audit Manager, Directory Service, AWS Signer,
+                           AWS Network Firewall
+    Note: IAM has its own module
+'''
 
 def get_clouddirectory_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
-        Returns keys managed by KMS (global)
+    '''
+        Returns clouddirectory inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -36,7 +28,7 @@ def get_clouddirectory_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/clouddirectory.html
-    """ 
+    ''' 
 
     return glob.get_inventory(
         ownerId = oId,
@@ -50,16 +42,9 @@ def get_clouddirectory_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    ACM (Certificate Manager)
-#
-#  ------------------------------------------------------------------------
-
 def get_acm_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns certificates managed with ACM
 
         :param oId: ownerId (AWS account)
@@ -71,7 +56,7 @@ def get_acm_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm.htm
-    """ 
+    ''' 
 
     return glob.get_inventory(
         ownerId = oId,
@@ -90,15 +75,9 @@ def get_acm_inventory(oId, profile, boto3_config, selected_regions):
     )
 
 
-#  ------------------------------------------------------------------------
-#
-#    ACMPCA (Certificate Manager Private Certificate Authority). Not implemented yet.
-#
-#  ------------------------------------------------------------------------
-
 def get_acmpca_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns certificates managed with ACM
 
         :param oId: ownerId (AWS account)
@@ -110,7 +89,7 @@ def get_acmpca_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm-pca.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -123,16 +102,9 @@ def get_acmpca_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "CertificateAuthorities"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Secrets Manager
-#
-#  ------------------------------------------------------------------------
-
 def get_secrets_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns all secrets managed by AWS (without values of the secrets ;-)
 
         :param oId: ownerId (AWS account)
@@ -144,7 +116,7 @@ def get_secrets_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.readthedocs.io/en/latest/reference/services/acm-pca.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -157,16 +129,9 @@ def get_secrets_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "SecretList"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    CloudHSM 
-#
-#  ------------------------------------------------------------------------
-
 def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloud HSM inventory
 
         :param oId: ownerId (AWS account)
@@ -178,7 +143,7 @@ def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: https://boto3.readthedocs.io/en/latest/reference/services/CloudHSM.html
-    """ 
+    ''' 
     inventory = {}
 
     inventory['clusters'] = glob.get_inventory(
@@ -195,7 +160,7 @@ def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
 
     # The API hangs here. Issue #06
     # Removed for it seems not working
-    """
+    '''
     inventory['hsm'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
@@ -225,21 +190,13 @@ def get_hsm_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "ClientArn", 
         detail_get_key = ""
     )
-    """
-
-
+    '''
     return inventory
 
 
-#  ------------------------------------------------------------------------
-#
-#    WAF, WAFv2 & WAF Regional - NO DETAILS for security reasons
-#
-#  ------------------------------------------------------------------------
-
 def get_waf_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns WAF, WAFv2 & WAF Regional inventory
 
         :param oId: ownerId (AWS account)
@@ -254,7 +211,7 @@ def get_waf_inventory(oId, profile, boto3_config, selected_regions):
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/wafv2.html
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/waf-regional.html
         
-    """ 
+    ''' 
     inventory = {}
 
     inventory['waf'] = glob.get_inventory(
@@ -310,16 +267,9 @@ def get_waf_inventory(oId, profile, boto3_config, selected_regions):
 
     return inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    GuardDuty (detectors, filters, )
-#
-#  ------------------------------------------------------------------------
-
 def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns GuardDuty inventory
 
         :param oId: ownerId (AWS account)
@@ -332,7 +282,7 @@ def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/guardduty.html
         
-    """ 
+    ''' 
     inventory = {}
 
     inventory['detectors'] = glob.get_inventory(
@@ -351,7 +301,7 @@ def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
     
-    """
+    '''
     inventory['filters'] = glob.get_inventory(
         ownerId = oId,
         profile = profile,
@@ -367,13 +317,45 @@ def get_guardduty_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = "",
         pagination = True
     )
-    """
+    '''
 
     return inventory
 
+def get_shield_inventory(oId, profile, boto3_config, selected_regions):
 
-#
-# Hey, doc: we're in a module!
-#
+    '''
+        Returns all secrets managed by AWS (without values of the secrets ;-)
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: secrets inventory 
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/shield.html#
+    ''' 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "shield", 
+        aws_region = "all", 
+        function_name = "list_protections", 
+        key_get = "Protections"
+    )
+
+
+
+
+
+
+
+
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')

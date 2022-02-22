@@ -6,23 +6,15 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), Step functions,
-#                         Amazon AppFlow, Amazon EventBridge SWF
-#  Unsupported services : Apache Airflow 
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    Simple Queue Service. Not sure that the API works well (strange responses in aws cli)
-#
-#  ------------------------------------------------------------------------
+'''
+Supported services   : Amazon MQ, Simple Notification Service (SNS), Simple Queue Service (SQS), Step functions,
+                       Amazon AppFlow, Amazon EventBridge SWF
+Unsupported services : Apache Airflow 
+'''
 
 def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Simple Queue Service (SQS) details
 
         :param oId: ownerId (AWS account)
@@ -34,7 +26,7 @@ def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/sqs.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -51,16 +43,9 @@ def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = "Attributes"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Amazon MQ
-#
-#  ------------------------------------------------------------------------
-
 def get_mq_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Amazon MQ details
 
         :param oId: ownerId (AWS account)
@@ -72,7 +57,7 @@ def get_mq_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/mq.html
-    """ 
+    ''' 
 
     mq_inventory = {}
     
@@ -104,16 +89,9 @@ def get_mq_inventory(oId, profile, boto3_config, selected_regions):
     
     return mq_inventory
 
-
-#  ------------------------------------------------------------------------
-#
-#    Simple Notification Service (SNS)
-#
-#  ------------------------------------------------------------------------
-
 def get_sns_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns sns (topics, applications) details
 
         :param oId: ownerId (AWS account)
@@ -125,7 +103,7 @@ def get_sns_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/sns.html
-    """ 
+    ''' 
 
     sns_inventory = {}
     
@@ -153,16 +131,10 @@ def get_sns_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-    
-#  ------------------------------------------------------------------------
-#
-#    Step functions
-#
-#  ------------------------------------------------------------------------
 
 def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns stepfunctions (machines, activities) details
 
         :param oId: ownerId (AWS account)
@@ -174,7 +146,7 @@ def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: not documented yet
-    """ 
+    ''' 
 
     inventory = {}
     
@@ -209,16 +181,10 @@ def get_stepfunctions_inventory(oId, profile, boto3_config, selected_regions):
     
     return inventory
 
-    
-#  ------------------------------------------------------------------------
-#
-#    Appflow
-#
-#  ------------------------------------------------------------------------
 
 def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns appflow (flows, connectors) details
 
         :param oId: ownerId (AWS account)
@@ -230,7 +196,7 @@ def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: not documented yet
-    """ 
+    ''' 
 
     inventory = {}
     
@@ -253,16 +219,9 @@ def get_appflow_inventory(oId, profile, boto3_config, selected_regions):
     
     return inventory
 
-    
-#  ------------------------------------------------------------------------
-#
-#    EventBridge (archives, connections, event_buses, event_sources, replays, rules)
-#
-#  ------------------------------------------------------------------------
-
 def get_eventbridge_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns EventBridge (rules) details
 
         :param oId: ownerId (AWS account)
@@ -274,7 +233,7 @@ def get_eventbridge_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         ..note:: not documented yet
-    """ 
+    ''' 
 
     inventory = {}
 
@@ -382,9 +341,7 @@ def get_eventbridge_inventory(oId, profile, boto3_config, selected_regions):
     
     return inventory
 
+''' Hey, doc: we're in a module! '''
 
-#
-# Hey, doc: we're in a module!
-#
 if (__name__ == '__main__'):
     print('Module => Do not execute')

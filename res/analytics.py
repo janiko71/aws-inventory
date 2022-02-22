@@ -6,34 +6,20 @@ import pprint, operator
 import res.utils as utils
 import res.glob as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, EMR
-#  Unsupported services : Athena, Kinesis, Quicksight (not scriptable), Glue
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    Elasticsearch
-#
-#  ------------------------------------------------------------------------
+''' Unsupported services : Quicksight (not scriptable), Glue  '''
 
 def get_es_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns Elasticsearch details
-
         :param oId: ownerId (AWS account)
         :type oId: string
         :param profile: configuration profile name used for session
         :type profile: string
-
         :return: Elasticsearch inventory
         :rtype: json
-
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/es.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -50,28 +36,21 @@ def get_es_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = "DomainStatus"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Cloudsearch
-#
-#  ------------------------------------------------------------------------
-
+'''
+    Cloudsearch
+'''
 def get_cloudsearch_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloudsearch details
-
         :param oId: ownerId (AWS account)
         :type oId: string
         :param profile: configuration profile name used for session
         :type profile: string        
-
         :return: cloudsearch inventory
         :rtype: json
-
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/cloudsearch.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -84,28 +63,22 @@ def get_cloudsearch_inventory(oId, profile, boto3_config, selected_regions):
         key_get = "DomainStatusList"
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Data Pipeline
-#
-#  ------------------------------------------------------------------------
+'''
+    Data Pipeline
+'''
 
 def get_datapipeline_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns datapipeline details
-
         :param oId: ownerId (AWS account)
         :type oId: string
         :param profile: configuration profile name used for session
         :type profile: string
-
         :return: datapipeline inventory
         :rtype: json
-
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/datapipeline.html
-    """ 
+    ''' 
     
     return glob.get_inventory(
         ownerId = oId,
@@ -123,28 +96,22 @@ def get_datapipeline_inventory(oId, profile, boto3_config, selected_regions):
         detail_get_key = ""
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Elastic MapReduce
-#
-#  ------------------------------------------------------------------------
+'''
+    Elastic MapReduce
+'''
 
 def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns emr details
-
         :param oId: ownerId (AWS account)
         :type oId: string
         :param profile: configuration profile name used for session
         :type profile: string
-
         :return: emr inventory
         :rtype: json
-
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/emr.html
-    """ 
+    ''' 
     
     emr_inventory = {}
 
@@ -206,8 +173,82 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
 
     return emr_inventory
 
-#
-# Hey, doc: we're in a module!
-#
+
+def get_athena_db_inventory(oId, profile, boto3_config, selected_regions):
+
+    '''
+        Returns Athena databases details
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+        :return: Athena inventory
+        :rtype: json
+        ..note:: https://docs.aws.amazon.com/cli/latest/reference/athena/
+    ''' 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "athena", 
+        aws_region = "all", 
+        function_name = "list_databases", 
+        key_get = "DatabaseList",
+    )
+
+def get_athena_data_catalog_inventory(oId, profile, boto3_config, selected_regions):
+
+    '''
+        Returns Athena databases details
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+        :return: Athena inventory
+        :rtype: json
+        ..note:: https://docs.aws.amazon.com/cli/latest/reference/athena/
+    ''' 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "athena", 
+        aws_region = "all", 
+        function_name = "list_data_catalogs", 
+        key_get = "DataCatalogSummary",
+    )
+
+
+def get_kinesis_streams_inventory(oId, profile, boto3_config, selected_regions):
+
+    '''
+        Returns Athena databases details
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+        :return: Athena inventory
+        :rtype: json
+        ..note:: https://docs.aws.amazon.com/cli/latest/reference/athena/
+    ''' 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "kinesis", 
+        aws_region = "all", 
+        function_name = "list_streams", 
+        key_get = "StreamNames",
+    )
+
+
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == "__main__"):
     print("Module => Do not execute")

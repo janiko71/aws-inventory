@@ -5,22 +5,14 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : EKS, Elastic Container Service, Elastic Container Registry
-#  Unsupported services : Red Hat Openshift
-#
-# =======================================================================================================================
-
-#  ------------------------------------------------------------------------
-#
-#    EC2 Container Service (ECS)
-#
-#  ------------------------------------------------------------------------
+'''
+    Supported services   : EKS, Elastic Container Service, Elastic Container Registry
+    Unsupported services : Red Hat Openshift
+'''
 
 def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ECS detailed inventory
 
         :param oId: ownerId (AWS account)
@@ -32,7 +24,7 @@ def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ecs.html
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -52,7 +44,7 @@ def get_ecs_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ECS tasks inventory  NOT WORKING YET
 
         :param oId: ownerId (AWS account)
@@ -62,7 +54,7 @@ def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
 
         :return: ECS tasks inventory
         :rtype: json
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -84,7 +76,7 @@ def get_ecs_services_inventory(oId, profile, boto3_config, selected_regions):
 
 def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ECS tasks inventory
 
         :param oId: ownerId (AWS account)
@@ -94,7 +86,7 @@ def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
 
         :return: ECS tasks inventory
         :rtype: json
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -113,16 +105,9 @@ def get_ecs_tasks_inventory(oId, profile, boto3_config, selected_regions):
         pagination_detail = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    EKS
-#
-#  ------------------------------------------------------------------------
-
 def get_eks_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns eks inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -134,9 +119,9 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/eks.html
-    """
+    '''
 
-    inv = glob.get_inventory(
+    return glob.get_inventory(
         ownerId = oId,
         profile = profile,
         boto3_config = boto3_config,
@@ -150,18 +135,10 @@ def get_eks_inventory(oId, profile, boto3_config, selected_regions):
         detail_join_key = "name", 
         detail_get_key = "cluster"
     )
-    return inv
-
-
-#  ------------------------------------------------------------------------
-#
-#    ECR
-#
-#  ------------------------------------------------------------------------
 
 def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns elastic container registry inventory (if the region is avalaible)
 
         :param oId: ownerId (AWS account)
@@ -173,7 +150,7 @@ def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
         :rtype: json
 
         .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ecr.html
-    """
+    '''
 
     # Special loop here
 
@@ -235,8 +212,8 @@ def get_ecr_inventory(oId, profile, boto3_config, selected_regions):
     return inventory
 
 
-#
-# Hey, doc: we're in a module!
-#
+
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')

@@ -5,23 +5,14 @@ import config
 import res.utils as utils
 import res.glob  as glob
 
-# =======================================================================================================================
-#
-#  Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
-#  Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
-#
-# =======================================================================================================================
-
-
-#  ------------------------------------------------------------------------
-#
-#    API Gateway (simple) 
-#
-#  ------------------------------------------------------------------------
+'''
+    Supported services   : API Gateway (simple), VPC (in 'compute' module), Route 53, CloudFront
+    Unsupported services : Direct Connect, AWS App Mesh, AWS Cloud Map, Global Accelerator
+'''
 
 def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns API Gateway inventory
 
         :param oId: ownerId (AWS account)
@@ -34,7 +25,7 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigateway.html
         ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -48,16 +39,38 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
+def get_apigatewayv2_inventory(oId, profile, boto3_config, selected_regions):
 
-#  ------------------------------------------------------------------------
-#
-#    CloudFront
-#
-#  ------------------------------------------------------------------------
+    '''
+        Returns API Gateway inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: API Gateway inventory
+        :rtype: json
+
+        ..note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2.html
+        ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
+    '''
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "apigatewayv2", 
+        aws_region = "all", 
+        function_name = "get_apis", 
+        key_get = "Items",
+        pagination = True
+    )
 
 def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns cloudfront inventory
 
         :param oId: ownerId (AWS account)
@@ -70,7 +83,7 @@ def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/cloudfront.html
 
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -85,16 +98,9 @@ def get_cloudfront_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-
-#  ------------------------------------------------------------------------
-#
-#    Route 53
-#
-#  ------------------------------------------------------------------------
-
 def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns route 53 inventory, partial.
 
         Traffic policies are not detailed because the detail function needs 2 arguments.
@@ -109,7 +115,7 @@ def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/route53.html
 
-    """
+    '''
     
     inventory = {}
     
@@ -154,17 +160,9 @@ def get_route53_inventory(oId, profile, boto3_config, selected_regions):
 
     return inventory
 
-
-
-#  ------------------------------------------------------------------------
-#
-#    Elastic Load Balancer
-#
-#  ------------------------------------------------------------------------
-
 def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ELB inventory
 
         :param oId: ownerId (AWS account)
@@ -177,7 +175,7 @@ def get_elb_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elb.html
 
-    """
+    '''
 
     return glob.get_inventory(
         ownerId = oId,
@@ -191,15 +189,9 @@ def get_elb_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-#  ------------------------------------------------------------------------
-#
-#    Elastic Load Balancer v2
-#
-#  ------------------------------------------------------------------------
-
 def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
 
-    """
+    '''
         Returns ELBv2 inventory
 
         :param oId: ownerId (AWS account)
@@ -212,7 +204,7 @@ def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
 
         ..note:: http://boto3.readthedocs.io/en/latest/reference/services/elbv2.html
 
-    """
+    '''
     
     return glob.get_inventory(
         ownerId = oId,
@@ -226,8 +218,7 @@ def get_elbv2_inventory(oId, profile, boto3_config, selected_regions):
         pagination = True
     )
 
-#
-# Hey, doc: we're in a module!
-#
+''' Hey, doc: we're in a module! '''
+
 if (__name__ == '__main__'):
     print('Module => Do not execute')
