@@ -64,7 +64,7 @@
                 "codeartifact:DescribeDomain",
 		"codebuild:List*",
 		"codepipeline:ListPipelines",
-		"codedeploy:List*"
+		"codedeploy:List*",
                 "events:DescribeEventSource",
                 "events:ListEventBuses",
                 "events:ListArchives",
@@ -75,7 +75,7 @@
                 "waf:ListRules",
                 "athena:ListDataCatalogs",
                 "athena:ListDatabases",
-		"shield:List*"
+		"shield:List*",
 		"iam:List*"
             ],
             "Resource": "*"
