@@ -254,7 +254,14 @@ def get_inventory_detail(client,
             key = inventory_object.get(join_key)
 
         # Now we add parameters (key) for the API Call
-        param = {detail_join_key: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
+        params = {detail_join_key: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
+
+        # SQS exception
+        if (client.meta.service_model.service_id == "SQS" and detail_function == "get_queue_attributes"):
+            # https://github.com/aws/aws-cli/issues/17#issuecomment-613973835
+            params["AttributeNames"] = ["All"]
+            # Attributes does not contains QueueUrl useful to keep
+            detailed_inv[detail_join_key] = key
 
         # now we fetch the details; again, depending on the called function, the return object may contains
         # a list, an object, etc. The return value structure may vary a lot.
@@ -265,13 +272,13 @@ def get_inventory_detail(client,
             if (pagination_detail):
                 # in case that the detail function allows pagination, for large lists
                 paginator = client.get_paginator(detail_function)
-                page_iterator = paginator.paginate(**param)
+                page_iterator = paginator.paginate(**params)
                 for detail in page_iterator:
                     for detail_object in detail.get(detail_get_key):
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param).get(detail_get_key)
+                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**params).get(detail_get_key)
 
         else:
 
@@ -282,13 +289,13 @@ def get_inventory_detail(client,
             if (pagination_detail):
                 # in case that the detail function allows pagination, for large lists
                 paginator = client.get_paginator(detail_function)
-                page_iterator = paginator.paginate(**param)
+                page_iterator = paginator.paginate(**params)
                 for detail in page_iterator:
                     for detail_object in detail:
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param)
+                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**params)
 
         if ("ResponseMetadata" in detailed_inv[detail_get_key]):
             del detailed_inv[detail_get_key]['ResponseMetadata']
