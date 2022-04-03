@@ -265,8 +265,10 @@ def get_inventory_detail(client,
         # if (client.meta.service_model.service_id == "SQS" and detail_function == "get_queue_attributes"):
         #     # https://github.com/aws/aws-cli/issues/17#issuecomment-613973835
         #     detail_additional_parameters["AttributeNames"] = ["All"]
-        #     # Attributes does not contains QueueUrl useful to keep
-        #     detailed_inv[detail_join_key] = key
+        # We enforce the join key at root level if not defined
+        if detail_join_key not in detailed_inv:
+            # For SQS the QueueUrl will be lost without that
+            detailed_inv[detail_join_key] = key
 
         # now we fetch the details; again, depending on the called function, the return object may contains
         # a list, an object, etc. The return value structure may vary a lot.
