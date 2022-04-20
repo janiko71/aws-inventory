@@ -259,7 +259,9 @@ def get_inventory_detail(client,
             key = inventory_object.get(join_key)
 
         # Now we add parameters (key) for the API Call
-        detail_additional_parameters[detail_join_key] = key
+        params = detail_additional_parameters.copy()
+        params[detail_join_key] = key
+
 
         # SQS exception
         # if (client.meta.service_model.service_id == "SQS" and detail_function == "get_queue_attributes"):
@@ -279,13 +281,13 @@ def get_inventory_detail(client,
             if (pagination_detail):
                 # in case that the detail function allows pagination, for large lists
                 paginator = client.get_paginator(detail_function)
-                page_iterator = paginator.paginate(**detail_additional_parameters)
+                page_iterator = paginator.paginate(**params)
                 for detail in page_iterator:
                     for detail_object in detail.get(detail_get_key):
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**detail_additional_parameters).get(detail_get_key)
+                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**params).get(detail_get_key)
 
         else:
 
@@ -296,13 +298,13 @@ def get_inventory_detail(client,
             if (pagination_detail):
                 # in case that the detail function allows pagination, for large lists
                 paginator = client.get_paginator(detail_function)
-                page_iterator = paginator.paginate(**detail_additional_parameters)
+                page_iterator = paginator.paginate(**params)
                 for detail in page_iterator:
                     for detail_object in detail:
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**detail_additional_parameters)
+                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**params)
 
         if ("ResponseMetadata" in detailed_inv[detail_get_key]):
             del detailed_inv[detail_get_key]['ResponseMetadata']
