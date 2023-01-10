@@ -287,7 +287,7 @@ if ('acm' in arguments):
 # ----------------- ACMPCA (Certificates) inventory Private Certificate Authority
 #
 if ('acm-pca' in arguments):
-    thread_list.append(awsthread.AWSThread('acm-pca', security.get_acm_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread('acm-pca', security.get_acmpca_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
 # ----------------- Secrets Manager
