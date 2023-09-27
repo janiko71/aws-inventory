@@ -99,6 +99,8 @@ t0 = time.time()
 
 if ('ec2' in arguments):
     thread_list.append(awsthread.AWSThread("ec2", compute.get_ec2_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    thread_list.append(awsthread.AWSThread("ec2-snapshots", compute.get_snapshot_inventory,
+                       ownerId, profile_name, boto3_config, selected_regions))
     thread_list.append(awsthread.AWSThread("ec2-network-interfaces", compute.get_interfaces_inventory, ownerId, profile_name, boto3_config, selected_regions))
     thread_list.append(awsthread.AWSThread("ec2-vpcs", compute.get_vpc_inventory, ownerId, profile_name, boto3_config, selected_regions))
     thread_list.append(awsthread.AWSThread("ec2-ebs", compute.get_ebs_inventory, ownerId, profile_name, boto3_config, selected_regions))
@@ -543,6 +545,7 @@ for svc in arguments:
     if (svc == "ec2"):
 
         inventory["ec2"] = config.global_inventory["ec2"]
+        inventory["ec2-snapshots"] = config.global_inventory["ec2-snapshots"]
         inventory["ec2-network-interfaces"] = config.global_inventory["ec2-network-interfaces"]
         inventory["ec2-ebs"] = config.global_inventory["ec2-ebs"]
         inventory["ec2-vpcs"] = config.global_inventory["ec2-vpcs"]

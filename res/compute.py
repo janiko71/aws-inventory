@@ -35,17 +35,46 @@ def get_ec2_inventory(oId, profile, boto3_config, selected_regions):
 
         .. note:: http://boto3.readthedocs.io/en/latest/reference/services/ec2.html
     """
-    
+
     return glob.get_inventory(
         ownerId = oId,
         profile = profile,
         boto3_config = boto3_config,
         selected_regions = selected_regions,
-        aws_service = "ec2", 
-        aws_region = "all", 
-        function_name = "describe_instances", 
+        aws_service = "ec2",
+        aws_region = "all",
+        function_name = "describe_instances",
         key_get = "Reservations",
         pagination = True
+    )
+
+
+def get_snapshot_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns snapshot inventory, without any analysis or any formatting
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: snapshot inventory
+        :rtype: json
+
+        .. note:: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_snapshots.html
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "ec2",
+        aws_region = "all",
+        function_name = "describe_snapshots",
+        key_get = "Snapshots",
+        additional_parameters={'OwnerIds': [oId]}
     )
 
 
