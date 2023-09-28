@@ -48,7 +48,8 @@ def get_sqs_inventory(oId, profile, boto3_config, selected_regions):
         detail_function = "get_queue_attributes", 
         join_key = "QueueUrl", 
         detail_join_key = "QueueUrl", 
-        detail_get_key = "Attributes"
+        detail_get_key = "Attributes",
+        detail_additional_parameters = {"AttributeNames": ["All"]}
     )
 
 

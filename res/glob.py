@@ -25,7 +25,8 @@ def get_inventory(ownerId,
                   detail_get_key = "",
                   pagination = False,
                   pagination_detail = False,
-                  additional_parameters = {}):
+                  additional_parameters = {},
+                  detail_additional_parameters = {}):
 
     """
         Returns inventory for a service. It's a generic function, meaning that it should work for almost any AWS service,
@@ -48,6 +49,7 @@ def get_inventory(ownerId,
         :param pagination: tells if the inventory function supports pagination or not ; pagination is need for large inventory lists.
         :param pagination_detail: tells if the detail inventory function supports pagination or not ; pagination is need for large inventory lists.
         :param additional_parameters: some additional parameters, if needed, like a key for searching
+        :param detail_additional_parameters: some additional parameters for detail operation call
 
         :type ownerId: string
         :type profile: string
@@ -62,7 +64,9 @@ def get_inventory(ownerId,
         :type detail_join_key: string
         :type detail_get_key: string 
         :type pagination: boolean
-        :type pagination_detail: boolean       
+        :type pagination_detail: boolean      
+        :type additional_parameters: dict
+        :type detail_additional_parameters: dict
 
         :return: inventory
         :rtype: json
@@ -108,7 +112,7 @@ def get_inventory(ownerId,
                         if (pagination):
                             
                             paginator = client.get_paginator(function_name)
-                            page_iterator = paginator.paginate()
+                            page_iterator = paginator.paginate(**additional_parameters)
 
                             for detail in page_iterator:
 
@@ -116,7 +120,7 @@ def get_inventory(ownerId,
                                 
                                 for inventory_object in detail.get(key_get):
                                      
-                                    detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
+                                    detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail, detail_additional_parameters)
                                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
     
                         else:
@@ -126,7 +130,7 @@ def get_inventory(ownerId,
 
                             for inventory_object in inv_list:
 
-                                detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
+                                detailed_inv = get_inventory_detail(client, region_name, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail, detail_additional_parameters)
                                 inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
                     except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
@@ -171,7 +175,7 @@ def get_inventory(ownerId,
             if (pagination):
 
                 paginator = client.get_paginator(function_name)
-                page_iterator = paginator.paginate()
+                page_iterator = paginator.paginate(**additional_parameters)
                 utils.display(ownerId, aws_region, aws_service, function_name)
 
                 for detail in page_iterator:
@@ -183,15 +187,15 @@ def get_inventory(ownerId,
                     # Anything in the detail item?
 
                     for inventory_object in detail.get(key_get):
-                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
+                        detailed_inv = get_inventory_detail(client, aws_region, inventory_object, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail, detail_additional_parameters)
                         inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
             else:
 
-                inv_list = client.__getattribute__(function_name)().get(key_get)
+                inv_list = client.__getattribute__(function_name)(**additional_parameters).get(key_get)
                 
                 for inv in inv_list:
-                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail)
+                    detailed_inv = get_inventory_detail(client, aws_region, inv, detail_function, join_key, detail_join_key, detail_get_key, pagination_detail, detail_additional_parameters)
                     inventory.append(json.loads(utils.json_datetime_converter(detailed_inv)))
 
         except (botocore.exceptions.EndpointConnectionError, botocore.exceptions.ClientError) as e:
@@ -224,7 +228,8 @@ def get_inventory_detail(client,
                          join_key, 
                          detail_join_key, 
                          detail_get_key, 
-                         pagination_detail = False):
+                         pagination_detail = False,
+                         detail_additional_parameters = {}):
 
     '''
         Get details for the resource, if needed. Same parameters as get_detail but all are mandatory except detail_get_key and pagination_detail
@@ -254,7 +259,18 @@ def get_inventory_detail(client,
             key = inventory_object.get(join_key)
 
         # Now we add parameters (key) for the API Call
-        param = {detail_join_key: key} # works only for a single value, but some functions needs tables[], like ECS Tasks
+        params = detail_additional_parameters.copy()
+        params[detail_join_key] = key
+
+
+        # SQS exception
+        # if (client.meta.service_model.service_id == "SQS" and detail_function == "get_queue_attributes"):
+        #     # https://github.com/aws/aws-cli/issues/17#issuecomment-613973835
+        #     detail_additional_parameters["AttributeNames"] = ["All"]
+        # We enforce the join key at root level if not defined
+        if detail_join_key not in detailed_inv:
+            # For SQS the QueueUrl will be lost without that
+            detailed_inv[detail_join_key] = key
 
         # now we fetch the details; again, depending on the called function, the return object may contains
         # a list, an object, etc. The return value structure may vary a lot.
@@ -265,13 +281,13 @@ def get_inventory_detail(client,
             if (pagination_detail):
                 # in case that the detail function allows pagination, for large lists
                 paginator = client.get_paginator(detail_function)
-                page_iterator = paginator.paginate(**param)
+                page_iterator = paginator.paginate(**params)
                 for detail in page_iterator:
                     for detail_object in detail.get(detail_get_key):
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param).get(detail_get_key)
+                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**params).get(detail_get_key)
 
         else:
 
@@ -282,13 +298,13 @@ def get_inventory_detail(client,
             if (pagination_detail):
                 # in case that the detail function allows pagination, for large lists
                 paginator = client.get_paginator(detail_function)
-                page_iterator = paginator.paginate(**param)
+                page_iterator = paginator.paginate(**params)
                 for detail in page_iterator:
                     for detail_object in detail:
                         detailed_inv[detail_get_key].append(detail_object)
             else:
                 # no pagination, so we call the detail function directly
-                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**param)
+                detailed_inv[detail_get_key] = client.__getattribute__(detail_function)(**params)
 
         if ("ResponseMetadata" in detailed_inv[detail_get_key]):
             del detailed_inv[detail_get_key]['ResponseMetadata']
