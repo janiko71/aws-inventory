@@ -15,14 +15,14 @@ import res.glob  as glob
 
 #  ------------------------------------------------------------------------
 #
-#    API Gateway (simple) 
+#    API Gateway (REST) 
 #
 #  ------------------------------------------------------------------------
 
 def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
 
     """
-        Returns API Gateway inventory
+        Returns API Gateway (rest) inventory
 
         :param oId: ownerId (AWS account)
         :type oId: string
@@ -45,6 +45,42 @@ def get_apigateway_inventory(oId, profile, boto3_config, selected_regions):
         aws_region = "all", 
         function_name = "get_rest_apis", 
         key_get = "items",
+        pagination = True
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    API Gateway V2 (HTTP)
+#
+#  ------------------------------------------------------------------------
+
+def get_apigatewayv2_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns API Gateway v2 (http) inventory
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: API Gateway inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/apigatewayv2.html
+        ..todo:: add --> plans, api keys, custom domain names, client certificates, vpc links
+    """
+
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "apigatewayv2", 
+        aws_region = "all", 
+        function_name = "get_apis", 
+        key_get = "Items",
         pagination = True
     )
 
