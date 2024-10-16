@@ -100,7 +100,7 @@ def check_arguments(arguments):
         :rtype: botocore.config.Config
     """   
 
-    parser = argparse.ArgumentParser(description='AWS inventory may have arguments. More information at https://github.com/janiko71/aws-inventory/wiki/How-to-use-it%3F.')
+    parser = argparse.ArgumentParser(description='AWS inventory may have arguments. More information at https://github.com/janiko71/aws-inventory/wiki/How-to-use-it')
 
     help_str = ""
     for arg_elem in config.SUPPORTED_COMMANDS:
@@ -111,7 +111,7 @@ def check_arguments(arguments):
     # Declaring allowed parameters
     #
 
-    parser.add_argument('--profile', required=False, type=str, default="default", help="Name of the AWS profile to use in {USER_DIR}\.aws\credentials")
+    parser.add_argument('--profile', required=False, type=str, default="default", help="Name of the AWS profile to use in {USER_DIR}\\.aws\\credentials")
     parser.add_argument('--log', required=False, type=str, default="error", help="Log level for output (debug, info, warning, error")
     parser.add_argument('--regions', required=False, type=str, default="", nargs='+', help="Selected regions for inventory, in string format")
     parser.add_argument('--services', required=False, type=str, default="", nargs='+', help="List of AWS services you want to check.\n" \
