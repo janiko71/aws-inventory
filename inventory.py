@@ -421,6 +421,18 @@ if ('datapipeline' in arguments):
 if ('emr' in arguments):
     thread_list.append(awsthread.AWSThread('emr', analytics.get_emr_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
+#
+# ----------------- Kinesis
+#
+if ('kinesis' in arguments):
+    thread_list.append(awsthread.AWSThread('kinesis', analytics.get_kinesis_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- Athena
+#
+if ('athena' in arguments):
+    thread_list.append(awsthread.AWSThread('athena', analytics.get_athena_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    
 
 #################################################################
 #                         MANAGEMENT                            #

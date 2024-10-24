@@ -8,8 +8,8 @@ import res.glob as glob
 
 # =======================================================================================================================
 #
-#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, EMR
-#  Unsupported services : Athena, Kinesis, Quicksight (not scriptable), Glue
+#  Supported services   : Elasticsearch Service, CloudSearch, Data Pipeline, EMR, Athena, Kinesis
+#  Unsupported services : Quicksight (not scriptable), Glue
 #
 # =======================================================================================================================
 
@@ -205,6 +205,83 @@ def get_emr_inventory(oId, profile, boto3_config, selected_regions):
     emr_inventory['clusters'] = emr_cluster
 
     return emr_inventory
+
+
+#  ------------------------------------------------------------------------
+#
+#    Athena
+#
+#  ------------------------------------------------------------------------
+
+def get_athena_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Athena details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: Athena inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/athena.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "athena", 
+        aws_region = "all", 
+        function_name = "list_work_groups", 
+        key_get = "WorkGroups",
+        join_key = "Name",
+        detail_join_key = "WorkGroup",
+        detail_function = "get_work_group",
+        detail_get_key = "WorkGroup"
+    )
+
+
+#  ------------------------------------------------------------------------
+#
+#    Kinesis
+#
+#  ------------------------------------------------------------------------
+
+def get_kinesis_inventory(oId, profile, boto3_config, selected_regions):
+
+    """
+        Returns Kinesis details
+
+        :param oId: ownerId (AWS account)
+        :type oId: string
+        :param profile: configuration profile name used for session
+        :type profile: string
+
+        :return: Kinesis inventory
+        :rtype: json
+
+        ..note:: http://boto3.readthedocs.io/en/latest/reference/services/kinesis.html
+    """ 
+    
+    return glob.get_inventory(
+        ownerId = oId,
+        profile = profile,
+        boto3_config = boto3_config,
+        selected_regions = selected_regions,
+        aws_service = "kinesis", 
+        aws_region = "all", 
+        function_name = "list_streams", 
+        key_get = "StreamNames",
+        join_key = "StreamName",
+        detail_join_key = "StreamName",
+        detail_function = "describe_stream",
+        detail_get_key = "StreamDescription"
+    )
+
 
 #
 # Hey, doc: we're in a module!
