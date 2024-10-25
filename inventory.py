@@ -314,10 +314,10 @@ if ('secrets' in arguments):
     thread_list.append(awsthread.AWSThread('secrets', security.get_secrets_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
-# ----------------- Cloud HSM
+# ----------------- Cloud HSM (deprecated)
 #
-if ('hsm' in arguments):
-    thread_list.append(awsthread.AWSThread('hsm', security.get_hsm_inventory, ownerId, profile_name, boto3_config, selected_regions))
+#if ('hsm' in arguments):
+#    thread_list.append(awsthread.AWSThread('hsm', security.get_hsm_inventory, ownerId, profile_name, boto3_config, selected_regions))
 
 #
 # ----------------- WAF, WAFv2 & WAF Regional
