@@ -1,8 +1,10 @@
 import subprocess
 import json
 import os
+import sys
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 # Ensure log directory exists
 log_dir = "log"
@@ -12,6 +14,7 @@ if not os.path.exists(log_dir):
 # Create a timestamped log file
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
+json_file_path = os.path.join(log_dir, f"inventory_result_{timestamp}.json")
 
 def write_log(message):
     with open(log_file_path, "a") as log_file:
@@ -54,7 +57,7 @@ def test_region_connectivity(region):
     command = f"aws ec2 describe-availability-zones --region {region}"
     return run_aws_cli(command)
 
-def run_command_in_region(service_func, region):
+def run_command_in_region(service_func, region, progress):
     """
     Execute a specific AWS CLI command for a service in a given region.
     
@@ -62,12 +65,19 @@ def run_command_in_region(service_func, region):
     :type service_func: function
     :param region: AWS region
     :type region: str
+    :param progress: A dictionary containing progress details
+    :type progress: dict
     :return: JSON output of the command or None if there was an error
     :rtype: dict or None
     """
     try:
         env_command = f"AWS_DEFAULT_REGION={region} {service_func()}"
-        return run_aws_cli(env_command)
+        result = run_aws_cli(env_command)
+        progress['completed'] += 1
+        if result is None:
+            progress['failed'] += 1
+        print(f"\rProgress: {progress['completed']}/{progress['total']} ({progress['completed'] - progress['failed']} completed, {progress['failed']} in error)", end='', flush=True)
+        return result
     except Exception as e:
         write_log(f"Could not execute command for region {region}: {e}")
         return None
@@ -191,6 +201,8 @@ def list_used_services():
     :return: Dictionary of services and their resources grouped by categories
     :rtype: dict
     """
+    start_time = time.time()
+    
     regions = get_all_regions()
 
     if not regions:
@@ -255,6 +267,12 @@ def list_used_services():
 
     results = {}
 
+    # Initialize progress counter
+    total_services = sum(len(service_dict) for service_dict in services.values())
+    completed_services = 0
+    correct_total = total_services * len(regions)
+    progress = {'completed': completed_services, 'failed': 0, 'total': correct_total}
+
     # Use ThreadPoolExecutor to execute services in parallel for each region
     with ThreadPoolExecutor(max_workers=20) as executor:
         future_to_service = {}
@@ -263,7 +281,7 @@ def list_used_services():
         for category, service_dict in services.items():
             for service, func in service_dict.items():
                 if "global" in service:
-                    write_log(f"Querying region: {region_name}, service: {service}, function: {func.__name__}")
+                    write_log(f"Querying service: {service}, function: {func.__name__}")
                     future_to_service[executor.submit(func)] = (category, service)
                 else:
                     # For regional services, iterate over each region
@@ -274,7 +292,7 @@ def list_used_services():
                         if result is None:
                             write_log(f"Could not connect to the endpoint URL for region {region_name}")
                         else:
-                            future_to_service[executor.submit(run_command_in_region, func, region_name)] = (category, f"{service} in {region_name}")
+                            future_to_service[executor.submit(run_command_in_region, func, region_name, progress)] = (category, f"{service} in {region_name}")
 
         for future in as_completed(future_to_service):
             category, service_name = future_to_service[future]
@@ -286,6 +304,14 @@ def list_used_services():
                     results[category][service_name] = data
             except Exception as e:
                 write_log(f"Error for service {service_name}: {e}")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    print(f"\nTotal execution time: {execution_time:.2f} seconds")
+    
+    with open(json_file_path, "w") as json_file:
+        json.dump(results, json_file, indent=4)
 
     return results
 
