@@ -11,10 +11,15 @@ log_dir = "log"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
+# Ensure output directory exists
+output_dir = "output"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
 # Create a timestamped log file
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
-json_file_path = os.path.join(log_dir, f"inventory_result_{timestamp}.json")
+json_file_path = os.path.join(output_dir, f"inventory_result_{timestamp}.json")
 
 # Global cache for boto3 clients
 boto3_clients = {}
@@ -167,7 +172,7 @@ def list_used_services():
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
     
-    # Save the results to a JSON file
+    # Save the results to a JSON file in the output directory
     with open(json_file_path, "w") as json_file:
         json.dump(results, json_file, indent=4)
 
@@ -175,7 +180,7 @@ def list_used_services():
 
 if __name__ == "__main__":
     services_data = list_used_services()
-    for category, services in services_data.items():
-        print(f"\n{category}:")
-        for service, data in services.items():
-            print(f"  {service}: {data if data else 'No resources found.'}")
+    #for category, services in services_data.items():
+    #    print(f"\n{category}:")
+    #    for service, data in services.items():
+    #        print(f"  {service}: {data if data else 'No resources found.'}")
