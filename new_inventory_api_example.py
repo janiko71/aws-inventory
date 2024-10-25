@@ -5,7 +5,6 @@ import os
 import sys
 from datetime import datetime
 import time
-from res.awsthread import AWSThread
 
 # Ensure log directory exists
 log_dir = "log"
@@ -66,8 +65,13 @@ class InventoryThread(threading.Thread):
         except Exception as e:
             write_log(f"Error querying {self.key}: {e}")
 
-
 def write_log(message):
+    """
+    Write a log message to the log file.
+    
+    :param message: The message to log
+    :type message: str
+    """
     with open(log_file_path, "a") as log_file:
         log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
 
@@ -83,6 +87,14 @@ def get_all_regions():
     return response['Regions']
 
 def test_region_connectivity(region):
+    """
+    Test connectivity to a given AWS region.
+    
+    :param region: The region to test
+    :type region: str
+    :return: True if the region is reachable, False otherwise
+    :rtype: bool
+    """
     ec2 = boto3.client('ec2', region_name=region)
     try:
         ec2.describe_availability_zones()
@@ -91,8 +103,16 @@ def test_region_connectivity(region):
         write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
         return False
 
-# Compute
+# Example function to list EC2 instances
 def list_ec2_instances(client):
+    """
+    List EC2 instances using the provided boto3 client.
+    
+    :param client: The boto3 client
+    :type client: boto3.client
+    :return: The response from describe_instances
+    :rtype: dict
+    """
     response = client.describe_instances()
     return response
 
@@ -104,7 +124,6 @@ def list_used_services():
     :return: Dictionary of services and their resources grouped by categories
     :rtype: dict
     """
-
     global results
 
     start_time = time.time()
@@ -115,35 +134,31 @@ def list_used_services():
         write_log("Unable to retrieve the list of regions.")
         return
 
+    # Define the services and their corresponding functions
     services = {
         'Compute': {
-            'ec2': 'list_ec2_instances',
-            'ec2': 'describe_vpcs',
+            'ec2': 'describe_instances',
+            'vpc': 'describe_vpcs',
         }
     }
 
     results = {}
-
     thread_list = []
 
-    # Global services (no need to iterate over regions)
+    # Iterate over each service and region
     for category, service_dict in services.items():
         for service, func in service_dict.items():
-            if "global" in service:                
-                write_log(f"Querying service: {service}, function: {func.__name__}")
-                thread = InventoryThread(category, "global", service, func, {})
-                results[service] = func(boto3.client(service.lower(), region_name="global"))
-            else:
-                # For regional services, iterate over each region
-                for region in regions:
-                    region_name = region['RegionName']
-                    if test_region_connectivity(region_name):
-                        thread = InventoryThread(category, region_name, service, func, {})
-                        thread_list.append(thread)
+            for region in regions:
+                region_name = region['RegionName']
+                if test_region_connectivity(region_name):
+                    thread = InventoryThread(category, region_name, service, func, service)
+                    thread_list.append(thread)
 
+    # Start all threads
     for thread in thread_list:
         thread.start()
 
+    # Wait for all threads to complete
     for thread in thread_list:
         thread.join()
 
@@ -152,6 +167,7 @@ def list_used_services():
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
     
+    # Save the results to a JSON file
     with open(json_file_path, "w") as json_file:
         json.dump(results, json_file, indent=4)
 
