@@ -1,6 +1,21 @@
 import subprocess
 import json
+import os
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Ensure log directory exists
+log_dir = "log"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Create a timestamped log file
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
+
+def write_log(message):
+    with open(log_file_path, "a") as log_file:
+        log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
 
 def run_aws_cli(command):
     """
@@ -14,12 +29,14 @@ def run_aws_cli(command):
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         if result.returncode == 0:
+            write_log(f"Success: {command}")
             return json.loads(result.stdout.decode('utf-8'))
         else:
-            print(f"Error during execution: {result.stderr.decode('utf-8')}")
+            error_message = result.stderr.decode('utf-8')
+            write_log(f"Error: {command} - {error_message}")
             return None
     except Exception as e:
-        print(f"Exception: {e}")
+        write_log(f"Exception: {command} - {e}")
         return None
 
 def get_all_regions():
@@ -32,7 +49,6 @@ def get_all_regions():
     command = "aws ec2 describe-regions --output json"
     regions = run_aws_cli(command)
     return regions['Regions'] if regions else []
-
 
 def test_region_connectivity(region):
     command = f"aws ec2 describe-availability-zones --region {region}"
@@ -53,7 +69,7 @@ def run_command_in_region(service_func, region):
         env_command = f"AWS_DEFAULT_REGION={region} {service_func()}"
         return run_aws_cli(env_command)
     except Exception as e:
-        print(f"Could not execute command for region {region}: {e}")
+        write_log(f"Could not execute command for region {region}: {e}")
         return None
 
 ### Declaration of functions for each AWS service
@@ -178,7 +194,7 @@ def list_used_services():
     regions = get_all_regions()
 
     if not regions:
-        print("Unable to retrieve the list of regions.")
+        write_log("Unable to retrieve the list of regions.")
         return
 
     services = {
@@ -247,18 +263,18 @@ def list_used_services():
         for category, service_dict in services.items():
             for service, func in service_dict.items():
                 if "global" in service:
+                    write_log(f"Querying region: {region_name}, service: {service}, function: {func.__name__}")
                     future_to_service[executor.submit(func)] = (category, service)
                 else:
                     # For regional services, iterate over each region
                     for region in regions:
                         region_name = region['RegionName']
-                        print(f"Testing region: {region_name}")
+                        write_log(f"Querying region: {region_name}, service: {service}, function: {func.__name__}")
                         result = test_region_connectivity(region_name)
                         if result is None:
-                            print(f"Could not connect to the endpoint URL for region {region_name}")
+                            write_log(f"Could not connect to the endpoint URL for region {region_name}")
                         else:
                             future_to_service[executor.submit(run_command_in_region, func, region_name)] = (category, f"{service} in {region_name}")
-
 
         for future in as_completed(future_to_service):
             category, service_name = future_to_service[future]
@@ -269,7 +285,7 @@ def list_used_services():
                         results[category] = {}
                     results[category][service_name] = data
             except Exception as e:
-                print(f"Error for service {service_name}: {e}")
+                write_log(f"Error for service {service_name}: {e}")
 
     return results
 
