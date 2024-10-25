@@ -17,6 +17,8 @@ timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
 json_file_path = os.path.join(log_dir, f"inventory_result_{timestamp}.json")
 
+# Global cache for boto3 clients
+boto3_clients = {}
 
 class InventoryThread(threading.Thread):
     def __init__(self, category, region, service, func, key):
@@ -27,10 +29,21 @@ class InventoryThread(threading.Thread):
         self.func = func
         self.key = key
 
-
     def run(self):
-        global results
+        global results, boto3_clients
         try:
+            # Get or create boto3 client
+            client_key = (self.service, self.region)
+            if client_key not in boto3_clients:
+                boto3_clients[client_key] = boto3.client(self.service.lower(), region_name=self.region)
+            client = boto3_clients[client_key]
+            
+            # Call the function with the boto3 client
+            inventory = client.__getattribute__(self.func)()
+            
+            # Extract the first key from the inventory to use as the object type
+            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+            
             # Ensure the category exists in the results
             if self.category not in results:
                 results[self.category] = {}
@@ -39,12 +52,17 @@ class InventoryThread(threading.Thread):
             if self.service not in results[self.category]:
                 results[self.category][self.service] = {}
             
-            # Ensure the region exists within the service
-            if self.region not in results[self.category][self.service]:
-                results[self.category][self.service][self.region] = {}
+            # Ensure the object type exists within the service
+            if object_type not in results[self.category][self.service]:
+                results[self.category][self.service][object_type] = {}
             
-            # Update the region with the result
-            results[self.category][self.service][self.region] = {"test": self.service}
+            # Ensure the region exists within the object type
+            if self.region not in results[self.category][self.service][object_type]:
+                results[self.category][self.service][object_type][self.region] = {}
+            
+            # Update the results with the inventory
+            results[self.category][self.service][object_type][self.region] = inventory
+
         except Exception as e:
             write_log(f"Error querying {self.key}: {e}")
 
@@ -74,9 +92,8 @@ def test_region_connectivity(region):
         return False
 
 # Compute
-def list_ec2_instances(region):
-    ec2 = boto3.client('ec2', region_name=region)
-    response = ec2.describe_instances()
+def list_ec2_instances(client):
+    response = client.describe_instances()
     return response
 
 # Inventory of used services
@@ -100,7 +117,8 @@ def list_used_services():
 
     services = {
         'Compute': {
-            'EC2 Instances': list_ec2_instances,
+            'ec2': 'list_ec2_instances',
+            'ec2': 'describe_vpcs',
         }
     }
 
@@ -114,7 +132,7 @@ def list_used_services():
             if "global" in service:                
                 write_log(f"Querying service: {service}, function: {func.__name__}")
                 thread = InventoryThread(category, "global", service, func, {})
-                results[service] = func("global")
+                results[service] = func(boto3.client(service.lower(), region_name="global"))
             else:
                 # For regional services, iterate over each region
                 for region in regions:
