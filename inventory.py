@@ -207,6 +207,22 @@ if ('fsx' in arguments):
 
 
 #################################################################
+#                         BLOCKCHAIN                            #
+#################################################################
+#
+# ----------------- Managed Blockchain
+#
+if ('managedblockchain' in arguments):
+    thread_list.append(awsthread.AWSThread('managedblockchain', blockchain.get_managed_blockchain_inventory, ownerId, profile_name, boto3_config, selected_regions))
+
+#
+# ----------------- QLDB (Quantum Ledger Database)
+#
+if ('qldb' in arguments):
+    thread_list.append(awsthread.AWSThread('qldb', blockchain.get_qldb_inventory, ownerId, profile_name, boto3_config, selected_regions))
+    
+
+#################################################################
 #                          DATABASES                            #
 #################################################################
 #
