@@ -3,8 +3,8 @@ import json
 import os
 import sys
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+from res.awsthread import AWSThread
 
 # Ensure log directory exists
 log_dir = "log"
@@ -39,31 +39,6 @@ def test_region_connectivity(region):
     except Exception as e:
         write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
         return False
-
-def run_command_in_region(service_func, region, progress):
-    """
-    Execute a specific boto3 API call for a service in a given region.
-    
-    :param service_func: Function returning the boto3 client method
-    :type service_func: function
-    :param region: AWS region
-    :type region: str
-    :param progress: A dictionary containing progress details
-    :type progress: dict
-    :return: JSON output of the command or None if there was an error
-    :rtype: dict or None
-    """
-    try:
-        result = service_func(region)
-        progress['completed'] += 1
-        if result is None:
-            progress['failed'] += 1
-        print(f"\rProgress: {progress['completed']}/{progress['total']} ({progress['completed'] - progress['failed']} completed, {progress['failed']} in error)", end='', flush=True)
-        return result
-    except Exception as e:
-        write_log(f"Could not execute command for region {region}: {e}")
-        progress['failed'] += 1
-        return None
 
 # Compute
 def list_ec2_instances(region):
@@ -314,40 +289,29 @@ def list_used_services():
 
     results = {}
 
-    # Initialize progress counter
-    total_services = sum(len(service_dict) for service_dict in services.values())
-    completed_services = 0
-    correct_total = total_services * len(regions)
-    progress = {'completed': completed_services, 'failed': 0, 'total': correct_total}
+    thread_list = []
 
-    # Use ThreadPoolExecutor to execute services in parallel for each region
-    with ThreadPoolExecutor(max_workers=20) as executor:
-        future_to_service = {}
+    # Global services (no need to iterate over regions)
+    for category, service_dict in services.items():
+        for service, func in service_dict.items():
+            if "global" in service:
+                write_log(f"Querying service: {service}, function: {func.__name__}")
+                thread = AWSThread(func, None, results, service)
+                thread_list.append(thread)
+            else:
+                # For regional services, iterate over each region
+                for region in regions:
+                    region_name = region['RegionName']
+                    write_log(f"Querying region: {region_name}, service: {service}, function: {func.__name__}")
+                    if test_region_connectivity(region_name):
+                        thread = AWSThread(func, region_name, results, f"{service} in {region_name}")
+                        thread_list.append(thread)
 
-        # Global services (no need to iterate over regions)
-        for category, service_dict in services.items():
-            for service, func in service_dict.items():
-                if "global" in service:
-                    write_log(f"Querying service: {service}, function: {func.__name__}")
-                    future_to_service[executor.submit(func, None)] = (category, service)
-                else:
-                    # For regional services, iterate over each region
-                    for region in regions:
-                        region_name = region['RegionName']
-                        write_log(f"Querying region: {region_name}, service: {service}, function: {func.__name__}")
-                        if test_region_connectivity(region_name):
-                            future_to_service[executor.submit(run_command_in_region, func, region_name, progress)] = (category, f"{service} in {region_name}")
+    for thread in thread_list:
+        thread.start()
 
-        for future in as_completed(future_to_service):
-            category, service_name = future_to_service[future]
-            try:
-                data = future.result()
-                if data:
-                    if category not in results:
-                        results[category] = {}
-                    results[category][service_name] = data
-            except Exception as e:
-                write_log(f"Error for service {service_name}: {e}")
+    for thread in thread_list:
+        thread.join()
 
     end_time = time.time()
     execution_time = end_time - start_time
