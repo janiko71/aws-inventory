@@ -16,6 +16,7 @@
                 "codeartifact:ListRepositories",
                 "codecommit:GetRepository",
                 "codecommit:ListRepositories",
+                "config:DescribeConfigRules",
                 "ecr:DescribeImages",
                 "ecr:DescribeRepositories",
                 "ecr:ListImages",
