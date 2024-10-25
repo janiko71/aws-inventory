@@ -5,6 +5,7 @@ import os
 import sys
 from datetime import datetime
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 # Ensure log directory exists
 log_dir = "log"
@@ -25,6 +26,20 @@ json_file_path = os.path.join(output_dir, f"inventory_result_{timestamp}.json")
 boto3_clients = {}
 
 class InventoryThread(threading.Thread):
+    """
+    A thread class to handle inventory operations for a specific AWS service in a specific region.
+
+    :param category: The category of the service (e.g., 'Compute')
+    :type category: str
+    :param region: The AWS region (e.g., 'us-west-1')
+    :type region: str
+    :param service: The AWS service (e.g., 'ec2')
+    :type service: str
+    :param func: The function to call on the boto3 client (e.g., 'describe_instances')
+    :type func: str
+    :param key: The key to use for logging and error messages
+    :type key: str
+    """
     def __init__(self, category, region, service, func, key):
         threading.Thread.__init__(self)
         self.category = category
@@ -34,7 +49,11 @@ class InventoryThread(threading.Thread):
         self.key = key
 
     def run(self):
+        """
+        Run the inventory operation and log the results.
+        """
         global results, boto3_clients
+        write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
         try:
             # Get or create boto3 client
             client_key = (self.service, self.region)
@@ -69,6 +88,8 @@ class InventoryThread(threading.Thread):
 
         except Exception as e:
             write_log(f"Error querying {self.key}: {e}")
+        finally:
+            write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
 
 def write_log(message):
     """
@@ -108,20 +129,6 @@ def test_region_connectivity(region):
         write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
         return False
 
-# Example function to list EC2 instances
-def list_ec2_instances(client):
-    """
-    List EC2 instances using the provided boto3 client.
-    
-    :param client: The boto3 client
-    :type client: boto3.client
-    :return: The response from describe_instances
-    :rtype: dict
-    """
-    response = client.describe_instances()
-    return response
-
-# Inventory of used services
 def list_used_services():
     """
     Inventory AWS services used for a given account across all available regions.
@@ -142,30 +149,117 @@ def list_used_services():
     # Define the services and their corresponding functions
     services = {
         'Compute': {
-            'ec2': 'describe_instances',
-            'vpc': 'describe_vpcs',
+            'ec2': [
+                'describe_instances',
+                'describe_volumes',
+                'describe_snapshots',
+                'describe_security_groups',
+                'describe_key_pairs',
+                'describe_addresses',
+                'describe_network_interfaces',
+                'describe_route_tables',
+                'describe_subnets',
+                'describe_vpcs',
+                'describe_elastic_gpus',
+                'describe_internet_gateways',
+                'describe_ipv6_pools',
+                'describe_nat_gateways',
+                'describe_account_attributes',
+                'describe_availability_zones',
+                'describe_bundle_tasks',
+                'describe_capacity_reservations',
+                'describe_classic_link_instances',
+                'describe_conversion_tasks',
+                'describe_customer_gateways',
+                'describe_dhcp_options',
+                'describe_egress_only_internet_gateways',
+                'describe_export_tasks',
+                'describe_fleets',
+                'describe_flow_logs',
+                'describe_fpga_images',
+                'describe_host_reservation_offerings',
+                'describe_host_reservations',
+                'describe_hosts',
+                'describe_iam_instance_profile_associations',
+                'describe_id_format',
+                'describe_identity_id_format',
+                'describe_image_attribute',
+                'describe_images',
+                'describe_import_image_tasks',
+                'describe_import_snapshot_tasks',
+                'describe_instance_attribute',
+                'describe_instance_credit_specifications',
+                'describe_instance_status',
+                'describe_instances',
+                'describe_internet_gateways',
+                'describe_key_pairs',
+                'describe_launch_template_versions',
+                'describe_launch_templates',
+                'describe_moving_addresses',
+                'describe_nat_gateways',
+                'describe_network_acls',
+                'describe_network_interface_attribute',
+                'describe_network_interface_permissions',
+                'describe_network_interfaces',
+                'describe_placement_groups',
+                'describe_prefix_lists',
+                'describe_regions',
+                'describe_reserved_instances',
+                'describe_reserved_instances_listings',
+                'describe_reserved_instances_modifications',
+                'describe_reserved_instances_offerings',
+                'describe_route_tables',
+                'describe_scheduled_instance_availability',
+                'describe_scheduled_instances',
+                'describe_security_group_references',
+                'describe_security_groups',
+                'describe_snapshot_attribute',
+                'describe_snapshots',
+                'describe_spot_datafeed_subscription',
+                'describe_spot_fleet_instances',
+                'describe_spot_fleet_request_history',
+                'describe_spot_fleet_requests',
+                'describe_spot_instance_requests',
+                'describe_spot_price_history',
+                'describe_stale_security_groups',
+                'describe_subnets',
+                'describe_tags',
+                'describe_volume_attribute',
+                'describe_volume_status',
+                'describe_volumes',
+                'describe_vpc_attribute',
+                'describe_vpc_classic_link',
+                'describe_vpc_classic_link_dns_support',
+                'describe_vpc_endpoint_connection_notifications',
+                'describe_vpc_endpoint_connections',
+                'describe_vpc_endpoint_service_configurations',
+                'describe_vpc_endpoint_service_permissions',
+                'describe_vpc_endpoint_services',
+                'describe_vpc_endpoints',
+                'describe_vpc_peering_connections',
+                'describe_vpcs',
+                'describe_vpn_connections',
+                'describe_vpn_gateways',
+            ]
         }
     }
-
     results = {}
     thread_list = []
 
     # Iterate over each service and region
-    for category, service_dict in services.items():
-        for service, func in service_dict.items():
-            for region in regions:
-                region_name = region['RegionName']
-                if test_region_connectivity(region_name):
-                    thread = InventoryThread(category, region_name, service, func, service)
-                    thread_list.append(thread)
-
-    # Start all threads
-    for thread in thread_list:
-        thread.start()
-
-    # Wait for all threads to complete
-    for thread in thread_list:
-        thread.join()
+    nb_inventories = 0
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        for category, service_dict in services.items():
+            for service, funcs in service_dict.items():
+                for func in funcs:
+                    for region in regions:
+                        region_name = region['RegionName']
+                        if test_region_connectivity(region_name):
+                            thread = InventoryThread(category, region_name, service, func, service)
+                            nb_inventories += 1
+                            print(f"Starting inventory #{nb_inventories} for {service} in {region_name} using {func}")
+                            thread_list.append(thread)
+                            executor.submit(thread.run)
 
     end_time = time.time()
     execution_time = end_time - start_time
@@ -180,7 +274,3 @@ def list_used_services():
 
 if __name__ == "__main__":
     services_data = list_used_services()
-    #for category, services in services_data.items():
-    #    print(f"\n{category}:")
-    #    for service, data in services.items():
-    #        print(f"  {service}: {data if data else 'No resources found.'}")
