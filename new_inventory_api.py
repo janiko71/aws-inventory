@@ -1,3 +1,36 @@
+"""
+AWS Inventory Script
+
+This script inventories AWS services used for a given account across all available regions.
+It uses multithreading to perform inventory operations concurrently.
+
+Modules:
+    threading
+    boto3
+    json
+    os
+    sys
+    re
+    datetime
+    time
+    argparse
+    multiprocessing
+    concurrent.futures
+    tqdm
+
+Classes:
+    InventoryThread
+
+Functions:
+    write_log(message)
+    get_all_regions()
+    test_region_connectivity(region)
+    transform_function_name(func_name)
+    json_serial(obj)
+    create_services_structure(policy_file)
+    list_used_services(policy_file)
+"""
+
 import threading
 import boto3
 import json
@@ -27,13 +60,13 @@ log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
 json_file_path = os.path.join(output_dir, f"inventory_result_{timestamp}.json")
 
 # Global variables
-boto3_clients = {}
-results = {}
+boto3_clients = {}  # Dictionary to store boto3 clients for different services and regions
+results = {}  # Dictionary to store the inventory results
 
 # Progress counters
-total_tasks = 0
-completed_tasks = 0
-progress_bar = None
+total_tasks = 0  # Counter for the total number of tasks
+completed_tasks = 0  # Counter for the number of completed tasks
+progress_bar = None  # Progress bar object
 
 # Determine the number of CPU cores
 num_cores = multiprocessing.cpu_count()
@@ -45,6 +78,17 @@ class InventoryThread(threading.Thread):
     """Thread class for performing inventory tasks."""
 
     def __init__(self, category, region, service, func, key, progress_callback):
+        """
+        Initialize the InventoryThread.
+
+        Args:
+            category (str): The category of the service.
+            region (str): The AWS region.
+            service (str): The AWS service.
+            func (str): The function to call on the service.
+            key (str): A unique key for the task.
+            progress_callback (function): A callback function to update the progress bar.
+        """
         threading.Thread.__init__(self)
         self.category = category
         self.region = region
@@ -54,6 +98,7 @@ class InventoryThread(threading.Thread):
         self.progress_callback = progress_callback
 
     def run(self):
+        """Run the inventory task."""
         global results, boto3_clients
         write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
         try:
@@ -93,18 +138,36 @@ class InventoryThread(threading.Thread):
             write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
 
 def write_log(message):
-    """Write a log message to the log file."""
+    """
+    Write a log message to the log file.
+
+    Args:
+        message (str): The message to log.
+    """
     with open(log_file_path, "a") as log_file:
         log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
 
 def get_all_regions():
-    """Retrieve all AWS regions."""
+    """
+    Retrieve all AWS regions.
+
+    Returns:
+        list: A list of all AWS regions.
+    """
     ec2 = boto3.client('ec2')
     response = ec2.describe_regions()
     return response['Regions']
 
 def test_region_connectivity(region):
-    """Test connectivity to a specific AWS region."""
+    """
+    Test connectivity to a specific AWS region.
+
+    Args:
+        region (str): The AWS region to test.
+
+    Returns:
+        bool: True if the region is reachable, False otherwise.
+    """
     ec2 = boto3.client('ec2', region_name=region)
     try:
         ec2.describe_availability_zones()
@@ -114,17 +177,44 @@ def test_region_connectivity(region):
         return False
 
 def transform_function_name(func_name):
-    """Transform a CamelCase function name to snake_case."""
+    """
+    Transform a CamelCase function name to snake_case.
+
+    Args:
+        func_name (str): The CamelCase function name.
+
+    Returns:
+        str: The snake_case function name.
+    """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
 
 def json_serial(obj):
-    """JSON serializer for objects not serializable by default."""
+    """
+    JSON serializer for objects not serializable by default.
+
+    Args:
+        obj (any): The object to serialize.
+
+    Returns:
+        str: The serialized object.
+
+    Raises:
+        TypeError: If the object is not serializable.
+    """
     if isinstance(obj, datetime):
         return obj.isoformat()
     raise TypeError("Type not serializable")
 
 def create_services_structure(policy_file):
-    """Create a structure of services based on the provided IAM policy file."""
+    """
+    Create a structure of services based on the provided IAM policy file.
+
+    Args:
+        policy_file (str): The path to the IAM policy file.
+
+    Returns:
+        dict: A dictionary structure of services.
+    """
     service_to_category = {
         'ec2': 'Compute',
         'ecs': 'Compute',
@@ -181,7 +271,15 @@ def create_services_structure(policy_file):
     return services
 
 def list_used_services(policy_file):
-    """List used services based on the provided IAM policy file."""
+    """
+    List used services based on the provided IAM policy file.
+
+    Args:
+        policy_file (str): The path to the IAM policy file.
+
+    Returns:
+        dict: A dictionary of the used services.
+    """
     global results, total_tasks, progress_bar
 
     start_time = time.time()
