@@ -1,7 +1,3 @@
-# Add import for tqdm
-from tqdm import tqdm
-
-# Other imports...
 import threading
 import boto3
 import json
@@ -11,7 +7,9 @@ import re
 from datetime import datetime
 import time
 import argparse
+import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 
 # Ensure log directory exists
 log_dir = "log"
@@ -37,20 +35,26 @@ total_tasks = 0
 completed_tasks = 0
 progress_bar = None
 
+# Determine the number of CPU cores
+num_cores = multiprocessing.cpu_count()
+
+# Set the number of threads to 2 to 4 times the number of CPU cores
+num_threads = num_cores * 2  # You can adjust this multiplier based on your needs
 
 class InventoryThread(threading.Thread):
     """Thread class for performing inventory tasks."""
 
-    def __init__(self, category, region, service, func, key):
+    def __init__(self, category, region, service, func, key, progress_callback):
         threading.Thread.__init__(self)
         self.category = category
         self.region = region
         self.service = service
         self.func = func
         self.key = key
+        self.progress_callback = progress_callback
 
     def run(self):
-        global results, boto3_clients, completed_tasks, progress_bar
+        global results, boto3_clients
         write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
         try:
             client_key = (self.service, self.region)
@@ -59,8 +63,11 @@ class InventoryThread(threading.Thread):
             client = boto3_clients[client_key]
             
             # First sub-task: API call
+            start_time = time.time()
             inventory = client.__getattribute__(self.func)()
-            progress_bar.update(1)  # Update progress bar by 0.5 task
+            self.progress_callback(0.5)  # Update progress bar by 0.5 task
+            end_time = time.time()
+            write_log(f"API call for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
             
             if not with_meta:
                 inventory.pop('ResponseMetadata', None)
@@ -75,15 +82,15 @@ class InventoryThread(threading.Thread):
                 results[self.category][self.service][object_type][self.region] = {}
             
             # Second sub-task: Processing results
+            start_time = time.time()
             results[self.category][self.service][object_type][self.region] = inventory
-            progress_bar.update(1) 
+            self.progress_callback(0.5)  # Update progress bar by 0.5 task
+            end_time = time.time()
+            write_log(f"Processing results for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
         except Exception as e:
             write_log(f"Error querying {self.service} in {self.region} using {self.func}: {e}")
         finally:
-            completed_tasks += 1
             write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
-
-
 
 def write_log(message):
     """Write a log message to the log file."""
@@ -188,6 +195,10 @@ def list_used_services(policy_file):
     services = create_services_structure(policy_file)
     thread_list = []
 
+    def progress_callback(amount):
+        """Callback function to update the progress bar."""
+        progress_bar.update(amount)
+
     for region in regions:
         region_name = region['RegionName']
         if test_region_connectivity(region_name):
@@ -195,18 +206,17 @@ def list_used_services(policy_file):
                 for service, func_list in service_dict.items():
                     for func in func_list:
                         write_log(f"Querying region: {region_name}, service: {service}, function: {func}")
-                        thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}")
-                        thread_list.append(thread)
                         total_tasks += 1  # Increment total_tasks for each task
+                        thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}", progress_callback)
+                        thread_list.append(thread)
 
     # Initialize progress bar with double the total tasks
-    progress_bar = tqdm(total=total_tasks * 2, desc="Inventory Progress", unit="sub-task")
+    progress_bar = tqdm(total=total_tasks, desc="Inventory Progress", unit="sub-task")
 
-    for thread in thread_list:
-        thread.start()
-
-    for thread in thread_list:
-        thread.join()
+    # Use ThreadPoolExecutor to manage the threads
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        for thread in thread_list:
+            executor.submit(thread.run)
 
     progress_bar.close()
 
