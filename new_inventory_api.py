@@ -35,6 +35,7 @@ import sys
 import re
 from datetime import datetime
 import time
+import argparse
 from concurrent.futures import ThreadPoolExecutor
 
 # Ensure log directory exists
@@ -95,6 +96,10 @@ class InventoryThread(threading.Thread):
             # Call the function with the boto3 client
             inventory = client.__getattribute__(self.func)()
             
+            # Remove ResponseMetadata if with_meta is False
+            if not with_meta:
+                inventory.pop('ResponseMetadata', None)
+
             # Extract the first key from the inventory to use as the object type
             object_type = list(inventory.keys())[0] if inventory else 'Unknown'
             
@@ -291,6 +296,15 @@ def list_used_services(policy_file):
     return results
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='AWS Inventory Script')
+    parser.add_argument('--policy-file', type=str, default='inventory_policy_1.json', help='The path to the IAM policy file')
+    parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
+    args = parser.parse_args()
+
+    policy_file = args.policy_file
+    with_meta = args.with_meta
+
     policy_file = 'inventory_policy_1.json'
     services_data = list_used_services(policy_file)
     #for category, services in services_data.items():
