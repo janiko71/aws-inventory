@@ -1,3 +1,5 @@
+# To do : vérifier compteur (penser aux appels en échec), voir les appels qui demandent des détails (comme VPC). Mettre une correspondance (dire quelle fonction appeler) et ajouter cela
+# au résultat final par programme. Il se peut que certains services demandent plusieurs détails. 
 """
 AWS Inventory Script
 
