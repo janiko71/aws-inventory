@@ -1,32 +1,7 @@
-"""
-AWS Inventory Script
+# Add import for tqdm
+from tqdm import tqdm
 
-This script inventories AWS services used for a given account across all available regions.
-It uses multithreading to perform inventory operations concurrently.
-
-Modules:
-    threading
-    boto3
-    json
-    os
-    sys
-    datetime
-    time
-    concurrent.futures
-
-Classes:
-    AWSThread
-
-Functions:
-    write_log(message)
-    get_all_regions()
-    test_region_connectivity(region)
-    list_ec2_instances(region)
-    list_s3_buckets(region)
-    create_services_structure(policy_file)
-    list_used_services(policy_file)
-"""
-
+# Other imports...
 import threading
 import boto3
 import json
@@ -57,21 +32,15 @@ json_file_path = os.path.join(output_dir, f"inventory_result_{timestamp}.json")
 boto3_clients = {}
 results = {}
 
-class InventoryThread(threading.Thread):
-    """
-    A thread class to handle inventory operations for a specific AWS service in a specific region.
+# Progress counters
+total_tasks = 0
+completed_tasks = 0
+progress_bar = None
 
-    :param category: The category of the service (e.g., 'Compute')
-    :type category: str
-    :param region: The AWS region (e.g., 'us-west-1')
-    :type region: str
-    :param service: The AWS service (e.g., 'ec2')
-    :type service: str
-    :param func: The function to call on the boto3 client (e.g., 'describe_instances')
-    :type func: str
-    :param key: The key to use for logging and error messages
-    :type key: str
-    """
+
+class InventoryThread(threading.Thread):
+    """Thread class for performing inventory tasks."""
+
     def __init__(self, category, region, service, func, key):
         threading.Thread.__init__(self)
         self.category = category
@@ -81,84 +50,54 @@ class InventoryThread(threading.Thread):
         self.key = key
 
     def run(self):
-        """
-        Run the inventory operation and log the results.
-        """
-        global results, boto3_clients
+        global results, boto3_clients, completed_tasks, progress_bar
         write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
         try:
-            # Get or create boto3 client
             client_key = (self.service, self.region)
             if client_key not in boto3_clients:
                 boto3_clients[client_key] = boto3.client(self.service.lower(), region_name=self.region)
             client = boto3_clients[client_key]
             
-            # Call the function with the boto3 client
+            # First sub-task: API call
             inventory = client.__getattribute__(self.func)()
+            progress_bar.update(1)  # Update progress bar by 0.5 task
             
-            # Remove ResponseMetadata if with_meta is False
             if not with_meta:
                 inventory.pop('ResponseMetadata', None)
-
-            # Extract the first key from the inventory to use as the object type
             object_type = list(inventory.keys())[0] if inventory else 'Unknown'
-            
-            # Ensure the category exists in the results
             if self.category not in results:
                 results[self.category] = {}
-            
-            # Ensure the service exists within the category
             if self.service not in results[self.category]:
                 results[self.category][self.service] = {}
-            
-            # Ensure the object type exists within the service
             if object_type not in results[self.category][self.service]:
                 results[self.category][self.service][object_type] = {}
-            
-            # Ensure the region exists within the object type
             if self.region not in results[self.category][self.service][object_type]:
                 results[self.category][self.service][object_type][self.region] = {}
             
-            # Update the results with the inventory
+            # Second sub-task: Processing results
             results[self.category][self.service][object_type][self.region] = inventory
-
-        except Exception as e: 
+            progress_bar.update(1) 
+        except Exception as e:
             write_log(f"Error querying {self.service} in {self.region} using {self.func}: {e}")
         finally:
+            completed_tasks += 1
             write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
 
 
 
 def write_log(message):
-    """
-    Write a log message to the log file.
-
-    :param message: The message to log
-    :type message: str
-    """
+    """Write a log message to the log file."""
     with open(log_file_path, "a") as log_file:
         log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
 
 def get_all_regions():
-    """
-    Retrieve the list of all AWS regions.
-
-    :return: List of all AWS regions
-    :rtype: list
-    """
+    """Retrieve all AWS regions."""
     ec2 = boto3.client('ec2')
     response = ec2.describe_regions()
     return response['Regions']
 
 def test_region_connectivity(region):
-    """
-    Test connectivity to a given AWS region.
-
-    :param region: The region to test
-    :type region: str
-    :return: True if connectivity is successful, False otherwise
-    :rtype: bool
-    """
+    """Test connectivity to a specific AWS region."""
     ec2 = boto3.client('ec2', region_name=region)
     try:
         ec2.describe_availability_zones()
@@ -168,27 +107,17 @@ def test_region_connectivity(region):
         return False
 
 def transform_function_name(func_name):
-    """
-    Transform a camel case function name to snake case.
-
-    :param func_name: The function name in camel case
-    :type func_name: str
-    :return: The function name in snake case
-    :rtype: str
-    """
+    """Transform a CamelCase function name to snake_case."""
     return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
-    
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError("Type not serializable")
+
 def create_services_structure(policy_file):
-    """
-    Create the services structure based on the IAM policy file.
-
-    :param policy_file: The path to the IAM policy file
-    :type policy_file: str
-    :return: Dictionary of services categorized by type
-    :rtype: dict
-    """
-
-    # Mapping of service prefixes to categories
+    """Create a structure of services based on the provided IAM policy file."""
     service_to_category = {
         'ec2': 'Compute',
         'ecs': 'Compute',
@@ -244,18 +173,9 @@ def create_services_structure(policy_file):
 
     return services
 
-
 def list_used_services(policy_file):
-    """
-    Inventory AWS services used for a given account across all available regions.
-
-    :param policy_file: The path to the IAM policy file
-    :type policy_file: str
-    :return: Dictionary of services and their resources grouped by categories
-    :rtype: dict
-    """
-
-    global results
+    """List used services based on the provided IAM policy file."""
+    global results, total_tasks, progress_bar
 
     start_time = time.time()
     
@@ -277,7 +197,10 @@ def list_used_services(policy_file):
                         write_log(f"Querying region: {region_name}, service: {service}, function: {func}")
                         thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}")
                         thread_list.append(thread)
+                        total_tasks += 1  # Increment total_tasks for each task
 
+    # Initialize progress bar with double the total tasks
+    progress_bar = tqdm(total=total_tasks * 2, desc="Inventory Progress", unit="sub-task")
 
     for thread in thread_list:
         thread.start()
@@ -285,18 +208,19 @@ def list_used_services(policy_file):
     for thread in thread_list:
         thread.join()
 
+    progress_bar.close()
+
     end_time = time.time()
     execution_time = end_time - start_time
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
     
     with open(json_file_path, "w") as json_file:
-        json.dump(results, json_file, indent=4)
+        json.dump(results, json_file, indent=4, default=json_serial)
 
     return results
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
     parser.add_argument('--policy-file', type=str, default='inventory_policy_1.json', help='The path to the IAM policy file')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
@@ -305,9 +229,4 @@ if __name__ == "__main__":
     policy_file = args.policy_file
     with_meta = args.with_meta
 
-    policy_file = 'inventory_policy_1.json'
     services_data = list_used_services(policy_file)
-    #for category, services in services_data.items():
-    #    print(f"\n{category}:")
-    #    for service, data in services.items():
-    #        print(f"  {service}: {data if data else 'No resources found.'}")
