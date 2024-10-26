@@ -1,29 +1,143 @@
+"""
+AWS Inventory Script
+
+This script inventories AWS services used for a given account across all available regions.
+It uses multithreading to perform inventory operations concurrently.
+
+Modules:
+    threading
+    boto3
+    json
+    os
+    sys
+    datetime
+    time
+    concurrent.futures
+
+Classes:
+    AWSThread
+
+Functions:
+    write_log(message)
+    get_all_regions()
+    test_region_connectivity(region)
+    list_ec2_instances(region)
+    list_s3_buckets(region)
+    create_services_structure(policy_file)
+    list_used_services(policy_file)
+"""
+
+import threading
 import boto3
 import json
 import os
 import sys
+import re
 from datetime import datetime
 import time
-from res.awsthread import AWSThread
+from concurrent.futures import ThreadPoolExecutor
 
 # Ensure log directory exists
 log_dir = "log"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
+# Ensure output directory exists
+output_dir = "output"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
 # Create a timestamped log file
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
-json_file_path = os.path.join(log_dir, f"inventory_result_{timestamp}.json")
+json_file_path = os.path.join(output_dir, f"inventory_result_{timestamp}.json")
+
+# Global variables
+boto3_clients = {}
+results = {}
+
+class InventoryThread(threading.Thread):
+    """
+    A thread class to handle inventory operations for a specific AWS service in a specific region.
+
+    :param category: The category of the service (e.g., 'Compute')
+    :type category: str
+    :param region: The AWS region (e.g., 'us-west-1')
+    :type region: str
+    :param service: The AWS service (e.g., 'ec2')
+    :type service: str
+    :param func: The function to call on the boto3 client (e.g., 'describe_instances')
+    :type func: str
+    :param key: The key to use for logging and error messages
+    :type key: str
+    """
+    def __init__(self, category, region, service, func, key):
+        threading.Thread.__init__(self)
+        self.category = category
+        self.region = region
+        self.service = service
+        self.func = func
+        self.key = key
+
+    def run(self):
+        """
+        Run the inventory operation and log the results.
+        """
+        global results, boto3_clients
+        write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
+        try:
+            # Get or create boto3 client
+            client_key = (self.service, self.region)
+            if client_key not in boto3_clients:
+                boto3_clients[client_key] = boto3.client(self.service.lower(), region_name=self.region)
+            client = boto3_clients[client_key]
+            
+            # Call the function with the boto3 client
+            inventory = client.__getattribute__(self.func)()
+            
+            # Extract the first key from the inventory to use as the object type
+            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+            
+            # Ensure the category exists in the results
+            if self.category not in results:
+                results[self.category] = {}
+            
+            # Ensure the service exists within the category
+            if self.service not in results[self.category]:
+                results[self.category][self.service] = {}
+            
+            # Ensure the object type exists within the service
+            if object_type not in results[self.category][self.service]:
+                results[self.category][self.service][object_type] = {}
+            
+            # Ensure the region exists within the object type
+            if self.region not in results[self.category][self.service][object_type]:
+                results[self.category][self.service][object_type][self.region] = {}
+            
+            # Update the results with the inventory
+            results[self.category][self.service][object_type][self.region] = inventory
+
+        except Exception as e: 
+            write_log(f"Error querying {self.service} in {self.region} using {self.func}: {e}")
+        finally:
+            write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
+
+
 
 def write_log(message):
+    """
+    Write a log message to the log file.
+
+    :param message: The message to log
+    :type message: str
+    """
     with open(log_file_path, "a") as log_file:
         log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
 
 def get_all_regions():
     """
     Retrieve the list of all AWS regions.
-    
+
     :return: List of all AWS regions
     :rtype: list
     """
@@ -32,6 +146,14 @@ def get_all_regions():
     return response['Regions']
 
 def test_region_connectivity(region):
+    """
+    Test connectivity to a given AWS region.
+
+    :param region: The region to test
+    :type region: str
+    :return: True if connectivity is successful, False otherwise
+    :rtype: bool
+    """
     ec2 = boto3.client('ec2', region_name=region)
     try:
         ec2.describe_availability_zones()
@@ -40,189 +162,96 @@ def test_region_connectivity(region):
         write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
         return False
 
-# Compute
-def list_ec2_instances(region):
-    ec2 = boto3.client('ec2', region_name=region)
-    response = ec2.describe_instances()
-    return response
+def transform_function_name(func_name):
+    """
+    Transform a camel case function name to snake case.
 
-def list_ecs_clusters(region):
-    ecs = boto3.client('ecs', region_name=region)
-    response = ecs.list_clusters()
-    return response
+    :param func_name: The function name in camel case
+    :type func_name: str
+    :return: The function name in snake case
+    :rtype: str
+    """
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
+    
+def create_services_structure(policy_file):
+    """
+    Create the services structure based on the IAM policy file.
 
-def list_eks_clusters(region):
-    eks = boto3.client('eks', region_name=region)
-    response = eks.list_clusters()
-    return response
+    :param policy_file: The path to the IAM policy file
+    :type policy_file: str
+    :return: Dictionary of services categorized by type
+    :rtype: dict
+    """
 
-def list_lambda_functions(region):
-    lambda_client = boto3.client('lambda', region_name=region)
-    response = lambda_client.list_functions()
-    return response
+    # Mapping of service prefixes to categories
+    service_to_category = {
+        'ec2': 'Compute',
+        'ecs': 'Compute',
+        'eks': 'Compute',
+        'lambda': 'Compute',
+        'lightsail': 'Compute',
+        's3': 'Storage',
+        'ebs': 'Storage',
+        'efs': 'Storage',
+        'rds': 'Databases',
+        'dynamodb': 'Databases',
+        'redshift': 'Databases',
+        'elasticache': 'Databases',
+        'vpc': 'Networking',
+        'elb': 'Networking',
+        'cloudfront': 'Networking',
+        'route53': 'Networking',
+        'apigateway': 'Networking',
+        'cloudwatch': 'Monitoring and Management',
+        'cloudtrail': 'Monitoring and Management',
+        'config': 'Monitoring and Management',
+        'iam': 'IAM and Security',
+        'kms': 'IAM and Security',
+        'secretsmanager': 'IAM and Security',
+        'waf': 'IAM and Security',
+        'shield': 'IAM and Security',
+        'sagemaker': 'Machine Learning',
+        'rekognition': 'Machine Learning',
+        'comprehend': 'Machine Learning',
+        'glue': 'Analytics',
+        'sns': 'Application Integration',
+        'sqs': 'Application Integration',
+        'stepfunctions': 'Application Integration',
+        'cloudformation': 'Management & Governance'
+    }
 
-def list_lightsail_instances(region):
-    lightsail = boto3.client('lightsail', region_name=region)
-    response = lightsail.get_instances()
-    return response
+    with open(policy_file, 'r') as file:
+        policy = json.load(file)
 
-# Storage
-def list_s3_buckets(region):
-    s3 = boto3.client('s3')
-    response = s3.list_buckets()
-    return response
+    services = {}
+    for statement in policy.get('Statement', []):
+        for action in statement.get('Action', []):
+            service_prefix, action_name = action.split(':')
+            if service_prefix in service_to_category:
+                category = service_to_category[service_prefix]
+                if category not in services:
+                    services[category] = {}
+                if service_prefix not in services[category]:
+                    services[category][service_prefix] = []
+                transformed_action_name = transform_function_name(action_name)
+                if transformed_action_name not in services[category][service_prefix]:
+                    services[category][service_prefix].append(transformed_action_name)
 
-def list_ebs_volumes(region):
-    ec2 = boto3.client('ec2', region_name=region)
-    response = ec2.describe_volumes()
-    return response
+    return services
 
-def list_efs_file_systems(region):
-    efs = boto3.client('efs', region_name=region)
-    response = efs.describe_file_systems()
-    return response
 
-# Databases
-def list_rds_instances(region):
-    rds = boto3.client('rds', region_name=region)
-    response = rds.describe_db_instances()
-    return response
-
-def list_dynamodb_tables(region):
-    dynamodb = boto3.client('dynamodb', region_name=region)
-    response = dynamodb.list_tables()
-    return response
-
-def list_redshift_clusters(region):
-    redshift = boto3.client('redshift', region_name=region)
-    response = redshift.describe_clusters()
-    return response
-
-def list_elasticache_clusters(region):
-    elasticache = boto3.client('elasticache', region_name=region)
-    response = elasticache.describe_cache_clusters()
-    return response
-
-# Networking
-def list_vpcs(region):
-    ec2 = boto3.client('ec2', region_name=region)
-    response = ec2.describe_vpcs()
-    return response
-
-def list_elb_load_balancers(region):
-    elb = boto3.client('elb', region_name=region)
-    response = elb.describe_load_balancers()
-    return response
-
-def list_cloudfront_distributions(region):
-    cloudfront = boto3.client('cloudfront')
-    response = cloudfront.list_distributions()
-    return response
-
-def list_route53_hosted_zones(region):
-    route53 = boto3.client('route53')
-    response = route53.list_hosted_zones()
-    return response
-
-def list_api_gateways(region):
-    apigateway = boto3.client('apigateway', region_name=region)
-    response = apigateway.get_rest_apis()
-    return response
-
-# Monitoring and Management
-def list_cloudwatch_alarms(region):
-    cloudwatch = boto3.client('cloudwatch', region_name=region)
-    response = cloudwatch.describe_alarms()
-    return response
-
-def list_cloudtrail_trails(region):
-    cloudtrail = boto3.client('cloudtrail', region_name=region)
-    response = cloudtrail.describe_trails()
-    return response
-
-def list_config_rules(region):
-    config = boto3.client('config', region_name=region)
-    response = config.describe_config_rules()
-    return response
-
-# IAM and Security
-def list_iam_users(region):
-    iam = boto3.client('iam')
-    response = iam.list_users()
-    return response
-
-def list_kms_keys(region):
-    kms = boto3.client('kms', region_name=region)
-    response = kms.list_keys()
-    return response
-
-def list_secrets_manager_secrets(region):
-    secretsmanager = boto3.client('secretsmanager', region_name=region)
-    response = secretsmanager.list_secrets()
-    return response
-
-def list_waf_rules(region):
-    waf = boto3.client('waf')
-    response = waf.list_rules()
-    return response
-
-def list_shield_protections(region):
-    shield = boto3.client('shield')
-    response = shield.list_protections()
-    return response
-
-# Machine Learning
-def list_sagemaker_endpoints(region):
-    sagemaker = boto3.client('sagemaker', region_name=region)
-    response = sagemaker.list_endpoints()
-    return response
-
-def list_rekognition_collections(region):
-    rekognition = boto3.client('rekognition', region_name=region)
-    response = rekognition.list_collections()
-    return response
-
-def list_comprehend_datasets(region):
-    comprehend = boto3.client('comprehend', region_name=region)
-    response = comprehend.list_datasets()
-    return response
-
-# Analytics
-def list_glue_jobs(region):
-    glue = boto3.client('glue', region_name=region)
-    response = glue.list_jobs()
-    return response
-
-# Application Integration
-def list_sns_topics(region):
-    sns = boto3.client('sns', region_name=region)
-    response = sns.list_topics()
-    return response
-
-def list_sqs_queues(region):
-    sqs = boto3.client('sqs', region_name=region)
-    response = sqs.list_queues()
-    return response
-
-def list_step_functions(region):
-    sfn = boto3.client('stepfunctions', region_name=region)
-    response = sfn.list_state_machines()
-    return response
-
-# Management & Governance
-def list_cloudformation_stacks(region):
-    cloudformation = boto3.client('cloudformation', region_name=region)
-    response = cloudformation.describe_stacks()
-    return response
-
-# Inventory of used services
-def list_used_services():
+def list_used_services(policy_file):
     """
     Inventory AWS services used for a given account across all available regions.
-    
+
+    :param policy_file: The path to the IAM policy file
+    :type policy_file: str
     :return: Dictionary of services and their resources grouped by categories
     :rtype: dict
     """
+
+    global results
+
     start_time = time.time()
     
     regions = get_all_regions()
@@ -231,81 +260,19 @@ def list_used_services():
         write_log("Unable to retrieve the list of regions.")
         return
 
-    services = {
-        'Compute': {
-            'EC2 Instances': list_ec2_instances,
-            'ECS Clusters': list_ecs_clusters,
-            'EKS Clusters': list_eks_clusters,
-            'Lambda Functions': list_lambda_functions,
-            'Lightsail Instances': list_lightsail_instances,
-        },
-        'Storage': {
-            'S3 Buckets (global)': list_s3_buckets,
-            'EBS Volumes': list_ebs_volumes,
-            'EFS File Systems': list_efs_file_systems,
-        },
-        'Databases': {
-            'RDS Instances': list_rds_instances,
-            'DynamoDB Tables': list_dynamodb_tables,
-            'Redshift Clusters': list_redshift_clusters,
-            'ElastiCache Clusters': list_elasticache_clusters,
-        },
-        'Networking': {
-            'VPCs': list_vpcs,
-            'ELB Load Balancers': list_elb_load_balancers,
-            'CloudFront Distributions (global)': list_cloudfront_distributions,
-            'Route 53 Hosted Zones (global)': list_route53_hosted_zones,
-            'API Gateways': list_api_gateways,
-        },
-        'Monitoring and Management': {
-            'CloudWatch Alarms': list_cloudwatch_alarms,
-            'CloudTrail Trails': list_cloudtrail_trails,
-            'Config Rules': list_config_rules,
-        },
-        'IAM and Security': {
-            'IAM Users (global)': list_iam_users,
-            'KMS Keys': list_kms_keys,
-            'Secrets Manager Secrets': list_secrets_manager_secrets,
-            'WAF Rules': list_waf_rules,
-            'Shield Protections': list_shield_protections,
-        },
-        'Machine Learning': {
-            'SageMaker Endpoints': list_sagemaker_endpoints,
-            'Rekognition Collections': list_rekognition_collections,
-            'Comprehend Datasets': list_comprehend_datasets,
-        },
-        'Analytics': {
-            'Glue Jobs': list_glue_jobs,
-        },
-        'Application Integration': {
-            'SNS Topics': list_sns_topics,
-            'SQS Queues': list_sqs_queues,
-            'Step Functions': list_step_functions,
-        },
-        'Management & Governance': {
-            'CloudFormation Stacks': list_cloudformation_stacks,
-        }
-    }
-
-    results = {}
-
+    services = create_services_structure(policy_file)
     thread_list = []
 
-    # Global services (no need to iterate over regions)
-    for category, service_dict in services.items():
-        for service, func in service_dict.items():
-            if "global" in service:
-                write_log(f"Querying service: {service}, function: {func.__name__}")
-                thread = AWSThread(func, None, results, service)
-                thread_list.append(thread)
-            else:
-                # For regional services, iterate over each region
-                for region in regions:
-                    region_name = region['RegionName']
-                    write_log(f"Querying region: {region_name}, service: {service}, function: {func.__name__}")
-                    if test_region_connectivity(region_name):
-                        thread = AWSThread(func, region_name, results, f"{service} in {region_name}")
+    for region in regions:
+        region_name = region['RegionName']
+        if test_region_connectivity(region_name):
+            for category, service_dict in services.items():
+                for service, func_list in service_dict.items():
+                    for func in func_list:
+                        write_log(f"Querying region: {region_name}, service: {service}, function: {func}")
+                        thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}")
                         thread_list.append(thread)
+
 
     for thread in thread_list:
         thread.start()
@@ -324,8 +291,9 @@ def list_used_services():
     return results
 
 if __name__ == "__main__":
-    services_data = list_used_services()
-    for category, services in services_data.items():
-        print(f"\n{category}:")
-        for service, data in services.items():
-            print(f"  {service}: {data if data else 'No resources found.'}")
+    policy_file = 'inventory_policy_1.json'
+    services_data = list_used_services(policy_file)
+    #for category, services in services_data.items():
+    #    print(f"\n{category}:")
+    #    for service, data in services.items():
+    #        print(f"  {service}: {data if data else 'No resources found.'}")
