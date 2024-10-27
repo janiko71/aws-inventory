@@ -4,6 +4,8 @@
         {
             "Effect": "Allow",
             "Action": [
+                "ec2:DescribeRegions",
+                "ec2:DescribeAvailabilityZones",
                 "ec2:DescribeInstances",
                 "ec2:DescribeVolumes",
                 "ec2:DescribeSecurityGroups",
@@ -33,9 +35,41 @@
                 "ec2:DescribeVpcClassicLink",
                 "ec2:DescribeVpcEndpoints",
                 "ec2:DescribeVpnConnections",
-                "ec2:DescribeVpnGateways"
+                "ec2:DescribeVpnGateways",
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "elasticfilesystem:DescribeFileSystems",
+                "rds:DescribeDBInstances",
+                "rds:DescribeDBClusters",
+                "elasticache:DescribeCacheClusters",
+                "qldb:ListLedgers",
+                "dynamodb:ListTables",
+                "dynamodb:DescribeEndpoints",
+                "neptune-db:ListMLEndpoints",
+                "fsx:DescribeBackups",
+                "fsx:DescribeVolumes",
+                "fsx:DescribeStorageVirtualMachines",
+                "glacier:ListVaults",
+                "glacier:ListParts",
+                "glacier:ListProvisionedCapacity",
+                "memorydb:DescribeClusters",
+                "lightsail:GetBuckets",
+                "lightsail:GetDisks",
+                "lightsail:GetDomains",
+                "lightsail:GetInstances",
+                "lightsail:GetKeyPairs",
+                "lightsail:GetLoadBalancers",
+                "lightsail:GetOperations",
+                "lightsail:GetRelationalDatabases",
+                "lightsail:GetStaticIps",
+                "lambda:ListFunctions",
+                "secretsmanager:ListSecrets",
+                "kms:ListKeys"
             ],
-            "Resource": "*"
+            "Resource": [
+                "*",
+                "*"
+            ]
         }
     ]
 }
