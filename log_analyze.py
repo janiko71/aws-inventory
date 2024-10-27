@@ -23,7 +23,7 @@ def analyze_log_file(log_file_path):
     return error_services
 
 # Path to the log file
-log_file_path = 'log/log_20241026_183953.log'
+log_file_path = 'log/log_20241027_192917.log'
 
 # Analyze the log file
 error_services = analyze_log_file(log_file_path)

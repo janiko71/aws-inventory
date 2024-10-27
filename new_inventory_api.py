@@ -1,5 +1,3 @@
-# To do : vérifier compteur (penser aux appels en échec), voir les appels qui demandent des détails (comme VPC). Mettre une correspondance (dire quelle fonction appeler) et ajouter cela
-# au résultat final par programme. Il se peut que certains services demandent plusieurs détails. 
 """
 AWS Inventory Script
 
@@ -8,6 +6,7 @@ It uses multithreading to perform inventory operations concurrently.
 
 Modules:
     threading
+    botocore
     boto3
     json
     os
@@ -35,6 +34,7 @@ Functions:
 
 import threading
 import boto3
+import botocore
 import json
 import os
 import sys
@@ -70,11 +70,15 @@ total_tasks = 0  # Counter for the total number of tasks
 completed_tasks = 0  # Counter for the number of completed tasks
 progress_bar = None  # Progress bar object
 
+# Service response counters
+successful_services = 0  # Counter for the number of successful service responses
+failed_services = 0  # Counter for the number of failed service responses
+
 # Determine the number of CPU cores
 num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
-num_threads = num_cores * 2  # You can adjust this multiplier based on your needs
+num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
 
 class InventoryThread(threading.Thread):
     """Thread class for performing inventory tasks."""
@@ -101,7 +105,7 @@ class InventoryThread(threading.Thread):
 
     def run(self):
         """Run the inventory task."""
-        global results, boto3_clients
+        global results, boto3_clients, successful_services, failed_services
         write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
         try:
             client_key = (self.service, self.region)
@@ -112,7 +116,7 @@ class InventoryThread(threading.Thread):
             # First sub-task: API call
             start_time = time.time()
             inventory = client.__getattribute__(self.func)()
-            self.progress_callback(0.5)  # Update progress bar by 0.5 task
+            self.progress_callback(1)  # Update progress bar by 1 task
             end_time = time.time()
             write_log(f"API call for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
             
@@ -131,11 +135,19 @@ class InventoryThread(threading.Thread):
             # Second sub-task: Processing results
             start_time = time.time()
             results[self.category][self.service][object_type][self.region] = inventory
-            self.progress_callback(0.5)  # Update progress bar by 0.5 task
+            self.progress_callback(1)  # Update progress bar by 1 task
             end_time = time.time()
             write_log(f"Processing results for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
-        except Exception as e:
-            write_log(f"Error querying {self.service} in {self.region} using {self.func}: {e}")
+            successful_services += 1  # Increment successful services counter
+
+        except botocore.exceptions.ClientError as e1:
+            write_log(f"Error (1) querying {self.service} in {self.region} using {self.func}: {e1} ({type(e1)})")
+            failed_services += 1  # Increment failed services counter
+            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
+        except Exception as e2:
+            write_log(f"Error (2) querying {self.service} in {self.region} using {self.func}: {e2} ({type(e2)})")
+            failed_services += 1  # Increment failed services counter
+            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
         finally:
             write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
 
@@ -282,7 +294,7 @@ def list_used_services(policy_file):
     Returns:
         dict: A dictionary of the used services.
     """
-    global results, total_tasks, progress_bar
+    global results, total_tasks, progress_bar, successful_services, failed_services
 
     start_time = time.time()
     
@@ -306,11 +318,11 @@ def list_used_services(policy_file):
                 for service, func_list in service_dict.items():
                     for func in func_list:
                         write_log(f"Querying region: {region_name}, service: {service}, function: {func}")
-                        total_tasks += 1  # Increment total_tasks for each task
+                        total_tasks += 2  # Increment total_tasks for each sub-task
                         thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}", progress_callback)
                         thread_list.append(thread)
 
-    # Initialize progress bar with double the total tasks
+    # Initialize progress bar with the total number of sub-tasks
     progress_bar = tqdm(total=total_tasks, desc="Inventory Progress", unit="sub-task")
 
     # Use ThreadPoolExecutor to manage the threads
@@ -324,6 +336,9 @@ def list_used_services(policy_file):
     execution_time = end_time - start_time
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
+    print(f"Total services called: {total_tasks // 2}")  # Divide by 2 to get the actual number of services called
+    print(f"Successful services: {successful_services}")
+    print(f"Failed services: {failed_services}")
     
     with open(json_file_path, "w") as json_file:
         json.dump(results, json_file, indent=4, default=json_serial)
