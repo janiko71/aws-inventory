@@ -73,6 +73,7 @@ progress_bar = None  # Progress bar object
 # Service response counters
 successful_services = 0  # Counter for the number of successful service responses
 failed_services = 0  # Counter for the number of failed service responses
+skipped_services = 0  # Counter for skipped services
 
 # Determine the number of CPU cores
 num_cores = multiprocessing.cpu_count()
@@ -105,55 +106,61 @@ class InventoryThread(threading.Thread):
 
     def run(self):
         """Run the inventory task."""
-        global results, boto3_clients, successful_services, failed_services
-        write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
-        try:
-            client_key = (self.service, self.region)
-            if client_key not in boto3_clients:
-                boto3_clients[client_key] = boto3.client(self.service.lower(), region_name=self.region)
-            client = boto3_clients[client_key]
-            
-            # First sub-task: API call
-            start_time = time.time()
-            inventory = client.__getattribute__(self.func)()
-            self.progress_callback(1)  # Update progress bar by 1 task
-            end_time = time.time()
-            write_log(f"API call for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
-            
-            if not with_meta:
-                inventory.pop('ResponseMetadata', None)
-            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
-            if self.category not in results:
-                results[self.category] = {}
-            if self.service not in results[self.category]:
-                results[self.category][self.service] = {}
-            if object_type not in results[self.category][self.service]:
-                results[self.category][self.service][object_type] = {}
-            if self.region not in results[self.category][self.service][object_type]:
-                results[self.category][self.service][object_type][self.region] = {}
-            
-            # Second sub-task: Processing results
-            start_time = time.time()
-            results[self.category][self.service][object_type][self.region] = inventory
-            self.progress_callback(1)  # Update progress bar by 1 task
-            end_time = time.time()
-            write_log(f"Processing results for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
-            successful_services += 1  # Increment successful services counter
+        global results, boto3_clients, successful_services, failed_services, skipped_services
+        if with_extra or self.func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
+            write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
+            try:
+                client_key = (self.service, self.region)
+                if client_key not in boto3_clients:
+                    boto3_clients[client_key] = boto3.client(self.service.lower(), region_name=self.region)
+                client = boto3_clients[client_key]
+                
+                # First sub-task: API call
+                start_time = time.time()
+                inventory = client.__getattribute__(self.func)()
+                self.progress_callback(1)  # Update progress bar by 1 task
+                end_time = time.time()
+                write_log(f"API call for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
+                
+                if not with_meta:
+                    inventory.pop('ResponseMetadata', None)
+                object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+                if self.category not in results:
+                    results[self.category] = {}
+                if self.service not in results[self.category]:
+                    results[self.category][self.service] = {}
+                if object_type not in results[self.category][self.service]:
+                    results[self.category][self.service][object_type] = {}
+                if self.region not in results[self.category][self.service][object_type]:
+                    results[self.category][self.service][object_type][self.region] = {}
+                
+                # Second sub-task: Processing results
+                start_time = time.time()
+                results[self.category][self.service][object_type][self.region] = inventory
+                self.progress_callback(1)  # Update progress bar by 1 task
+                end_time = time.time()
+                write_log(f"Processing results for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
+                successful_services += 1  # Increment successful services counter
 
-        except AttributeError as e1:
-            write_log(f"Error (1) querying {self.service} in {self.region} using {self.func}: {e1} ({type(e1)})")
-            failed_services += 1  # Increment failed services counter
-            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        except botocore.exceptions.ClientError as e2:
-            write_log(f"Error (2) querying {self.service} in {self.region} using {self.func}: {e2} ({type(e2)})")
-            failed_services += 1  # Increment failed services counter
-            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        except Exception as e:
-            write_log(f"Error (e) querying {self.service} in {self.region} using {self.func}: {e} ({type(e)})")
-            failed_services += 1  # Increment failed services counter
-            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        finally:
-            write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
+            except AttributeError as e1:
+                write_log(f"Error (1) querying {self.service} in {self.region} using {self.func}: {e1} ({type(e1)})")
+                failed_services += 1  # Increment failed services counter
+                self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
+            except botocore.exceptions.ClientError as e2:
+                write_log(f"Error (2) querying {self.service} in {self.region} using {self.func}: {e2} ({type(e2)})")
+                failed_services += 1  # Increment failed services counter
+                self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
+            except Exception as e:
+                write_log(f"Error (e) querying {self.service} in {self.region} using {self.func}: {e} ({type(e)})")
+                failed_services += 1  # Increment failed services counter
+                self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
+            finally:
+                write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
+
+        else:
+            skipped_services += 1  # Increment failed services counter
+            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service                
+            write_log(f"Inventory for {self.service} in {self.region} using {self.func} skipped!")
 
 def write_log(message):
     """
@@ -207,13 +214,7 @@ def transform_function_name(func_name):
     #return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
     return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', func_name)).lower()
 
-def remove_availability_zones(results):
-    for category in results.values():
-        for service in category.values():
-            for object_type in service.values():
-                if 'AvailabilityZones' in object_type:
-                    del object_type['AvailabilityZones']
-                    
+
 def json_serial(obj):
     """
     JSON serializer for objects not serializable by default.
@@ -351,6 +352,7 @@ def list_used_services(policy_file):
     print(f"Total services called: {total_tasks // 2}")  # Divide by 2 to get the actual number of services called
     print(f"Successful services: {successful_services}")
     print(f"Failed services: {failed_services}")
+    print(f"Skipped services: {skipped_services}")
     
     with open(json_file_path, "w") as json_file:
         json.dump(results, json_file, indent=4, default=json_serial)
@@ -361,12 +363,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
     parser.add_argument('--policy-file', type=str, default='inventory_policy_1.json', help='The path to the IAM policy file')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
+    parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
     args = parser.parse_args()
 
     policy_file = args.policy_file
     with_meta = args.with_meta
+    with_extra = args.with_extra
 
     services_data = list_used_services(policy_file)
-
-    # With ou without AvailabilityZones
-    remove_availability_zones(services_data)    

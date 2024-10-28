@@ -6,6 +6,7 @@
             "Action": [
                 "ec2:DescribeRegions",
                 "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeAccountAttributes",
                 "ec2:DescribeInstances",
                 "ec2:DescribeVolumes",
                 "ec2:DescribeSecurityGroups",
@@ -18,7 +19,6 @@
                 "ec2:DescribeInternetGateways",
                 "ec2:DescribeIpv6Pools",
                 "ec2:DescribeNatGateways",
-                "ec2:DescribeAccountAttributes",
                 "ec2:DescribeCustomerGateways",
                 "ec2:DescribeDhcpOptions",
                 "ec2:DescribeEgressOnlyInternetGateways",
