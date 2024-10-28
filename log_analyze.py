@@ -1,3 +1,7 @@
+
+# Path to the log file
+log_file_path = 'log/log_20241028_121611.log'
+
 def analyze_log_file(log_file_path):
     """
     Analyze the log file to identify services that encountered errors.
@@ -21,9 +25,6 @@ def analyze_log_file(log_file_path):
                     error_services.add(service_name)
 
     return error_services
-
-# Path to the log file
-log_file_path = 'log/log_20241027_192917.log'
 
 # Analyze the log file
 error_services = analyze_log_file(log_file_path)

@@ -140,12 +140,16 @@ class InventoryThread(threading.Thread):
             write_log(f"Processing results for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
             successful_services += 1  # Increment successful services counter
 
-        except botocore.exceptions.ClientError as e1:
+        except AttributeError as e1:
             write_log(f"Error (1) querying {self.service} in {self.region} using {self.func}: {e1} ({type(e1)})")
             failed_services += 1  # Increment failed services counter
             self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        except Exception as e2:
+        except botocore.exceptions.ClientError as e2:
             write_log(f"Error (2) querying {self.service} in {self.region} using {self.func}: {e2} ({type(e2)})")
+            failed_services += 1  # Increment failed services counter
+            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
+        except Exception as e:
+            write_log(f"Error (e) querying {self.service} in {self.region} using {self.func}: {e} ({type(e)})")
             failed_services += 1  # Increment failed services counter
             self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
         finally:
@@ -200,7 +204,9 @@ def transform_function_name(func_name):
     Returns:
         str: The snake_case function name.
     """
-    return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
+    #return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
+    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', func_name)).lower()
+
 
 def json_serial(obj):
     """
