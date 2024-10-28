@@ -1,6 +1,10 @@
+import os
+import glob
 
-# Path to the log file
-log_file_path = 'log/log_20241028_121611.log'
+# Get the most recent log file in the log directory
+log_dir = 'log'
+list_of_files = glob.glob(os.path.join(log_dir, 'log_*.log'))
+log_file_path = max(list_of_files, key=os.path.getctime)
 
 def analyze_log_file(log_file_path):
     """
@@ -10,7 +14,7 @@ def analyze_log_file(log_file_path):
         log_file_path (str): The path to the log file.
 
     Returns:
-        set: A set of unique services that encountered errors.
+        set: A set of unique resources and services that encountered errors.
     """
     error_services = set()
 
@@ -18,20 +22,22 @@ def analyze_log_file(log_file_path):
         for line in log_file:
             if "Error" in line or "Exception" in line:
                 print(f"Found error line: {line.strip()}")  # Debugging line
-                # Extract the service name from the error message
+                # Extract the resource name and service name from the error message
+                if "querying" in line:
+                    resource_name = line.split("querying")[1].split()[0].strip()
                 if "using" in line:
                     service_name = line.split("using")[1].split()[0].strip()
-                    print(f"Extracted service name: {service_name}")  # Debugging line
-                    error_services.add(service_name)
+                    print(f"Extracted resource name: {resource_name}, service name: {service_name}")  # Debugging line
+                    error_services.add(f"{resource_name}:{service_name}")
 
     return error_services
 
 # Analyze the log file
 error_services = analyze_log_file(log_file_path)
 
-# Print the unique services that encountered errors
+# Print the unique resources and services that encountered errors
 if error_services:
-    print("Services that encountered errors:")
+    print("Resources and services that encountered errors:")
     for service in error_services:
         print(service)
 else:
