@@ -207,7 +207,13 @@ def transform_function_name(func_name):
     #return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
     return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', func_name)).lower()
 
-
+def remove_availability_zones(results):
+    for category in results.values():
+        for service in category.values():
+            for object_type in service.values():
+                if 'AvailabilityZones' in object_type:
+                    del object_type['AvailabilityZones']
+                    
 def json_serial(obj):
     """
     JSON serializer for objects not serializable by default.
@@ -361,3 +367,6 @@ if __name__ == "__main__":
     with_meta = args.with_meta
 
     services_data = list_used_services(policy_file)
+
+    # With ou without AvailabilityZones
+    remove_availability_zones(services_data)    
