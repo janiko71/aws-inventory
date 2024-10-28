@@ -150,9 +150,12 @@ def inventory_handling(category, region, service, func, progress_callback):
             if region not in results[category][service][object_type]:
                 results[category][service][object_type][region] = {}
             
+            # Remove empty values except 'ResponseMetadata'
+            cleaned_inventory = {k: v for k, v in inventory.items() if k == 'ResponseMetadata' or not is_empty(v)}
+            
             # Second sub-task: Processing results
             start_time = time.time()
-            results[category][service][object_type][region] = inventory
+            results[category][service][object_type][region] = cleaned_inventory
             progress_callback(1)  # Update progress bar by 1 task
             end_time = time.time()
             write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
@@ -177,6 +180,23 @@ def inventory_handling(category, region, service, func, progress_callback):
         skipped_services += 1  # Increment failed services counter
         progress_callback(2)  # Update progress bar by 2 tasks for failed service                
         write_log(f"Inventory for {service} in {region} using {func} skipped!")
+
+
+def is_empty(value):
+    """
+    Check if a value is empty. This includes None, empty strings, empty lists, and empty dictionaries.
+
+    Args:
+        value (any): The value to check.
+
+    Returns:
+        bool: True if the value is empty, False otherwise.
+    """
+    if value is None:
+        return True
+    if isinstance(value, (str, list, dict)) and not value:
+        return True
+    return False
 
 
 def write_log(message):
