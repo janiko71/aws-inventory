@@ -30,7 +30,6 @@
                 "ec2:DescribeLaunchTemplates",
                 "ec2:DescribePlacementGroups",
                 "ec2:DescribeReservedInstances",
-                "ec2:DescribeVpcClassicLink",
                 "ec2:DescribeVpcEndpoints",
                 "ec2:DescribeVpnConnections",
                 "ec2:DescribeVpnGateways",
