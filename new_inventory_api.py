@@ -106,61 +106,78 @@ class InventoryThread(threading.Thread):
 
     def run(self):
         """Run the inventory task."""
-        global results, boto3_clients, successful_services, failed_services, skipped_services
-        if with_extra or self.func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
-            write_log(f"Starting inventory for {self.service} in {self.region} using {self.func}")
-            try:
-                client_key = (self.service, self.region)
-                if client_key not in boto3_clients:
-                    boto3_clients[client_key] = boto3.client(self.service.lower(), region_name=self.region)
-                client = boto3_clients[client_key]
-                
-                # First sub-task: API call
-                start_time = time.time()
-                inventory = client.__getattribute__(self.func)()
-                self.progress_callback(1)  # Update progress bar by 1 task
-                end_time = time.time()
-                write_log(f"API call for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
-                
-                if not with_meta:
-                    inventory.pop('ResponseMetadata', None)
-                object_type = list(inventory.keys())[0] if inventory else 'Unknown'
-                if self.category not in results:
-                    results[self.category] = {}
-                if self.service not in results[self.category]:
-                    results[self.category][self.service] = {}
-                if object_type not in results[self.category][self.service]:
-                    results[self.category][self.service][object_type] = {}
-                if self.region not in results[self.category][self.service][object_type]:
-                    results[self.category][self.service][object_type][self.region] = {}
-                
-                # Second sub-task: Processing results
-                start_time = time.time()
-                results[self.category][self.service][object_type][self.region] = inventory
-                self.progress_callback(1)  # Update progress bar by 1 task
-                end_time = time.time()
-                write_log(f"Processing results for {self.service} in {self.region} took {end_time - start_time:.2f} seconds")
-                successful_services += 1  # Increment successful services counter
+        inventory_handling(self.category, self.region, self.service, self.func, self.progress_callback)
 
-            except AttributeError as e1:
-                write_log(f"Error (1) querying {self.service} in {self.region} using {self.func}: {e1} ({type(e1)})")
-                failed_services += 1  # Increment failed services counter
-                self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-            except botocore.exceptions.ClientError as e2:
-                write_log(f"Error (2) querying {self.service} in {self.region} using {self.func}: {e2} ({type(e2)})")
-                failed_services += 1  # Increment failed services counter
-                self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-            except Exception as e:
-                write_log(f"Error (e) querying {self.service} in {self.region} using {self.func}: {e} ({type(e)})")
-                failed_services += 1  # Increment failed services counter
-                self.progress_callback(2)  # Update progress bar by 2 tasks for failed service
-            finally:
-                write_log(f"Completed inventory for {self.service} in {self.region} using {self.func}")
+def inventory_handling(category, region, service, func, progress_callback):
+    """
+    Handle the inventory task for a given service and region.
 
-        else:
-            skipped_services += 1  # Increment failed services counter
-            self.progress_callback(2)  # Update progress bar by 2 tasks for failed service                
-            write_log(f"Inventory for {self.service} in {self.region} using {self.func} skipped!")
+    Args:
+        category (str): The category of the service.
+        region (str): The AWS region.
+        service (str): The AWS service.
+        func (str): The function to call on the service.
+        progress_callback (function): A callback function to update the progress bar.
+
+    Returns:
+        None
+    """
+    global results, boto3_clients, successful_services, failed_services, skipped_services
+    if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
+        write_log(f"Starting inventory for {service} in {region} using {func}")
+        try:
+            client_key = (service, region)
+            if client_key not in boto3_clients:
+                boto3_clients[client_key] = boto3.client(service.lower(), region_name=region)
+            client = boto3_clients[client_key]
+            
+            # First sub-task: API call
+            start_time = time.time()
+            inventory = client.__getattribute__(func)()
+            progress_callback(1)  # Update progress bar by 1 task
+            end_time = time.time()
+            write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds")
+            
+            if not with_meta:
+                inventory.pop('ResponseMetadata', None)
+            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+            if category not in results:
+                results[category] = {}
+            if service not in results[category]:
+                results[category][service] = {}
+            if object_type not in results[category][service]:
+                results[category][service][object_type] = {}
+            if region not in results[category][service][object_type]:
+                results[category][service][object_type][region] = {}
+            
+            # Second sub-task: Processing results
+            start_time = time.time()
+            results[category][service][object_type][region] = inventory
+            progress_callback(1)  # Update progress bar by 1 task
+            end_time = time.time()
+            write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
+            successful_services += 1  # Increment successful services counter
+
+        except AttributeError as e1:
+            write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})")
+            failed_services += 1  # Increment failed services counter
+            progress_callback(2)  # Update progress bar by 2 tasks for failed service
+        except botocore.exceptions.ClientError as e2:
+            write_log(f"Error (2) querying {service} in {region} using {func}: {e2} ({type(e2)})")
+            failed_services += 1  # Increment failed services counter
+            progress_callback(2)  # Update progress bar by 2 tasks for failed service
+        except Exception as e:
+            write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})")
+            failed_services += 1  # Increment failed services counter
+            progress_callback(2)  # Update progress bar by 2 tasks for failed service
+        finally:
+            write_log(f"Completed inventory for {service} in {region} using {func}")
+
+    else:
+        skipped_services += 1  # Increment failed services counter
+        progress_callback(2)  # Update progress bar by 2 tasks for failed service                
+        write_log(f"Inventory for {service} in {region} using {func} skipped!")
+
 
 def write_log(message):
     """
