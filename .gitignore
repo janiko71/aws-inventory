@@ -2,6 +2,7 @@ __pycache__
 res/__pycache__/*
 output/*
 log/*
+output_policies
 launch.json
 venv
 .vscode
