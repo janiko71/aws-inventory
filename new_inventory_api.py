@@ -153,23 +153,22 @@ def inventory_handling(category, region, service, func, progress_callback):
                 results[category][service][object_type] = {}
 
             # Create region only if inventory not empty
-            object_inventory = inventory[object_type]
-            if (object_inventory is not None) or with_empty:
-                if len(object_inventory) > 0:
-                    if region not in results[category][service][object_type]:
-                        results[category][service][object_type][region] = {}
-            
-                    # Second sub-task: Processing results
-                    start_time = time.time()
-                    results[category][service][object_type][region] = inventory
-                    if with_meta:
-                        results[category][service][object_type][region].append(response_metadata)
-                    end_time = time.time()
-                    write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
-                    filled_services += 1
-                else:
-                    empty_services += 1
-                    write_log(f"Empty results for {service} in {region}")
+            non_empty_items = {k: v for k, v in inventory.items() if k != 'ResponseMetadata' and not is_empty(v)}
+            if non_empty_items or with_empty:
+                if region not in results[category][service][object_type]:
+                    results[category][service][object_type][region] = {}
+
+                # Second sub-task: Processing results
+                start_time = time.time()
+                results[category][service][object_type][region] = inventory
+                if with_meta:
+                    results[category][service][object_type][region]['ResponseMetadata'] = response_metadata
+                end_time = time.time()
+                write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
+                filled_services += 1
+            else:
+                empty_services += 1
+                write_log(f"Empty results for {service} in {region}")
             progress_callback(1)  # Update progress bar by 1 task
             successful_services += 1  # Increment successful services counter
 
@@ -205,7 +204,9 @@ def is_empty(value):
     """
     if value is None:
         return True
-    if isinstance(value, (str, list, dict)) and not value:
+    if isinstance(value, str) and not value.strip():  # Check empty string
+        return True
+    if isinstance(value, (list, dict)) and len(value) == 0:  # Check empty list or dict
         return True
     return False
 
