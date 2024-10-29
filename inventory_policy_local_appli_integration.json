@@ -1,0 +1,16 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:ListTopics",
+                "sns:ListSubscriptions",
+                "sqs:ListQueues",
+                "stepfunctions:ListStateMachines",
+                "stepfunctions:ListActivities"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

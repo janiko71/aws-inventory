@@ -4,9 +4,6 @@
         {
             "Effect": "Allow",
             "Action": [
-                "stepfunctions:ListStateMachines",
-                "stepfunctions:ListActivities",
-                "qldb:ListLedgers",
                 "managedblockchain:ListNetworks",
                 "managedblockchain:ListMembers",
                 "managedblockchain:ListNodes",
@@ -18,7 +15,7 @@
                 "braket:GetQuantumTask",
                 "braket:SearchDevices",
                 "braket:SearchQuantumTasks",
-                "braket:ListTagsForResource"
+                "braket:ListTagsForResource"                
             ],
             "Resource": "*"
         }

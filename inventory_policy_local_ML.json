@@ -1,0 +1,19 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:ListEndpoints",
+                "sagemaker:ListEndpointConfigs",
+                "sagemaker:ListModels",
+                "sagemaker:ListNotebookInstances",
+                "rekognition:ListCollections",
+                "rekognition:ListStreamProcessors",
+                "comprehend:ListDocumentClassifiers",
+                "comprehend:ListEntityRecognizers"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

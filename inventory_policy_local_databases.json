@@ -1,0 +1,35 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds:DescribeDBInstances",
+                "rds:DescribeDBClusters",
+                "rds:DescribeDBSnapshots",
+                "rds:DescribeDBSubnetGroups",
+                "rds:DescribeEventSubscriptions",
+                "rds:DescribeOptionGroups",
+                "rds:DescribeReservedDBInstances",
+                "elasticache:DescribeCacheClusters",
+                "elasticache:DescribeCacheSubnetGroups",
+                "elasticache:DescribeReplicationGroups",
+                "elasticache:DescribeReservedCacheNodes",
+                "dynamodb:ListTables",
+                "dynamodb:DescribeEndpoints",
+                "dynamodb:DescribeTable",
+                "dynamodb:ListTagsOfResource",
+                "neptune-db:ListMLEndpoints",
+                "neptune:DescribeDBInstances",
+                "neptune:DescribeDBClusters",
+                "neptune:DescribeDBSubnetGroups",
+                "neptune:DescribeReservedDBInstances",
+                "memorydb:DescribeClusters",
+                "memorydb:DescribeSnapshots",
+                "memorydb:DescribeSubnetGroups",
+                "memorydb:DescribeUsers"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
