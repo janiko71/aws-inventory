@@ -44,7 +44,7 @@ def analyze_log_file(log_file_path):
 # ------------------------------------------------------------------------------
 
 # Analyze the log file
-error_services = analyze_log_file(log_file_path)
+error_services = sorted(analyze_log_file(log_file_path))
 
 # ------------------------------------------------------------------------------
 

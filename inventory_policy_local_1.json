@@ -47,7 +47,6 @@
                 "elasticache:DescribeCacheSubnetGroups",
                 "elasticache:DescribeReplicationGroups",
                 "elasticache:DescribeReservedCacheNodes",
-                "qldb:ListLedgers",
                 "dynamodb:ListTables",
                 "dynamodb:DescribeEndpoints",
                 "dynamodb:DescribeTable",

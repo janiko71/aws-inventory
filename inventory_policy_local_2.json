@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "stepfunctions:ListStateMachines",
+                "stepfunctions:ListActivities",
+                "qldb:ListLedgers",
+                "managedblockchain:ListNetworks",
+                "managedblockchain:ListMembers",
+                "managedblockchain:ListNodes",
+                "managedblockchain:ListProposals",
+                "managedblockchain:GetNetwork",
+                "managedblockchain:GetMember",
+                "managedblockchain:GetNode",
+                "braket:GetDevice",
+                "braket:GetQuantumTask",
+                "braket:SearchDevices",
+                "braket:SearchQuantumTasks",
+                "braket:ListTagsForResource"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

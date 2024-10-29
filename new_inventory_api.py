@@ -32,9 +32,9 @@ Functions:
     # Inventory Management Functions
     get_all_regions()
     test_region_connectivity(region)
-    create_services_structure(policy_file)
+    create_services_structure(policy_files)
     inventory_handling(category, region, service, func, progress_callback)
-    list_used_services(policy_file)
+    list_used_services(policy_files)
 
     # Main Function
     main()
@@ -53,6 +53,7 @@ import argparse
 import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
+import glob
 
 # Ensure log directory exists
 log_dir = "log"
@@ -226,12 +227,12 @@ def test_region_connectivity(region):
 
 # ------------------------------------------------------------------------------
 
-def create_services_structure(policy_file):
+def create_services_structure(policy_files):
     """
-    Create a structure of services based on the provided IAM policy file.
+    Create a structure of services based on the provided IAM policy files.
 
     Args:
-        policy_file (str): The path to the IAM policy file.
+        policy_files (list): A list of paths to the IAM policy files.
 
     Returns:
         dict: A dictionary structure of services.
@@ -272,22 +273,22 @@ def create_services_structure(policy_file):
         'cloudformation': 'Management & Governance'
     }
 
-    with open(policy_file, 'r') as file:
-        policy = json.load(file)
-
     services = {}
-    for statement in policy.get('Statement', []):
-        for action in statement.get('Action', []):
-            service_prefix, action_name = action.split(':')
-            if service_prefix in service_to_category:
-                category = service_to_category[service_prefix]
-                if category not in services:
-                    services[category] = {}
-                if service_prefix not in services[category]:
-                    services[category][service_prefix] = []
-                transformed_action_name = transform_function_name(action_name)
-                if transformed_action_name not in services[category][service_prefix]:
-                    services[category][service_prefix].append(transformed_action_name)
+    for policy_file in policy_files:
+        with open(policy_file, 'r') as file:
+            policy = json.load(file)
+            for statement in policy.get('Statement', []):
+                for action in statement.get('Action', []):
+                    service_prefix, action_name = action.split(':')
+                    if service_prefix in service_to_category:
+                        category = service_to_category[service_prefix]
+                        if category not in services:
+                            services[category] = {}
+                        if service_prefix not in services[category]:
+                            services[category][service_prefix] = []
+                        transformed_action_name = transform_function_name(action_name)
+                        if transformed_action_name not in services[category][service_prefix]:
+                            services[category][service_prefix].append(transformed_action_name)
 
     return services
 
@@ -377,12 +378,12 @@ def inventory_handling(category, region, service, func, progress_callback):
 
 # ------------------------------------------------------------------------------
 
-def list_used_services(policy_file):
+def list_used_services(policy_files):
     """
-    List used services based on the provided IAM policy file.
+    List used services based on the provided IAM policy files.
 
     Args:
-        policy_file (str): The path to the IAM policy file.
+        policy_files (list): A list of paths to the IAM policy files.
 
     Returns:
         dict: A dictionary of the used services.
@@ -397,7 +398,7 @@ def list_used_services(policy_file):
         write_log("Unable to retrieve the list of regions.")
         return
 
-    services = create_services_structure(policy_file)
+    services = create_services_structure(policy_files)
     thread_list = []
 
     def progress_callback(amount):
@@ -445,15 +446,22 @@ def list_used_services(policy_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
-    parser.add_argument('--policy-file', type=str, default='inventory_policy_1.json', help='The path to the IAM policy file')
+    parser.add_argument('--policy-dir', type=str, default='.', help='The directory containing the IAM policy files')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
     parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
     parser.add_argument('--with-empty', action='store_true', help='Include empty values in the inventory')
     args = parser.parse_args()
 
-    policy_file = args.policy_file
+    policy_dir = args.policy_dir
     with_meta = args.with_meta
     with_extra = args.with_extra
     with_empty = args.with_empty
 
-    services_data = list_used_services(policy_file)
+    # Find all policy files matching the pattern inventory_policy_local_X.json
+    policy_files = glob.glob(os.path.join(policy_dir, 'inventory_policy_local_*.json'))
+
+    if not policy_files:
+        print("No policy files found.")
+        sys.exit(1)
+
+    services_data = list_used_services(policy_files)
