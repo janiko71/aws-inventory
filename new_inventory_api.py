@@ -23,13 +23,21 @@ Classes:
     InventoryThread
 
 Functions:
+    # Utility Functions
     write_log(message)
-    get_all_regions()
-    test_region_connectivity(region)
     transform_function_name(func_name)
     json_serial(obj)
+    is_empty(value)
+
+    # Inventory Management Functions
+    get_all_regions()
+    test_region_connectivity(region)
     create_services_structure(policy_file)
+    inventory_handling(category, region, service, func, progress_callback)
     list_used_services(policy_file)
+
+    # Main Function
+    main()
 """
 
 import threading
@@ -83,6 +91,10 @@ num_cores = multiprocessing.cpu_count()
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
 
+# ------------------------------------------------------------------------------
+
+# Multithreading Class
+
 class InventoryThread(threading.Thread):
     """Thread class for performing inventory tasks."""
 
@@ -109,6 +121,177 @@ class InventoryThread(threading.Thread):
     def run(self):
         """Run the inventory task."""
         inventory_handling(self.category, self.region, self.service, self.func, self.progress_callback)
+
+# ------------------------------------------------------------------------------
+
+# Utility Functions
+
+def write_log(message):
+    """
+    Write a log message to the log file.
+
+    Args:
+        message (str): The message to log.
+    """
+    with open(log_file_path, "a") as log_file:
+        log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
+
+# ------------------------------------------------------------------------------
+
+def transform_function_name(func_name):
+    """
+    Transform a CamelCase function name to snake_case.
+
+    Args:
+        func_name (str): The CamelCase function name.
+
+    Returns:
+        str: The snake_case function name.
+    """
+    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', func_name)).lower()
+
+# ------------------------------------------------------------------------------
+
+def json_serial(obj):
+    """
+    JSON serializer for objects not serializable by default.
+
+    Args:
+        obj (any): The object to serialize.
+
+    Returns:
+        str: The serialized object.
+
+    Raises:
+        TypeError: If the object is not serializable.
+    """
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError("Type not serializable")
+
+# ------------------------------------------------------------------------------
+
+def is_empty(value):
+    """
+    Check if a value is empty. This includes None, empty strings, empty lists, and empty dictionaries.
+
+    Args:
+        value (any): The value to check.
+
+    Returns:
+        bool: True if the value is empty, False otherwise.
+    """
+    if value is None:
+        return True
+    if isinstance(value, str) and not value.strip():  # Check empty string
+        return True
+    if isinstance(value, (list, dict)) and len(value) == 0:  # Check empty list or dict
+        return True
+    return False
+
+# ------------------------------------------------------------------------------
+
+# Inventory Management Functions
+
+def get_all_regions():
+    """
+    Retrieve all AWS regions.
+
+    Returns:
+        list: A list of all AWS regions.
+    """
+    ec2 = boto3.client('ec2')
+    response = ec2.describe_regions()
+    return response['Regions']
+
+# ------------------------------------------------------------------------------
+
+def test_region_connectivity(region):
+    """
+    Test connectivity to a specific AWS region.
+
+    Args:
+        region (str): The AWS region to test.
+
+    Returns:
+        bool: True if the region is reachable, False otherwise.
+    """
+    ec2 = boto3.client('ec2', region_name=region)
+    try:
+        ec2.describe_availability_zones()
+        return True
+    except Exception as e:
+        write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
+        return False
+
+# ------------------------------------------------------------------------------
+
+def create_services_structure(policy_file):
+    """
+    Create a structure of services based on the provided IAM policy file.
+
+    Args:
+        policy_file (str): The path to the IAM policy file.
+
+    Returns:
+        dict: A dictionary structure of services.
+    """
+    service_to_category = {
+        'ec2': 'Compute',
+        'ecs': 'Compute',
+        'eks': 'Compute',
+        'lambda': 'Compute',
+        'lightsail': 'Compute',
+        's3': 'Storage',
+        'ebs': 'Storage',
+        'efs': 'Storage',
+        'rds': 'Databases',
+        'dynamodb': 'Databases',
+        'redshift': 'Databases',
+        'elasticache': 'Databases',
+        'vpc': 'Networking',
+        'elb': 'Networking',
+        'cloudfront': 'Networking',
+        'route53': 'Networking',
+        'apigateway': 'Networking',
+        'cloudwatch': 'Monitoring and Management',
+        'cloudtrail': 'Monitoring and Management',
+        'config': 'Monitoring and Management',
+        'iam': 'IAM and Security',
+        'kms': 'IAM and Security',
+        'secretsmanager': 'IAM and Security',
+        'waf': 'IAM and Security',
+        'shield': 'IAM and Security',
+        'sagemaker': 'Machine Learning',
+        'rekognition': 'Machine Learning',
+        'comprehend': 'Machine Learning',
+        'glue': 'Analytics',
+        'sns': 'Application Integration',
+        'sqs': 'Application Integration',
+        'stepfunctions': 'Application Integration',
+        'cloudformation': 'Management & Governance'
+    }
+
+    with open(policy_file, 'r') as file:
+        policy = json.load(file)
+
+    services = {}
+    for statement in policy.get('Statement', []):
+        for action in statement.get('Action', []):
+            service_prefix, action_name = action.split(':')
+            if service_prefix in service_to_category:
+                category = service_to_category[service_prefix]
+                if category not in services:
+                    services[category] = {}
+                if service_prefix not in services[category]:
+                    services[category][service_prefix] = []
+                transformed_action_name = transform_function_name(action_name)
+                if transformed_action_name not in services[category][service_prefix]:
+                    services[category][service_prefix].append(transformed_action_name)
+
+    return services
+
+# ------------------------------------------------------------------------------
 
 def inventory_handling(category, region, service, func, progress_callback):
     """
@@ -192,159 +375,7 @@ def inventory_handling(category, region, service, func, progress_callback):
         progress_callback(2)  # Update progress bar by 2 tasks for failed service                
         write_log(f"Inventory for {service} in {region} using {func} skipped!")
 
-def is_empty(value):
-    """
-    Check if a value is empty. This includes None, empty strings, empty lists, and empty dictionaries.
-
-    Args:
-        value (any): The value to check.
-
-    Returns:
-        bool: True if the value is empty, False otherwise.
-    """
-    if value is None:
-        return True
-    if isinstance(value, str) and not value.strip():  # Check empty string
-        return True
-    if isinstance(value, (list, dict)) and len(value) == 0:  # Check empty list or dict
-        return True
-    return False
-
-
-def write_log(message):
-    """
-    Write a log message to the log file.
-
-    Args:
-        message (str): The message to log.
-    """
-    with open(log_file_path, "a") as log_file:
-        log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
-
-def get_all_regions():
-    """
-    Retrieve all AWS regions.
-
-    Returns:
-        list: A list of all AWS regions.
-    """
-    ec2 = boto3.client('ec2')
-    response = ec2.describe_regions()
-    return response['Regions']
-
-def test_region_connectivity(region):
-    """
-    Test connectivity to a specific AWS region.
-
-    Args:
-        region (str): The AWS region to test.
-
-    Returns:
-        bool: True if the region is reachable, False otherwise.
-    """
-    ec2 = boto3.client('ec2', region_name=region)
-    try:
-        ec2.describe_availability_zones()
-        return True
-    except Exception as e:
-        write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
-        return False
-
-def transform_function_name(func_name):
-    """
-    Transform a CamelCase function name to snake_case.
-
-    Args:
-        func_name (str): The CamelCase function name.
-
-    Returns:
-        str: The snake_case function name.
-    """
-    #return re.sub(r'(?<!^)(?=[A-Z])', '_', func_name).lower()
-    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', func_name)).lower()
-
-
-def json_serial(obj):
-    """
-    JSON serializer for objects not serializable by default.
-
-    Args:
-        obj (any): The object to serialize.
-
-    Returns:
-        str: The serialized object.
-
-    Raises:
-        TypeError: If the object is not serializable.
-    """
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    raise TypeError("Type not serializable")
-
-def create_services_structure(policy_file):
-    """
-    Create a structure of services based on the provided IAM policy file.
-
-    Args:
-        policy_file (str): The path to the IAM policy file.
-
-    Returns:
-        dict: A dictionary structure of services.
-    """
-    service_to_category = {
-        'ec2': 'Compute',
-        'ecs': 'Compute',
-        'eks': 'Compute',
-        'lambda': 'Compute',
-        'lightsail': 'Compute',
-        's3': 'Storage',
-        'ebs': 'Storage',
-        'efs': 'Storage',
-        'rds': 'Databases',
-        'dynamodb': 'Databases',
-        'redshift': 'Databases',
-        'elasticache': 'Databases',
-        'vpc': 'Networking',
-        'elb': 'Networking',
-        'cloudfront': 'Networking',
-        'route53': 'Networking',
-        'apigateway': 'Networking',
-        'cloudwatch': 'Monitoring and Management',
-        'cloudtrail': 'Monitoring and Management',
-        'config': 'Monitoring and Management',
-        'iam': 'IAM and Security',
-        'kms': 'IAM and Security',
-        'secretsmanager': 'IAM and Security',
-        'waf': 'IAM and Security',
-        'shield': 'IAM and Security',
-        'sagemaker': 'Machine Learning',
-        'rekognition': 'Machine Learning',
-        'comprehend': 'Machine Learning',
-        'glue': 'Analytics',
-        'sns': 'Application Integration',
-        'sqs': 'Application Integration',
-        'stepfunctions': 'Application Integration',
-        'cloudformation': 'Management & Governance'
-    }
-
-    with open(policy_file, 'r') as file:
-        policy = json.load(file)
-
-    services = {}
-    for statement in policy.get('Statement', []):
-        for action in statement.get('Action', []):
-            service_prefix, action_name = action.split(':')
-            if service_prefix in service_to_category:
-                category = service_to_category[service_prefix]
-                if category not in services:
-                    services[category] = {}
-                if service_prefix not in services[category]:
-                    services[category][service_prefix] = []
-                transformed_action_name = transform_function_name(action_name)
-                if transformed_action_name not in services[category][service_prefix]:
-                    services[category][service_prefix].append(transformed_action_name)
-
-    return services
+# ------------------------------------------------------------------------------
 
 def list_used_services(policy_file):
     """
@@ -407,6 +438,10 @@ def list_used_services(policy_file):
         json.dump(results, json_file, indent=4, default=json_serial)
 
     return results
+
+# ------------------------------------------------------------------------------
+
+# Main Function
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
