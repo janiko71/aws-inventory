@@ -1,0 +1,38 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListUsers",
+                "iam:ListRoles",
+                "iam:ListGroups",
+                "iam:ListPolicies",
+                "iam:ListInstanceProfiles",
+                "iam:ListAccessKeys",
+                "iam:ListMFADevices",
+                "iam:ListSSHPublicKeys",
+                "iam:ListServiceSpecificCredentials",
+                "iam:ListSigningCertificates",
+                "iam:ListServerCertificates",
+                "iam:ListVirtualMFADevices",
+                "route53:ListHostedZones",
+                "route53:ListResourceRecordSets",
+                "cloudfront:ListDistributions",
+                "cloudfront:ListStreamingDistributions",
+                "waf:ListWebACLs",
+                "waf:ListRules",
+                "waf:ListByteMatchSets",
+                "waf:ListIPSets",
+                "organizations:ListAccounts",
+                "organizations:ListOrganizationalUnitsForParent",
+                "organizations:ListPolicies",
+                "organizations:ListRoots",
+                "sts:GetCallerIdentity",
+                "s3:ListBuckets",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

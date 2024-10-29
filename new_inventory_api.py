@@ -335,8 +335,8 @@ def inventory_handling(category, region, service, func, progress_callback):
             if object_type not in results[category][service]:
                 results[category][service][object_type] = {}
 
-            # Create region only if inventory not empty
-            non_empty_items = {k: v for k, v in inventory.items() if k != 'ResponseMetadata' and not is_empty(v)}
+            # Check if the first value is not empty and the key is not 'ResponseMetadata'
+            non_empty_items = next((v for k, v in inventory.items() if k != 'ResponseMetadata' and not is_empty(v)), None)
             if non_empty_items or with_empty:
                 if region not in results[category][service][object_type]:
                     results[category][service][object_type][region] = {}

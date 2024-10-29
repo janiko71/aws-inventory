@@ -1,7 +1,7 @@
 import boto3
 
-res = 's3'
-svc = 'list_buckets'
+res = 'sns'
+svc = 'list_subscriptions'
 
 try:
     # Get the service resource
