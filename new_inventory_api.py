@@ -74,6 +74,8 @@ progress_bar = None  # Progress bar object
 successful_services = 0  # Counter for the number of successful service responses
 failed_services = 0  # Counter for the number of failed service responses
 skipped_services = 0  # Counter for skipped services
+empty_services = 0
+filled_services = 0
 
 # Determine the number of CPU cores
 num_cores = multiprocessing.cpu_count()
@@ -122,7 +124,8 @@ def inventory_handling(category, region, service, func, progress_callback):
     Returns:
         None
     """
-    global results, boto3_clients, successful_services, failed_services, skipped_services
+    global results, boto3_clients, successful_services, failed_services, skipped_services, empty_services, filled_services
+    
     if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
         write_log(f"Starting inventory for {service} in {region} using {func}")
         try:
@@ -138,8 +141,9 @@ def inventory_handling(category, region, service, func, progress_callback):
             end_time = time.time()
             write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds")
             
-            if not with_meta:
-                inventory.pop('ResponseMetadata', None)
+            # Extracting ResponseMetadata
+            response_metadata = inventory.pop('ResponseMetadata', None)
+            
             object_type = list(inventory.keys())[0] if inventory else 'Unknown'
             if category not in results:
                 results[category] = {}
@@ -147,18 +151,26 @@ def inventory_handling(category, region, service, func, progress_callback):
                 results[category][service] = {}
             if object_type not in results[category][service]:
                 results[category][service][object_type] = {}
-            if region not in results[category][service][object_type]:
-                results[category][service][object_type][region] = {}
+
+            # Create region only if inventory not empty
+            object_inventory = inventory[object_type]
+            if (object_inventory is not None) or with_empty:
+                if len(object_inventory) > 0:
+                    if region not in results[category][service][object_type]:
+                        results[category][service][object_type][region] = {}
             
-            # Remove empty values except 'ResponseMetadata'
-            cleaned_inventory = {k: v for k, v in inventory.items() if k == 'ResponseMetadata' or not is_empty(v)}
-            
-            # Second sub-task: Processing results
-            start_time = time.time()
-            results[category][service][object_type][region] = cleaned_inventory
+                    # Second sub-task: Processing results
+                    start_time = time.time()
+                    results[category][service][object_type][region] = inventory
+                    if with_meta:
+                        results[category][service][object_type][region].append(response_metadata)
+                    end_time = time.time()
+                    write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
+                    filled_services += 1
+                else:
+                    empty_services += 1
+                    write_log(f"Empty results for {service} in {region}")
             progress_callback(1)  # Update progress bar by 1 task
-            end_time = time.time()
-            write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
             successful_services += 1  # Increment successful services counter
 
         except AttributeError as e1:
@@ -180,7 +192,6 @@ def inventory_handling(category, region, service, func, progress_callback):
         skipped_services += 1  # Increment failed services counter
         progress_callback(2)  # Update progress bar by 2 tasks for failed service                
         write_log(f"Inventory for {service} in {region} using {func} skipped!")
-
 
 def is_empty(value):
     """
@@ -344,7 +355,7 @@ def list_used_services(policy_file):
     Returns:
         dict: A dictionary of the used services.
     """
-    global results, total_tasks, progress_bar, successful_services, failed_services
+    global results, total_tasks, progress_bar, successful_services, failed_services, filled_services, empty_services
 
     start_time = time.time()
     
@@ -387,7 +398,7 @@ def list_used_services(policy_file):
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
     print(f"Total services called: {total_tasks // 2}")  # Divide by 2 to get the actual number of services called
-    print(f"Successful services: {successful_services}")
+    print(f"Successful services: {successful_services} ({filled_services} services with datas, {empty_services} empty services)")
     print(f"Failed services: {failed_services}")
     print(f"Skipped services: {skipped_services}")
     
@@ -401,10 +412,12 @@ if __name__ == "__main__":
     parser.add_argument('--policy-file', type=str, default='inventory_policy_1.json', help='The path to the IAM policy file')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
     parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
+    parser.add_argument('--with-empty', action='store_true', help='Include empty values in the inventory')
     args = parser.parse_args()
 
     policy_file = args.policy_file
     with_meta = args.with_meta
     with_extra = args.with_extra
+    with_empty = args.with_empty
 
     services_data = list_used_services(policy_file)
