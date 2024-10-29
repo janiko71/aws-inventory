@@ -54,6 +54,7 @@ import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import glob
+from utils import write_log, transform_function_name, json_serial, is_empty  # Importer les fonctions utilitaires
 
 # Ensure log directory exists
 log_dir = "log"
@@ -123,75 +124,6 @@ class InventoryThread(threading.Thread):
         """Run the inventory task."""
         inventory_handling(self.category, self.region, self.service, self.func, self.progress_callback)
 
-# ------------------------------------------------------------------------------
-
-# Utility Functions
-
-def write_log(message):
-    """
-    Write a log message to the log file.
-
-    Args:
-        message (str): The message to log.
-    """
-    with open(log_file_path, "a") as log_file:
-        log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
-
-# ------------------------------------------------------------------------------
-
-def transform_function_name(func_name):
-    """
-    Transform a CamelCase function name to snake_case.
-
-    Args:
-        func_name (str): The CamelCase function name.
-
-    Returns:
-        str: The snake_case function name.
-    """
-    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', func_name)).lower()
-
-# ------------------------------------------------------------------------------
-
-def json_serial(obj):
-    """
-    JSON serializer for objects not serializable by default.
-
-    Args:
-        obj (any): The object to serialize.
-
-    Returns:
-        str: The serialized object.
-
-    Raises:
-        TypeError: If the object is not serializable.
-    """
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    raise TypeError("Type not serializable")
-
-# ------------------------------------------------------------------------------
-
-def is_empty(value):
-    """
-    Check if a value is empty. This includes None, empty strings, empty lists, and empty dictionaries.
-
-    Args:
-        value (any): The value to check.
-
-    Returns:
-        bool: True if the value is empty, False otherwise.
-    """
-    if value is None:
-        return True
-    if isinstance(value, str) and not value.strip():  # Check empty string
-        return True
-    if isinstance(value, (list, dict)) and len(value) == 0:  # Check empty list or dict
-        return True
-    return False
-
-# ------------------------------------------------------------------------------
-
 # Inventory Management Functions
 
 def get_all_regions():
@@ -222,7 +154,7 @@ def test_region_connectivity(region):
         ec2.describe_availability_zones()
         return True
     except Exception as e:
-        write_log(f"Could not connect to the endpoint URL for region {region}: {e}")
+        write_log(f"Could not connect to the endpoint URL for region {region}: {e}", log_file_path)
         return False
 
 # ------------------------------------------------------------------------------
@@ -237,94 +169,10 @@ def create_services_structure(policy_files):
     Returns:
         dict: A dictionary structure of services.
     """
-    service_to_category = {
-        'ec2': 'Compute',
-        'ecs': 'Compute',
-        'eks': 'Compute',
-        'lambda': 'Compute',
-        'lightsail': 'Compute',
-        's3': 'Storage',
-        'ebs': 'Storage',
-        'efs': 'Storage',
-        'rds': 'Databases',
-        'dynamodb': 'Databases',
-        'redshift': 'Databases',
-        'elasticache': 'Databases',
-        'vpc': 'Networking',
-        'elb': 'Networking',
-        'cloudfront': 'Networking',
-        'route53': 'Networking',
-        'apigateway': 'Networking',
-        'cloudwatch': 'Monitoring and Management',
-        'cloudtrail': 'Monitoring and Management',
-        'config': 'Monitoring and Management',
-        'iam': 'IAM and Security',
-        'kms': 'IAM and Security',
-        'secretsmanager': 'IAM and Security',
-        'waf': 'IAM and Security',
-        'shield': 'IAM and Security',
-        'sagemaker': 'Machine Learning',
-        'rekognition': 'Machine Learning',
-        'comprehend': 'Machine Learning',
-        'glue': 'Analytics',
-        'sns': 'Application Integration',
-        'sqs': 'Application Integration',
-        'stepfunctions': 'Application Integration',
-        'cloudformation': 'Management & Governance',
-        'codebuild': 'Developer Tools',
-        'codepipeline': 'Developer Tools',
-        'codecommit': 'Developer Tools',
-        'codedeploy': 'Developer Tools',
-        'athena': 'Analytics',
-        'quicksight': 'Analytics',
-        'kinesis': 'Analytics',
-        'firehose': 'Analytics',
-        'emr': 'Analytics',
-        'elasticbeanstalk': 'Compute',
-        'batch': 'Compute',
-        'autoscaling': 'Compute',
-        'opsworks': 'Management & Governance',
-        'systemsmanager': 'Management & Governance',
-        'servicecatalog': 'Management & Governance',
-        'trustedadvisor': 'Management & Governance',
-        'macie': 'Security, Identity, & Compliance',
-        'guardduty': 'Security, Identity, & Compliance',
-        'inspector': 'Security, Identity, & Compliance',
-        'securityhub': 'Security, Identity, & Compliance',
-        'backup': 'Storage',
-        'fsx': 'Storage',
-        'storagegateway': 'Storage',
-        'workspaces': 'End User Computing',
-        'appstream': 'End User Computing',
-        'chime': 'Business Applications',
-        'workmail': 'Business Applications',
-        'workdocs': 'Business Applications',
-        'connect': 'Customer Engagement',
-        'pinpoint': 'Customer Engagement',
-        'ses': 'Customer Engagement',
-        'transcribe': 'Machine Learning',
-        'translate': 'Machine Learning',
-        'textract': 'Machine Learning',
-        'forecast': 'Machine Learning',
-        'personalize': 'Machine Learning',
-        'frauddetector': 'Machine Learning',
-        'lex': 'Machine Learning',
-        'polly': 'Machine Learning',
-        'greengrass': 'Internet of Things',
-        'iot': 'Internet of Things',
-        'iotanalytics': 'Internet of Things',
-        'iotevents': 'Internet of Things',
-        'iotthingsgraph': 'Internet of Things',
-        'iot1click': 'Internet of Things',
-        'iotdeviceadvisor': 'Internet of Things',
-        'iotfleethub': 'Internet of Things',
-        'iotsecuretunneling': 'Internet of Things',
-        'iotsitewise': 'Internet of Things',
-        'iottwinmaker': 'Internet of Things',
-        'iotwireless': 'Internet of Things'
-    }
+    with open('service_structure.json', 'r') as file:
+        service_to_category = json.load(file)
 
-    services = {}
+    services = {'global': {}, 'regional': {}}  # Add keys for global and regional services
     for policy_file in policy_files:
         with open(policy_file, 'r') as file:
             policy = json.load(file)
@@ -333,13 +181,20 @@ def create_services_structure(policy_files):
                     service_prefix, action_name = action.split(':')
                     if service_prefix in service_to_category:
                         category = service_to_category[service_prefix]
-                        if category not in services:
-                            services[category] = {}
-                        if service_prefix not in services[category]:
-                            services[category][service_prefix] = []
-                        transformed_action_name = transform_function_name(action_name)
-                        if transformed_action_name not in services[category][service_prefix]:
-                            services[category][service_prefix].append(transformed_action_name)
+                        if policy_file.endswith('inventory_policy_global.json'):
+                            if service_prefix not in services['global']:
+                                services['global'][service_prefix] = []
+                            transformed_action_name = transform_function_name(action_name)
+                            if transformed_action_name not in services['global'][service_prefix]:
+                                services['global'][service_prefix].append(transformed_action_name)
+                        else:
+                            if category not in services['regional']:
+                                services['regional'][category] = {}
+                            if service_prefix not in services['regional'][category]:
+                                services['regional'][category][service_prefix] = []
+                            transformed_action_name = transform_function_name(action_name)
+                            if transformed_action_name not in services['regional'][category][service_prefix]:
+                                services['regional'][category][service_prefix].append(transformed_action_name)
 
     return services
 
@@ -362,7 +217,7 @@ def inventory_handling(category, region, service, func, progress_callback):
     global results, boto3_clients, successful_services, failed_services, skipped_services, empty_services, filled_services
     
     if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
-        write_log(f"Starting inventory for {service} in {region} using {func}")
+        write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
         try:
             client_key = (service, region)
             if client_key not in boto3_clients:
@@ -374,7 +229,7 @@ def inventory_handling(category, region, service, func, progress_callback):
             inventory = client.__getattribute__(func)()
             progress_callback(1)  # Update progress bar by 1 task
             end_time = time.time()
-            write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds")
+            write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
             
             # Extracting ResponseMetadata
             response_metadata = inventory.pop('ResponseMetadata', None)
@@ -405,33 +260,33 @@ def inventory_handling(category, region, service, func, progress_callback):
                 if with_meta:
                     results[category][service][object_type][region]['ResponseMetadata'] = response_metadata
                 end_time = time.time()
-                write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds")
+                write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
                 filled_services += 1
             else:
                 empty_services += 1
-                write_log(f"Empty results for {service} in {region}")
+                write_log(f"Empty results for {service} in {region}", log_file_path)
             progress_callback(1)  # Update progress bar by 1 task
             successful_services += 1  # Increment successful services counter
 
         except AttributeError as e1:
-            write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})")
+            write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})", log_file_path)
             failed_services += 1  # Increment failed services counter
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
         except botocore.exceptions.ClientError as e2:
-            write_log(f"Error (2) querying {service} in {region} using {func}: {e2} ({type(e2)})")
+            write_log(f"Error (2) querying {service} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
             failed_services += 1  # Increment failed services counter
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
         except Exception as e:
-            write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})")
+            write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})", log_file_path)
             failed_services += 1  # Increment failed services counter
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
         finally:
-            write_log(f"Completed inventory for {service} in {region} using {func}")
+            write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
 
     else:
         skipped_services += 1  # Increment failed services counter
         progress_callback(2)  # Update progress bar by 2 tasks for failed service                
-        write_log(f"Inventory for {service} in {region} using {func} skipped!")
+        write_log(f"Inventory for {service} in {region} using {func} skipped!", log_file_path)
 
 # ------------------------------------------------------------------------------
 
@@ -452,7 +307,7 @@ def list_used_services(policy_files):
     regions = get_all_regions()
 
     if not regions:
-        write_log("Unable to retrieve the list of regions.")
+        write_log("Unable to retrieve the list of regions.", log_file_path)
         return
 
     services = create_services_structure(policy_files)
@@ -462,13 +317,23 @@ def list_used_services(policy_files):
         """Callback function to update the progress bar."""
         progress_bar.update(amount)
 
+    # Handle global services
+    if 'global' in services:
+        for service, func_list in services['global'].items():
+            for func in func_list:
+                write_log(f"Querying global service: {service}, function: {func}", log_file_path)
+                total_tasks += 2  # Increment total_tasks for each sub-task
+                thread = InventoryThread('global', 'global', service, func, f"{service} (global)", progress_callback)
+                thread_list.append(thread)
+
+    # Handle regional services
     for region in regions:
         region_name = region['RegionName']
         if test_region_connectivity(region_name):
-            for category, service_dict in services.items():
+            for category, service_dict in services['regional'].items():
                 for service, func_list in service_dict.items():
                     for func in func_list:
-                        write_log(f"Querying region: {region_name}, service: {service}, function: {func}")
+                        write_log(f"Querying region: {region_name}, service: {service}, function: {func}", log_file_path)
                         total_tasks += 2  # Increment total_tasks for each sub-task
                         thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}", progress_callback)
                         thread_list.append(thread)
@@ -516,6 +381,11 @@ if __name__ == "__main__":
 
     # Find all policy files matching the pattern inventory_policy_local_X.json
     policy_files = glob.glob(os.path.join(policy_dir, 'inventory_policy_local_*.json'))
+
+    # Add the global policy file
+    global_policy_file = os.path.join(policy_dir, 'inventory_policy_global.json')
+    if os.path.exists(global_policy_file):
+        policy_files.append(global_policy_file)
 
     if not policy_files:
         print("No policy files found.")

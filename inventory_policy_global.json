@@ -28,9 +28,7 @@
                 "organizations:ListOrganizationalUnitsForParent",
                 "organizations:ListPolicies",
                 "organizations:ListRoots",
-                "sts:GetCallerIdentity",
-                "s3:ListBuckets",
-                "s3:GetBucketLocation"
+                "sts:GetCallerIdentity"
             ],
             "Resource": "*"
         }

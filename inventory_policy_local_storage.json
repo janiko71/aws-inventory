@@ -11,7 +11,9 @@
                 "fsx:DescribeFileSystems",
                 "glacier:ListVaults",
                 "glacier:ListParts",
-                "glacier:ListProvisionedCapacity"
+                "glacier:ListProvisionedCapacity",
+                "s3:ListAllMyBuckets",
+                "s3:GetBucketLocation"                
             ],
             "Resource": "*"
         }
