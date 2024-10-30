@@ -214,15 +214,16 @@ def inventory_handling(category, region, service, func, progress_callback):
     Returns:
         None
     """
-    global results, boto3_clients, successful_services, failed_services, skipped_services, empty_services, filled_services
+    global results, successful_services, failed_services, skipped_services, empty_services, filled_services
     
     if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
         write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
         try:
-            client_key = (service, region)
-            if client_key not in boto3_clients:
-                boto3_clients[client_key] = boto3.client(service.lower(), region_name=region)
-            client = boto3_clients[client_key]
+            if service not in {'s3'}:
+                client = boto3.client(service.lower(), region_name=region)
+            else:
+                # Special case for 's3' service in the global context: no region specified
+                client = boto3.client(service.lower())           
             
             # First sub-task: API call
             start_time = time.time()
@@ -294,6 +295,14 @@ def list_used_services(policy_files):
     """
     List used services based on the provided IAM policy files.
 
+    This function performs the following steps:
+    1. Retrieves all AWS regions.
+    2. Creates a structure of services based on the provided IAM policy files.
+    3. Initializes and manages threads to query both global and regional services.
+    4. Updates a progress bar to reflect the progress of the inventory process.
+    5. Logs the execution time and results of the inventory process.
+    6. Writes the results to a JSON file.
+
     Args:
         policy_files (list): A list of paths to the IAM policy files.
 
@@ -323,6 +332,7 @@ def list_used_services(policy_files):
             for func in func_list:
                 write_log(f"Querying global service: {service}, function: {func}", log_file_path)
                 total_tasks += 2  # Increment total_tasks for each sub-task
+
                 thread = InventoryThread('global', 'global', service, func, f"{service} (global)", progress_callback)
                 thread_list.append(thread)
 
@@ -368,7 +378,7 @@ def list_used_services(policy_files):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
-    parser.add_argument('--policy-dir', type=str, default='.', help='The directory containing the IAM policy files')
+    parser.add_argument('--policy-dir', type=str, default='policies', help='The directory containing the IAM policy files')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
     parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
     parser.add_argument('--with-empty', action='store_true', help='Include empty values in the inventory')
