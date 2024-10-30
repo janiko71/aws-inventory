@@ -4,12 +4,7 @@
         {
             "Effect": "Allow",
             "Action": [
-                "cloudwatch:DescribeAlarms",
-                "cloudwatch:DescribeAlarmHistory",
-                "cloudwatch:DescribeInsightRules",
                 "cloudtrail:DescribeTrails",
-                "cloudtrail:GetTrailStatus",
-                "cloudtrail:ListTags",
                 "config:DescribeConfigRules",
                 "config:DescribeConfigurationRecorders",
                 "config:DescribeConfigurationRecorderStatus",

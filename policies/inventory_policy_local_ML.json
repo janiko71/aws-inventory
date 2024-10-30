@@ -9,9 +9,9 @@
                 "sagemaker:ListModels",
                 "sagemaker:ListNotebookInstances",
                 "rekognition:ListCollections",
-                "rekognition:ListStreamProcessors",
-                "comprehend:ListDocumentClassifiers",
-                "comprehend:ListEntityRecognizers"
+                "rekognition:ListUsers",
+                "comprehend:ListEndpoints",
+                "comprehend:ListDatasets"
             ],
             "Resource": "*"
         }

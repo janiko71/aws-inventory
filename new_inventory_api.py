@@ -1,3 +1,4 @@
+# NEW_INVENTORY_API.PY CONTEXT
 """
 AWS Inventory Script
 
@@ -40,6 +41,7 @@ Functions:
     main()
 """
 
+import pprint
 import threading
 import boto3
 import botocore
@@ -69,7 +71,6 @@ if not os.path.exists(output_dir):
 # Create a timestamped log file
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
-json_file_path = os.path.join(output_dir, f"inventory_result_{timestamp}.json")
 
 # Global variables
 boto3_clients = {}  # Dictionary to store boto3 clients for different services and regions
@@ -196,6 +197,7 @@ def create_services_structure(policy_files):
                             if transformed_action_name not in services['regional'][category][service_prefix]:
                                 services['regional'][category][service_prefix].append(transformed_action_name)
 
+    #pprint.pprint(services)
     return services
 
 # ------------------------------------------------------------------------------
@@ -215,15 +217,17 @@ def inventory_handling(category, region, service, func, progress_callback):
         None
     """
     global results, successful_services, failed_services, skipped_services, empty_services, filled_services
-    
     if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
         write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
         try:
-            if service not in {'s3'}:
+            if region != 'global':
                 client = boto3.client(service.lower(), region_name=region)
             else:
                 # Special case for 's3' service in the global context: no region specified
-                client = boto3.client(service.lower())           
+                if service == 'ec2':
+                    client = boto3.client(service.lower(), region_name='us-east-1')
+                else:
+                    client = boto3.client(service.lower())
             
             # First sub-task: API call
             start_time = time.time()
@@ -326,6 +330,13 @@ def list_used_services(policy_files):
         """Callback function to update the progress bar."""
         progress_bar.update(amount)
 
+    # Retrieve the AWS account ID using STS
+    sts_client = boto3.client('sts')
+    account_id = sts_client.get_caller_identity()["Account"]
+
+    # Modify the JSON file path to include the account ID
+    json_file_path = os.path.join(output_dir, f"inventory_{account_id}_{timestamp}.json")
+
     # Handle global services
     if 'global' in services:
         for service, func_list in services['global'].items():
@@ -358,6 +369,10 @@ def list_used_services(policy_files):
 
     progress_bar.close()
 
+   # Include the list of regions if --with-extra is specified
+    if with_extra:
+        results['regions'] = regions
+
     end_time = time.time()
     execution_time = end_time - start_time
 
@@ -371,6 +386,7 @@ def list_used_services(policy_files):
         json.dump(results, json_file, indent=4, default=json_serial)
 
     return results
+
 
 # ------------------------------------------------------------------------------
 

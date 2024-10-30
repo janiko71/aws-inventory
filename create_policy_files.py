@@ -3,7 +3,7 @@ import glob
 import json
 
 # Constants
-POLICY_DIR = '.'  # Directory containing the policy files
+POLICY_DIR = 'policies'  # Directory containing the policy files
 OUTPUT_DIR = 'output_policies'  # Directory to save the output policy files
 CHAR_LIMIT = 6144  # Character limit for each JSON file
 

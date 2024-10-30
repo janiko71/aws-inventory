@@ -4,8 +4,10 @@
         {
             "Effect": "Allow",
             "Action": [
+                "ec2:DescribeRegions",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeAccountAttributes",
                 "iam:ListUsers",
-                "iam:ListRoles",
                 "iam:ListGroups",
                 "iam:ListPolicies",
                 "iam:ListInstanceProfiles",
@@ -17,20 +19,17 @@
                 "iam:ListServerCertificates",
                 "iam:ListVirtualMFADevices",
                 "route53:ListHostedZones",
-                "route53:ListResourceRecordSets",
+                "route53domains:ListDomains",
+                "route53resolver:ListResolverEndpoints",
                 "cloudfront:ListDistributions",
                 "cloudfront:ListStreamingDistributions",
-                "waf:ListWebACLs",
                 "waf:ListRules",
                 "waf:ListByteMatchSets",
                 "waf:ListIPSets",
                 "organizations:ListAccounts",
-                "organizations:ListOrganizationalUnitsForParent",
-                "organizations:ListPolicies",
                 "organizations:ListRoots",
                 "sts:GetCallerIdentity",
-                "s3:ListAllMyBuckets",
-                "s3:GetBucketLocation"
+                "s3:ListAllMyBuckets"
             ],
             "Resource": "*"
         }

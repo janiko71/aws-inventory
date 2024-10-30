@@ -1,9 +1,7 @@
 import boto3
 
-res = 's3'
-#res = 'iam'
-svc = 'list_buckets'
-#svc = 'list_users'
+res = 'sts'
+svc = 'get_caller_identity'
 #region = 'eu-west-3'
 #region = 'global'
 region = None
