@@ -60,9 +60,7 @@ This project is _open source_ (GPL-3.0), but took me some time and efforts to d
 
 So, this project in **donationware** (or _donateware_). It means that you _can_ give me a small fee or contribution for my work. For those who are familiar with [RFCs](https://www.ietf.org/rfc/rfc2119.txt), it's not SHOULD but it's MAY. Think about it especially if you fork the project, but there is **no obligation**.
 
-For instance, a couple of \$ or € can help me buying a dozen of coffee at work! And if you are millionnaire or a big company, please note that the service I use ([leetchi.com](https://www.leetchi.com/c/janiko71-aws-inventory)) accepts millions of $/€, which could be help me with coffees until retirement.
-
-You _can_ donate here: **[_janiko71/aws-inventory_ on leetchi.com](https://www.leetchi.com/c/janiko71-aws-inventory)**
+For instance, a couple of \$ or € can help me buying a dozen of coffee at work! You can donate through the github sponsor program.
 
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
