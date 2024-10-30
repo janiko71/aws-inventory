@@ -60,7 +60,7 @@ This project is _open source_ (GPL-3.0), but took me some time and efforts to d
 
 So, this project in **donationware** (or _donateware_). It means that you _can_ give me a small fee or contribution for my work. For those who are familiar with [RFCs](https://www.ietf.org/rfc/rfc2119.txt), it's not SHOULD but it's MAY. Think about it especially if you fork the project, but there is **no obligation**.
 
-For instance, a couple of \$ or € can help me buying a dozen of coffee at work! You can donate through the github sponsor program.
+For instance, a couple of \$ or € can help me buying a dozen of coffee at work! You can donate through the [github sponsor program](https://github.com/sponsors/janiko71).
 
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
