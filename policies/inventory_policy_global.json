@@ -29,7 +29,8 @@
                 "organizations:ListAccounts",
                 "organizations:ListRoots",
                 "sts:GetCallerIdentity",
-                "s3:ListAllMyBuckets"
+                "s3:ListAllMyBuckets",
+                "freetier:GetFreeTierUsage"
             ],
             "Resource": "*"
         }

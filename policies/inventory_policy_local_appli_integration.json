@@ -7,8 +7,8 @@
                 "sns:ListTopics",
                 "sns:ListSubscriptions",
                 "sqs:ListQueues",
-                "stepfunctions:ListStateMachines",
-                "stepfunctions:ListActivities"
+                "states:ListStateMachines",
+                "states:ListActivities"
             ],
             "Resource": "*"
         }

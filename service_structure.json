@@ -68,7 +68,7 @@
     "databrew": "Analytics",
     "sns": "Application Integration",
     "sqs": "Application Integration",
-    "stepfunctions": "Application Integration",
+    "states": "Application Integration",
     "eventbridge": "Application Integration",
     "cloudformation": "Management & Governance",
     "opsworks": "Management & Governance",

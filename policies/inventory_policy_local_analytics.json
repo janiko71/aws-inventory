@@ -4,8 +4,11 @@
         {
             "Effect": "Allow",
             "Action": [
-                "glue:GetDatabases",
-                "glue:GetTables"
+                "glue:ListTables",
+                "glue:ListJobs",
+                "glue:ListWorkflows",
+                "glue:ListSchemas",
+                "glue:ListStatements"
             ],
             "Resource": "*"
         }

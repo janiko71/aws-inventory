@@ -1,7 +1,7 @@
 import boto3
 
-res = 'sts'
-svc = 'get_caller_identity'
+res = 'stepfunctions'
+svc = 'list_executions'
 #region = 'eu-west-3'
 #region = 'global'
 region = None

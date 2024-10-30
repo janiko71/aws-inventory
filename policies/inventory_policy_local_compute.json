@@ -34,7 +34,7 @@
                 "batch:DescribeJobQueues",
                 "batch:DescribeComputeEnvironments",
                 "batch:DescribeJobDefinitions",
-                "batch:DescribesJobs",
+                "batch:ListJobs",
                 "elasticbeanstalk:DescribeApplications",
                 "elasticbeanstalk:DescribeApplicationVersions",
                 "elasticbeanstalk:DescribeEnvironments",

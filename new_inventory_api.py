@@ -221,7 +221,10 @@ def inventory_handling(category, region, service, func, progress_callback):
         write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
         try:
             if region != 'global':
-                client = boto3.client(service.lower(), region_name=region)
+                if service == 'states':
+                    client = boto3.client('stepfunctions', region_name=region)
+                else:
+                    client = boto3.client(service.lower(), region_name=region)
             else:
                 # Special case for 's3' service in the global context: no region specified
                 if service == 'ec2':
