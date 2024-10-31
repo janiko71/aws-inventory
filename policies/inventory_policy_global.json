@@ -30,7 +30,12 @@
                 "organizations:ListRoots",
                 "sts:GetCallerIdentity",
                 "s3:ListAllMyBuckets",
-                "freetier:GetFreeTierUsage"
+                "freetier:GetFreeTierUsage",
+                "directconnect:DescribeConnections",
+                "directconnect:DescribeVirtualInterfaces",
+                "directconnect:DescribeInterconnects",
+                "cloudfront:ListDistributions",
+                "cloudfront:ListStreamingDistributions"
             ],
             "Resource": "*"
         }

@@ -57,6 +57,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import glob
 from utils import write_log, transform_function_name, json_serial, is_empty  # Importer les fonctions utilitaires
+from botocore.exceptions import EndpointConnectionError, ClientError # Ajout des exceptions
 
 # Ensure log directory exists
 log_dir = "log"
@@ -202,12 +203,6 @@ def create_services_structure(policy_files):
 
 # ------------------------------------------------------------------------------
 
-import boto3
-import botocore
-from botocore.exceptions import EndpointConnectionError, ClientError # Ajout des exceptions
-import botocore.errorfactory
-#from botocore.errorfactory import AWSOrganizationsNotInUseException
-
 def inventory_handling(category, region, service, func, progress_callback):
     """
     Handle the inventory task for a given service and region.
@@ -229,6 +224,8 @@ def inventory_handling(category, region, service, func, progress_callback):
             if region != 'global':
                 if service == 'states':
                     client = boto3.client('stepfunctions', region_name=region)
+                elif service == 'private-networks':
+                    client = boto3.client("privatenetworks", region_name=region)
                 else:
                     client = boto3.client(service.lower(), region_name=region)
             else:
@@ -288,6 +285,10 @@ def inventory_handling(category, region, service, func, progress_callback):
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
         except botocore.exceptions.ClientError as e2: 
             if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
+                write_log(f"Warning (2): querying {service} in {region} using {func}: error (organizations not in use): {e2} ({type(e2)})", log_file_path)
+                skipped_services += 1  # Increment skipped services counter
+                progress_callback(2)  # Update progress bar by 2 tasks for skipped service
+            elif type(e2).__name__ == 'DirectConnectClientException':
                 write_log(f"Warning (2): querying {service} in {region} using {func}: error (organizations not in use): {e2} ({type(e2)})", log_file_path)
                 skipped_services += 1  # Increment skipped services counter
                 progress_callback(2)  # Update progress bar by 2 tasks for skipped service

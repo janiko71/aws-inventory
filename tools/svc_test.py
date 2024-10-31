@@ -2,12 +2,12 @@ import boto3
 import botocore
 from botocore.exceptions import EndpointConnectionError
 
-res = 'glue'
-svc = 'list_tables'
+res = 'privatenetworks'
+svc = 'list_networks'
 #region = 'eu-west-3'
+#region = None
+region = 'us-east-1'
 #region = 'global'
-region = None
-region = 'us-north-1'
 
 def print_exception(order, e):
     print('-'*72)
