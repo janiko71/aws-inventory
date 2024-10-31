@@ -288,7 +288,7 @@ def inventory_handling(category, region, service, func, progress_callback):
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
         except botocore.exceptions.ClientError as e2: 
             if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
-                write_log(f"Warning (2): Skipping {service} in {region} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
+                write_log(f"Warning (2): querying {service} in {region} using {func}: error (organizations not in use): {e2} ({type(e2)})", log_file_path)
                 skipped_services += 1  # Increment skipped services counter
                 progress_callback(2)  # Update progress bar by 2 tasks for skipped service
             else:
@@ -296,7 +296,7 @@ def inventory_handling(category, region, service, func, progress_callback):
                 failed_services += 1  # Increment failed services counter
                 progress_callback(2)  # Update progress bar by 2 tasks for failed service
         except EndpointConnectionError as e3:
-            write_log(f"Warning (4): Skipping {service} in {region} due to connection error: {e3} ({type(e3)})", log_file_path)
+            write_log(f"Warning (4): querying {service} in {region} using {func}: error due to connection error: {e3} ({type(e3)})", log_file_path)
             skipped_services += 1  # Increment skipped services counter
             progress_callback(2)  # Update progress bar by 2 tasks for skipped service
         except Exception as e:
