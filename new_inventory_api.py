@@ -202,6 +202,12 @@ def create_services_structure(policy_files):
 
 # ------------------------------------------------------------------------------
 
+import boto3
+import botocore
+from botocore.exceptions import EndpointConnectionError, ClientError # Ajout des exceptions
+import botocore.errorfactory
+#from botocore.errorfactory import AWSOrganizationsNotInUseException
+
 def inventory_handling(category, region, service, func, progress_callback):
     """
     Handle the inventory task for a given service and region.
@@ -276,14 +282,22 @@ def inventory_handling(category, region, service, func, progress_callback):
             progress_callback(1)  # Update progress bar by 1 task
             successful_services += 1  # Increment successful services counter
 
-        except AttributeError as e1:
-            write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})", log_file_path)
+        except botocore.errorfactory.AWSOrganizationsNotInUseException as e1:
+            write_log(f"Warning: Skipping {service} in {region} due to organizations not in use error: {e1} ({type(e1)})", log_file_path)
+            skipped_services += 1  # Increment skipped services counter
+            progress_callback(2)  # Update progress bar by 2 tasks for skipped service
+        except AttributeError as e2:
+            write_log(f"Error (1) querying {service} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
             failed_services += 1  # Increment failed services counter
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        except botocore.exceptions.ClientError as e2:
-            write_log(f"Error (2) querying {service} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
+        except botocore.exceptions.ClientError as e3:
+            write_log(f"Error (2) querying {service} in {region} using {func}: {e3} ({type(e3)})", log_file_path)
             failed_services += 1  # Increment failed services counter
             progress_callback(2)  # Update progress bar by 2 tasks for failed service
+        except EndpointConnectionError as e4:
+            write_log(f"Warning: Skipping {service} in {region} due to connection error: {e4} ({type(e4)})", log_file_path)
+            skipped_services += 1  # Increment skipped services counter
+            progress_callback(2)  # Update progress bar by 2 tasks for skipped service
         except Exception as e:
             write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})", log_file_path)
             failed_services += 1  # Increment failed services counter
@@ -292,9 +306,10 @@ def inventory_handling(category, region, service, func, progress_callback):
             write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
 
     else:
-        skipped_services += 1  # Increment failed services counter
-        progress_callback(2)  # Update progress bar by 2 tasks for failed service                
+        skipped_services += 1  # Increment skipped services counter
+        progress_callback(2)  # Update progress bar by 2 tasks for skipped service                
         write_log(f"Inventory for {service} in {region} using {func} skipped!", log_file_path)
+
 
 # ------------------------------------------------------------------------------
 

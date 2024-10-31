@@ -67,3 +67,13 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 ## License
 This project is licensed under the terms of the GNU General Public License v3.0. See the LICENSE file for details.
+
+## Services with details
+
+* EC2, ... : ...
+* ECS, list_clusters : list_services, list_tasks, describe_cluster, describe_tasks, list_tasks
+* ECS, list_container_instances : describe_container_instances
+* EKS, list_clusters, id : 
+* EKS, list_nodegroups : describe_nodegroup
+* glue, list_tables : list_schemas, list_nodegroups, list_fragate_pofile
+* batch:DescribeJobQueues : list_jobs (queue name)

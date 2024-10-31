@@ -1,10 +1,11 @@
 import boto3
 
-res = 'stepfunctions'
-svc = 'list_executions'
+res = 'organizations'
+svc = 'list_accounts'
 #region = 'eu-west-3'
 #region = 'global'
 region = None
+region = 'us-north-1'
 
 try:
     # Get the service resource
@@ -20,5 +21,5 @@ try:
 except Exception as e:
 
     print('-'*72)
-    print(e)
+    print(type(e), e)
     print('-'*72)
