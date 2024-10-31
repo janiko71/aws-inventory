@@ -11,7 +11,7 @@ Intended for personal use (even if I added some professional features like loggi
 
 This project provides a comprehensive inventory of AWS services used within an account across all available regions. It leverages multithreading to perform inventory operations concurrently, ensuring efficient and timely data collection.
 
-This project is [*donateware*](#If you like it). 
+This project is [donateware](#if-you-like-it). 
 
 ## Features
 
