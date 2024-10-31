@@ -1,11 +1,18 @@
 import boto3
+import botocore
+from botocore.exceptions import EndpointConnectionError
 
-res = 'organizations'
-svc = 'list_accounts'
+res = 'glue'
+svc = 'list_tables'
 #region = 'eu-west-3'
 #region = 'global'
 region = None
 region = 'us-north-1'
+
+def print_exception(order, e):
+    print('-'*72)
+    print(order, type(e), e)
+    print('-'*72) 
 
 try:
     # Get the service resource
@@ -18,8 +25,14 @@ try:
     # You can now access identifiers and attributes
     print(res)
 
+#except AWSOrganizationsNotInUseException as e1:
+#    print_exception(1, e1)
+except AttributeError as e2:
+    print_exception(2, e2)
+except botocore.exceptions.ClientError as e3:
+    print_exception(3, e3)
+except EndpointConnectionError as e4:
+    print_exception(4, e4)
 except Exception as e:
+    print_exception(5, e)
 
-    print('-'*72)
-    print(type(e), e)
-    print('-'*72)

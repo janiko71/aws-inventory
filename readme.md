@@ -5,6 +5,8 @@ Did your never forget to stop an EC2 instance? Or to delete some unusued AWS res
 
 This python script lists all the main resources of your AWS account. This inventory may be uncomplete, but it should help you to find what I call "main" resources that are, in my mind, resources that should affect billing and/or security.
 
+> This is a brand new version, completely rebuilt from scratch (again). It may be quicker and a bit simpler to maintain, but the inventory may have sometimes less details than the previous one. 
+
 Intended for personal use (even if I added some professional features like logging), and for only one account. For more information on multiple accounts, read the [wiki](https://github.com/janiko71/aws-inventory/wiki). 
 
 This project provides a comprehensive inventory of AWS services used within an account across all available regions. It leverages multithreading to perform inventory operations concurrently, ensuring efficient and timely data collection.
@@ -19,12 +21,13 @@ This project provides a comprehensive inventory of AWS services used within an a
 
 ## Project Structure
 
+tbd
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.6+
+- Python 3.11+
 - AWS CLI configured with appropriate credentials
 - Install required Python packages:
   ```sh
@@ -47,7 +50,8 @@ This program needs Python 3.4 or newer.
 
 AWS CLI must be installed and configured on the system you want to run aws-inventory. You SHOULD use a special account with minimal rights (= those in inventory*.json files). See [wiki](https://github.com/janiko71/aws-inventory/wiki) for more.
 
-Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
+Make sure that you have the latest boto3 version. Older versions may lead to signature error with the newest regions or to some malfunction. Further information here : 
+* http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html.
 
 ## How to contribute?
 [**TESTERS WANTED! If you test this code, please send me feedback**](https://github.com/janiko71/aws-inventory/discussions/39): I can't test every configuration (especially when there are a lot of items in inventories), so either if it works or not, let me know what is fine and what needs to be corrected (use [issues](https://github.com/janiko71/aws-inventory/issues)).
@@ -68,12 +72,13 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 ## License
 This project is licensed under the terms of the GNU General Public License v3.0. See the LICENSE file for details.
 
-## Services with details
+## To do : services with details
 
-* EC2, ... : ...
-* ECS, list_clusters : list_services, list_tasks, describe_cluster, describe_tasks, list_tasks
-* ECS, list_container_instances : describe_container_instances
-* EKS, list_clusters, id : 
-* EKS, list_nodegroups : describe_nodegroup
-* glue, list_tables : list_schemas, list_nodegroups, list_fragate_pofile
-* batch:DescribeJobQueues : list_jobs (queue name)
+- [ ] EC2, ... : ...
+- [ ] ECS, list_clusters : list_services, list_tasks, describe_cluster, describe_tasks, list_tasks
+- [ ] ECS, list_container_instances : describe_container_instances
+- [ ] EKS, list_clusters, id : ListFargateProfiles
+- [ ] EKS, list_nodegroups : describe_nodegroup, ListNodegroups
+- [ ] glue, list_tables : list_schemas, list_nodegroups, list_fragate_pofile, ListTables, ListStatements
+- [ ] batch:DescribeJobQueues : list_jobs (queue name)
+- [ ] rekognition : list_users

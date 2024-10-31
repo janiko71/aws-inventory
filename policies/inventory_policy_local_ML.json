@@ -9,7 +9,6 @@
                 "sagemaker:ListModels",
                 "sagemaker:ListNotebookInstances",
                 "rekognition:ListCollections",
-                "rekognition:ListUsers",
                 "comprehend:ListEndpoints",
                 "comprehend:ListDatasets"
             ],
