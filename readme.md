@@ -5,11 +5,13 @@ Did your never forget to stop an EC2 instance? Or to delete some unusued AWS res
 
 This python script lists all the main resources of your AWS account. This inventory may be uncomplete, but it should help you to find what I call "main" resources that are, in my mind, resources that should affect billing and/or security.
 
-> This is a brand new version, completely rebuilt from scratch (again). It may be quicker and a bit simpler to maintain, but the inventory may have sometimes less details than the previous one. 
+> **This is a brand new version, completely rebuilt from scratch (again). It may be quicker and a bit simpler to maintain, but the inventory may have sometimes less details than the previous one.**
 
 Intended for personal use (even if I added some professional features like logging), and for only one account. For more information on multiple accounts, read the [wiki](https://github.com/janiko71/aws-inventory/wiki). 
 
 This project provides a comprehensive inventory of AWS services used within an account across all available regions. It leverages multithreading to perform inventory operations concurrently, ensuring efficient and timely data collection.
+
+This project is [*donateware*](#If you like it). 
 
 ## Features
 
