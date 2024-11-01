@@ -6,6 +6,7 @@ import json
 POLICY_DIR = 'policies'  # Directory containing the policy files
 OUTPUT_DIR = 'output_policies'  # Directory to save the output policy files
 CHAR_LIMIT = 6144  # Character limit for each JSON file
+EXTRA_SERVICE_CALLS_FILE = os.path.join(POLICY_DIR, 'extra_service_calls.json')  # File containing extra service calls
 
 # Ensure output directory exists
 if not os.path.exists(OUTPUT_DIR):
@@ -30,6 +31,17 @@ def read_policy_files(policy_dir):
                 all_actions.update(statement.get('Action', []))
 
     return list(all_actions)
+
+def read_extra_permissions(extra_service_calls_file):
+    """Read extra permissions from the extra_service_calls.json file."""
+    with open(extra_service_calls_file, 'r') as f:
+        extra_service_calls = json.load(f)
+    
+    extra_permissions = set()
+    for service, config in extra_service_calls.items():
+        extra_permissions.add(config['required_permission'])
+    
+    return list(extra_permissions)
 
 def split_actions_into_policies(actions, char_limit):
     """Split actions into multiple policies based on character limit."""
@@ -81,6 +93,9 @@ def save_policies(policies, output_dir):
 def main():
     remove_old_files(OUTPUT_DIR)
     all_actions = read_policy_files(POLICY_DIR)
+    extra_permissions = read_extra_permissions(EXTRA_SERVICE_CALLS_FILE)
+    all_actions.extend(extra_permissions)
+    all_actions = sorted(all_actions)  # Sort actions alphabetically
     policies = split_actions_into_policies(all_actions, CHAR_LIMIT)
     save_policies(policies, OUTPUT_DIR)
 

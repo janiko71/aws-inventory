@@ -68,6 +68,7 @@
     "emr": "Analytics",
     "lakeformation": "Analytics",
     "databrew": "Analytics",
+    "es": "Analytics",
     "sns": "Application Integration",
     "sqs": "Application Integration",
     "states": "Application Integration",

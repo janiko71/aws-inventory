@@ -254,12 +254,12 @@ def inventory_handling(category, region, service, func, progress_callback):
                 results[category][service][object_type] = {}
 
             # Check if there are non-empty items in the inventory (excluding 'NextToken' because some services responds with an empty table but with a NextToken)
-            empty_items = False # temporary test
-            #empty_items = True
-            #for key, value in inventory.items():
-            #    if not is_empty(value) and key not in {'NextToken'}:
-            #        empty_items = False
-            #        break
+            #empty_items = False # temporary test
+            empty_items = True
+            for key, value in inventory.items():
+                if not is_empty(value) and key not in {'NextToken'}:
+                    empty_items = False
+                    break
             # Check if there are non-empty items in the inventory excluding 'ResponseMetadata' and 'NextToken'
             # non_empty_items = next((v for k, v in inventory.items() if k != 'ResponseMetadata' and not is_empty(v) and not (len(v) == 1 and 'NextToken' in v)), None)
             if not empty_items or with_empty:
@@ -274,6 +274,28 @@ def inventory_handling(category, region, service, func, progress_callback):
                 end_time = time.time()
                 write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
                 filled_services += 1
+
+                # Check for extra service calls
+                if service in extra_service_calls:
+                    extra_call_config = extra_service_calls[service]
+                    list_function = extra_call_config['list_function']
+                    result_key = extra_call_config['result_key']
+                    item_key = extra_call_config['item_key']
+                    detail_function = extra_call_config['detail_function']
+                    detail_param = extra_call_config['detail_param']
+
+                    items = inventory.get(result_key, [])
+                    for item in items:
+                        detail_param_value = item[item_key]
+                        detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                        
+                        # Initialize the list if it doesn't exist
+                        if detail_param_value not in results[category][service][object_type][region]:
+                            results[category][service][object_type][region][detail_param_value] = []
+                        
+                        # Append the detail response to the list
+                        results[category][service][object_type][region][detail_param_value].append(detail_response)
+
             else:
                 empty_services += 1
                 write_log(f"Empty results for {service} in {region}", log_file_path)
@@ -433,6 +455,11 @@ if __name__ == "__main__":
     global_policy_file = os.path.join(policy_dir, 'inventory_policy_global.json')
     if os.path.exists(global_policy_file):
         policy_files.append(global_policy_file)
+
+    # Load extra service calls configuration
+    extra_service_file = os.path.join(policy_dir, 'extra_service_calls.json')
+    with open(extra_service_file, 'r') as file:
+        extra_service_calls = json.load(file)
 
     if not policy_files:
         print("No policy files found.")

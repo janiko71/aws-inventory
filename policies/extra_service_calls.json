@@ -1,0 +1,10 @@
+{
+    "es": {
+        "list_function": "list_domain_names",
+        "result_key": "DomainNames",
+        "item_key": "DomainName",
+        "detail_function": "describe_elasticsearch_domain",
+        "detail_param": "DomainName",
+        "required_permission": "es:DescribeElasticsearchDomain"
+    }
+}
