@@ -35,7 +35,9 @@
                 "directconnect:DescribeVirtualInterfaces",
                 "directconnect:DescribeInterconnects",
                 "cloudfront:ListDistributions",
-                "cloudfront:ListStreamingDistributions"
+                "cloudfront:ListStreamingDistributions",
+                "outposts:ListOutposts",
+                "outposts:ListSites"
             ],
             "Resource": "*"
         }
