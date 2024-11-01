@@ -254,11 +254,12 @@ def inventory_handling(category, region, service, func, progress_callback):
                 results[category][service][object_type] = {}
 
             # Check if there are non-empty items in the inventory (excluding 'NextToken' because some services responds with an empty table but with a NextToken)
-            empty_items = True
-            for key, value in inventory.items():
-                if not is_empty(value) and key not in {'NextToken'}:
-                    empty_items = False
-                    break
+            empty_items = False # temporary test
+            #empty_items = True
+            #for key, value in inventory.items():
+            #    if not is_empty(value) and key not in {'NextToken'}:
+            #        empty_items = False
+            #        break
             # Check if there are non-empty items in the inventory excluding 'ResponseMetadata' and 'NextToken'
             # non_empty_items = next((v for k, v in inventory.items() if k != 'ResponseMetadata' and not is_empty(v) and not (len(v) == 1 and 'NextToken' in v)), None)
             if not empty_items or with_empty:
