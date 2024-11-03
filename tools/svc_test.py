@@ -2,8 +2,8 @@ import boto3
 import botocore
 from botocore.exceptions import EndpointConnectionError
 
-res = 'privatenetworks'
-svc = 'list_networks'
+res = 'sns'
+svc = 'list_subscriptions'
 #region = 'eu-west-3'
 #region = None
 region = 'us-east-1'

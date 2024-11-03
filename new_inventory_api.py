@@ -181,42 +181,27 @@ def create_services_structure(policy_files):
             for statement in policy.get('Statement', []):
                 for action in statement.get('Action', []):
                     service_prefix, action_name = action.split(':')
-                    if service_prefix in service_to_category:
-                        category = service_to_category[service_prefix]
-                        if policy_file.endswith('inventory_policy_global.json'):
-                            if service_prefix not in services['global']:
-                                services['global'][service_prefix] = []
-                            transformed_action_name = transform_function_name(action_name)
-                            if transformed_action_name not in services['global'][service_prefix]:
-                                services['global'][service_prefix].append(transformed_action_name)
-                        else:
-                            if category not in services['regional']:
-                                services['regional'][category] = {}
-                            if service_prefix not in services['regional'][category]:
-                                services['regional'][category][service_prefix] = []
-                            transformed_action_name = transform_function_name(action_name)
-                            if transformed_action_name not in services['regional'][category][service_prefix]:
-                                services['regional'][category][service_prefix].append(transformed_action_name)
+                    category = service_to_category.get(service_prefix, 'Unknown')
+                    if policy_file.endswith('inventory_policy_global.json'):
+                        if service_prefix not in services['global']:
+                            services['global'][service_prefix] = []
+                        transformed_action_name = transform_function_name(action_name)
+                        if transformed_action_name not in services['global'][service_prefix]:
+                            services['global'][service_prefix].append(transformed_action_name)
+                    else:
+                        if category not in services['regional']:
+                            services['regional'][category] = {}
+                        if service_prefix not in services['regional'][category]:
+                            services['regional'][category][service_prefix] = []
+                        transformed_action_name = transform_function_name(action_name)
+                        if transformed_action_name not in services['regional'][category][service_prefix]:
+                            services['regional'][category][service_prefix].append(transformed_action_name)
 
-    #pprint.pprint(services)
     return services
 
 # ------------------------------------------------------------------------------
 
 def inventory_handling(category, region, service, func, progress_callback):
-    """
-    Handle the inventory task for a given service and region.
-
-    Args:
-        category (str): The category of the service.
-        region (str): The AWS region.
-        service (str): The AWS service.
-        func (str): The function to call on the service.
-        progress_callback (function): A callback function to update the progress bar.
-
-    Returns:
-        None
-    """
     global results, successful_services, failed_services, skipped_services, empty_services, filled_services
     if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
         write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
@@ -225,7 +210,11 @@ def inventory_handling(category, region, service, func, progress_callback):
                 if service == 'states':
                     client = boto3.client('stepfunctions', region_name=region)
                 elif service == 'private-networks':
-                    client = boto3.client("privatenetworks", region_name=region)
+                    client = boto3.client('privatenetworks', region_name=region)
+                elif service == 'neptune-db':
+                    client = boto3.client('neptune', region_name=region)
+                elif service == 'elasticfilesystem':
+                    client = boto3.client('efs', region_name=region)
                 else:
                     client = boto3.client(service.lower(), region_name=region)
             else:
@@ -254,14 +243,11 @@ def inventory_handling(category, region, service, func, progress_callback):
                 results[category][service][object_type] = {}
 
             # Check if there are non-empty items in the inventory (excluding 'NextToken' because some services responds with an empty table but with a NextToken)
-            #empty_items = False # temporary test
             empty_items = True
             for key, value in inventory.items():
                 if not is_empty(value) and key not in {'NextToken'}:
                     empty_items = False
                     break
-            # Check if there are non-empty items in the inventory excluding 'ResponseMetadata' and 'NextToken'
-            # non_empty_items = next((v for k, v in inventory.items() if k != 'ResponseMetadata' and not is_empty(v) and not (len(v) == 1 and 'NextToken' in v)), None)
             if not empty_items or with_empty:
                 if region not in results[category][service][object_type]:
                     results[category][service][object_type][region] = {}
@@ -281,20 +267,33 @@ def inventory_handling(category, region, service, func, progress_callback):
                     list_function = extra_call_config['list_function']
                     result_key = extra_call_config['result_key']
                     item_key = extra_call_config['item_key']
-                    detail_function = extra_call_config['detail_function']
-                    detail_param = extra_call_config['detail_param']
 
                     items = inventory.get(result_key, [])
                     for item in items:
-                        detail_param_value = item[item_key]
-                        detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                        detail_responses = {}
+                        if 'details' in extra_call_config:
+                            details = extra_call_config['details']
+                            for detail in details:
+                                detail_function = detail['detail_function']
+                                detail_param = detail['detail_param']
+                                detail_param_value = item[item_key]
+                                detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                                detail_responses[detail_function] = detail_response
+                        else:
+                            for sub_key, sub_config in extra_call_config.items():
+                                if isinstance(sub_config, dict):
+                                    detail_function = sub_config['detail_function']
+                                    detail_param = sub_config['detail_param']
+                                    detail_param_value = item[item_key]
+                                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                                    detail_responses[sub_key] = detail_response
                         
                         # Initialize the list if it doesn't exist
                         if detail_param_value not in results[category][service][object_type][region]:
                             results[category][service][object_type][region][detail_param_value] = []
                         
-                        # Append the detail response to the list
-                        results[category][service][object_type][region][detail_param_value].append(detail_response)
+                        # Append the detail responses to the list
+                        results[category][service][object_type][region][detail_param_value].append(detail_responses)
 
             else:
                 empty_services += 1
@@ -335,7 +334,7 @@ def inventory_handling(category, region, service, func, progress_callback):
         progress_callback(2)  # Update progress bar by 2 tasks for skipped service                
         write_log(f"Inventory for {service} in {region} using {func} skipped!", log_file_path)
 
-
+        
 # ------------------------------------------------------------------------------
 
 def list_used_services(policy_files):

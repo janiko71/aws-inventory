@@ -6,5 +6,71 @@
         "detail_function": "describe_elasticsearch_domain",
         "detail_param": "DomainName",
         "required_permission": "es:DescribeElasticsearchDomain"
+    },
+    "lightsail": {
+        "list_function": "get_instances",
+        "result_key": "instances",
+        "item_key": "name",
+        "detail_function": "get_instance",
+        "detail_param": "instanceName",
+        "required_permission": "lightsail:GetInstance"
+    },
+    "batch": {
+        "list_function": "list_jobs",
+        "result_key": "jobSummaryList",
+        "item_key": "jobId",
+        "detail_function": "describe_jobs",
+        "detail_param": "jobs",
+        "required_permission": "batch:DescribeJobs"
+    },
+    "simspaceweaver": {
+        "list_function": "list_simulations",
+        "result_key": "Simulations",
+        "item_key": "SimulationName",
+        "detail_function": "describe_simulation",
+        "detail_param": "SimulationName",
+        "required_permission": "simspaceweaver:DescribeSimulation"
+    },
+    "apprunner": {
+        "list_function": "list_services",
+        "result_key": "ServiceSummaryList",
+        "item_key": "ServiceArn",
+        "detail_function": "describe_service",
+        "detail_param": "ServiceArn",
+        "required_permission": "apprunner:DescribeService"
+    },
+    "grafana": {
+        "list_function": "list_workspaces",
+        "result_key": "workspaces",
+        "item_key": "workspaceId",
+        "detail_function": "describe_workspace",
+        "detail_param": "workspaceId",
+        "required_permission": "grafana:DescribeWorkspace"
+    },
+    "sns": {
+        "topics": {
+            "list_function": "list_topics",
+            "result_key": "Topics",
+            "item_key": "TopicArn",
+            "detail_function": "get_topic_attributes",
+            "detail_param": "TopicArn",
+            "required_permission": "sns:GetTopicAttributes"
+        },
+        "subscriptions": {
+            "list_function": "list_subscriptions",
+            "result_key": "Subscriptions",
+            "item_key": "SubscriptionArn",
+            "detail_function": "get_subscription_attributes",
+            "detail_param": "SubscriptionArn",
+            "required_permission": "sns:GetSubscriptionAttributes"
+        }
+    },
+    "sqs": {
+        "list_function": "list_queues",
+        "result_key": "QueueUrls",
+        "item_key": "QueueUrl",
+        "detail_function": "get_queue_attributes",
+        "detail_param": "QueueUrl",
+        "required_permission": "sqs:GetQueueAttributes"
     }
 }

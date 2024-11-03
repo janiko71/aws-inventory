@@ -89,3 +89,4 @@ This project is licensed under the terms of the GNU General Public License v3.0.
 - [ ] glue, list_tables : list_schemas, list_nodegroups, list_fragate_pofile, ListTables, ListStatements
 - [ ] batch:DescribeJobQueues : list_jobs (queue name)
 - [ ] rekognition : list_users
+- [X] qldb deprecated

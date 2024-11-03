@@ -38,12 +38,17 @@
                 "elasticbeanstalk:DescribeApplicationVersions",
                 "elasticbeanstalk:DescribeEnvironments",
                 "elasticbeanstalk:DescribeEnvironmentResources",
-                "parallelcluster:DescribeClusters",
-                "parallelcluster:ListClusters",
+                "pcs:ListQueues",
+                "pcs:ListClusters",
+                "pcs:ListComputeNodeGroups",
                 "simspaceweaver:ListSimulations",
-                "simspaceweaver:DescribeSimulation",
                 "apprunner:ListServices",
-                "apprunner:DescribeService"
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DescribePolicies",
+                "autoscaling:DescribeScalingActivities",
+                "autoscaling:DescribeScheduledActions"
             ],
             "Resource": "*"
         }
