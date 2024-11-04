@@ -203,136 +203,131 @@ def create_services_structure(policy_files):
 
 def inventory_handling(category, region, service, func, progress_callback):
     global results, successful_services, failed_services, skipped_services, empty_services, filled_services
-    if with_extra or func not in {'describe_availability_zones', 'describe_regions', 'describe_account_attributes'}:
-        write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
-        try:
-            if region != 'global':
-                if service == 'states':
-                    client = boto3.client('stepfunctions', region_name=region)
-                elif service == 'private-networks':
-                    client = boto3.client('privatenetworks', region_name=region)
-                elif service == 'neptune-db':
-                    client = boto3.client('neptune', region_name=region)
-                elif service == 'elasticfilesystem':
-                    client = boto3.client('efs', region_name=region)
-                else:
-                    client = boto3.client(service.lower(), region_name=region)
+    
+    write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
+    try:
+        if region != 'global':
+            if service == 'states':
+                client = boto3.client('stepfunctions', region_name=region)
             else:
-                # Special case for 's3' service in the global context: no region specified
-                if service == 'ec2':
-                    client = boto3.client(service.lower(), region_name='us-east-1')
-                else:
-                    client = boto3.client(service.lower())
-            
-            # First sub-task: API call
-            start_time = time.time()
-            inventory = client.__getattribute__(func)()
-            progress_callback(1)  # Update progress bar by 1 task
-            end_time = time.time()
-            write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
-            
-            # Extracting ResponseMetadata
+                client = boto3.client(service.lower(), region_name=region)
+        else:
+            if service == 'ec2':
+                client = boto3.client(service.lower(), region_name='us-east-1')
+            else:
+                client = boto3.client(service.lower())
+        
+        start_time = time.time()
+        inventory = client.__getattribute__(func)()
+        progress_callback(1)
+        end_time = time.time()
+        write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
+
+        if not with_meta:
             response_metadata = inventory.pop('ResponseMetadata', None)
-            
-            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
-            if category not in results:
-                results[category] = {}
-            if service not in results[category]:
-                results[category][service] = {}
-            if object_type not in results[category][service]:
-                results[category][service][object_type] = {}
+        
+        object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+        if category not in results:
+            results[category] = {}
+        if service not in results[category]:
+            results[category][service] = {}
+        if object_type not in results[category][service]:
+            results[category][service][object_type] = {}
+        
+        empty_items = True
+        for key, value in inventory.items():
+            if not is_empty(value) and key not in {'NextToken'}:
+                empty_items = False
+                break
+        if not empty_items or with_empty:
+            if region not in results[category][service][object_type]:
+                results[category][service][object_type][region] = {}
 
-            # Check if there are non-empty items in the inventory (excluding 'NextToken' because some services responds with an empty table but with a NextToken)
-            empty_items = True
-            for key, value in inventory.items():
-                if not is_empty(value) and key not in {'NextToken'}:
-                    empty_items = False
-                    break
-            if not empty_items or with_empty:
-                if region not in results[category][service][object_type]:
-                    results[category][service][object_type][region] = {}
+            start_time = time.time()
+            results[category][service][object_type][region] = inventory
+            if with_meta and response_metadata:
+                results[category][service][object_type][region]['ResponseMetadata'] = response_metadata
+            end_time = time.time()
+            write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
+            filled_services += 1
 
-                # Second sub-task: Processing results
-                start_time = time.time()
-                results[category][service][object_type][region] = inventory
-                if with_meta:
-                    results[category][service][object_type][region]['ResponseMetadata'] = response_metadata
-                end_time = time.time()
-                write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
-                filled_services += 1
-
-                # Check for extra service calls
-                if service in extra_service_calls:
-                    extra_call_config = extra_service_calls[service]
+            if service in extra_service_calls:
+                extra_call_config = extra_service_calls[service]
+                if "list_function" in extra_call_config:
                     list_function = extra_call_config['list_function']
                     result_key = extra_call_config['result_key']
                     item_key = extra_call_config['item_key']
 
                     items = inventory.get(result_key, [])
                     for item in items:
-                        detail_responses = {}
+                        detail_param_value = item[item_key]
                         if 'details' in extra_call_config:
-                            details = extra_call_config['details']
-                            for detail in details:
+                            for detail in extra_call_config['details']:
                                 detail_function = detail['detail_function']
                                 detail_param = detail['detail_param']
-                                detail_param_value = item[item_key]
                                 detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                                detail_responses[detail_function] = detail_response
+                                if not with_meta:
+                                    detail_response.pop('ResponseMetadata', None)
+                                item.update(detail_response)
                         else:
-                            for sub_key, sub_config in extra_call_config.items():
-                                if isinstance(sub_config, dict):
-                                    detail_function = sub_config['detail_function']
-                                    detail_param = sub_config['detail_param']
-                                    detail_param_value = item[item_key]
-                                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                                    detail_responses[sub_key] = detail_response
-                        
-                        # Initialize the list if it doesn't exist
+                            detail_function = extra_call_config['detail_function']
+                            detail_param = extra_call_config['detail_param']
+                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                            if not with_meta:
+                                detail_response.pop('ResponseMetadata', None)
+                            item.update(detail_response)
+
                         if detail_param_value not in results[category][service][object_type][region]:
-                            results[category][service][object_type][region][detail_param_value] = []
-                        
-                        # Append the detail responses to the list
-                        results[category][service][object_type][region][detail_param_value].append(detail_responses)
+                            results[category][service][object_type][region][detail_param_value] = item
 
-            else:
-                empty_services += 1
-                write_log(f"Empty results for {service} in {region}", log_file_path)
-            progress_callback(1)  # Update progress bar by 1 task
-            successful_services += 1  # Increment successful services counter
+                else:
+                    for sub_key, sub_config in extra_call_config.items():
+                        list_function = sub_config['list_function']
+                        result_key = sub_config['result_key']
+                        item_key = sub_config['item_key']
 
-        except AttributeError as e1:
-            write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})", log_file_path)
-            failed_services += 1  # Increment failed services counter
-            progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        except botocore.exceptions.ClientError as e2: 
-            if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
-                write_log(f"Warning (2): querying {service} in {region} using {func}: error (organizations not in use): {e2} ({type(e2)})", log_file_path)
-                skipped_services += 1  # Increment skipped services counter
-                progress_callback(2)  # Update progress bar by 2 tasks for skipped service
-            elif type(e2).__name__ == 'DirectConnectClientException':
-                write_log(f"Warning (2): querying {service} in {region} using {func}: error (organizations not in use): {e2} ({type(e2)})", log_file_path)
-                skipped_services += 1  # Increment skipped services counter
-                progress_callback(2)  # Update progress bar by 2 tasks for skipped service
-            else:
-                write_log(f"Error (3) querying {service} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
-                failed_services += 1  # Increment failed services counter
-                progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        except EndpointConnectionError as e3:
-            write_log(f"Warning (4): querying {service} in {region} using {func}: error due to connection error: {e3} ({type(e3)})", log_file_path)
-            skipped_services += 1  # Increment skipped services counter
-            progress_callback(2)  # Update progress bar by 2 tasks for skipped service
-        except Exception as e:
-            write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})", log_file_path)
-            failed_services += 1  # Increment failed services counter
-            progress_callback(2)  # Update progress bar by 2 tasks for failed service
-        finally:
-            write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
+                        items = inventory.get(result_key, [])
+                        for item in items:
+                            detail_param_value = item[item_key]
+                            detail_function = sub_config['detail_function']
+                            detail_param = sub_config['detail_param']
+                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                            if not with_meta:
+                                detail_response.pop('ResponseMetadata', None)
+                            item.update(detail_response)
 
-    else:
-        skipped_services += 1  # Increment skipped services counter
-        progress_callback(2)  # Update progress bar by 2 tasks for skipped service                
-        write_log(f"Inventory for {service} in {region} using {func} skipped!", log_file_path)
+                            if detail_param_value not in results[category][service][object_type][region]:
+                                results[category][service][object_type][region][detail_param_value] = item
+
+        else:
+            empty_services += 1
+            write_log(f"Empty results for {service} in {region}", log_file_path)
+        progress_callback(1)
+        successful_services += 1
+
+    except AttributeError as e1:
+        write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})", log_file_path)
+        failed_services += 1
+        progress_callback(2)
+    except botocore.exceptions.ClientError as e2: 
+        if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
+            write_log(f"Warning (2): Skipping {service} in {region} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
+            skipped_services += 1
+            progress_callback(2)
+        else:
+            write_log(f"Error (3) querying {service} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
+            failed_services += 1
+            progress_callback(2)
+    except EndpointConnectionError as e3:
+        write_log(f"Warning (4): Skipping {service} in {region} due to connection error: {e3} ({type(e3)})", log_file_path)
+        skipped_services += 1
+        progress_callback(2)
+    except Exception as e:
+        write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})", log_file_path)
+        failed_services += 1
+        progress_callback(2)
+    finally:
+        write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
 
         
 # ------------------------------------------------------------------------------
