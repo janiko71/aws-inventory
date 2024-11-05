@@ -95,6 +95,14 @@
             "result_key": "",
             "required_permission": "s3:GetBucketWebsite"
         },
+        "Location": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_location",
+            "detail_param": "Bucket",
+            "result_key": "LocationConstraint",
+            "required_permission": "s3:GetBucketLocation"
+        },
         "Tags": {
             "item_key": "Buckets",
             "item_search_id": "Name",

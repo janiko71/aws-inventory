@@ -48,7 +48,6 @@ import botocore
 import json
 import os
 import sys
-import re
 from datetime import datetime
 import time
 import argparse
@@ -76,6 +75,7 @@ log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
 # Global variables
 boto3_clients = {}  # Dictionary to store boto3 clients for different services and regions
 results = {}  # Dictionary to store the inventory results
+account_id = None  # AWS account ID
 
 # Progress counters
 total_tasks = 0  # Counter for the total number of tasks
@@ -203,9 +203,79 @@ def create_services_structure(policy_files):
 # ------------------------------------------------------------------------------
 
 def inventory_handling(category, region, service, func, progress_callback):
-    global results, successful_services, failed_services, skipped_services, empty_services, filled_services
+    """
+    Handles the inventory retrieval and processing for a specified AWS service and region.
+        category (str): The category of the inventory items.
+        region (str): The AWS region to query.
+        service (str): The AWS service to query.
+        func (str): The function name to call on the client to retrieve the inventory.
+        progress_callback (function): A callback function to report progress.
+        None: The function updates global variables with the inventory results.
+
+    Raises:
+        AttributeError: If the specified function does not exist on the client.
+        botocore.exceptions.ClientError: If there is an error making the API call.
+        EndpointConnectionError: If there is a connection error to the endpoint.
+        Exception: For any other exceptions that occur during processing.
+    """
+
+    global account_id, results, successful_services, failed_services, skipped_services, empty_services, filled_services
     
     write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
+
+    def detail_handling(client, inventory, extra_call_config, sub_config, result_key, item_key, item_search_id):
+        """
+        Handles the detailed retrieval and updating of inventory items using a specified client and configuration.
+
+        Args:
+            client (object): The client object used to make API calls.
+            inventory (dict): The inventory data containing items to be processed.
+            extra_call_config (dict): Additional configuration for the API call, including complementary parameters.
+            sub_config (dict): Sub-configuration containing details about the function and parameters for the API call.
+            result_key (str): The key in the API response that contains the detailed information.
+            item_key (str): The key in the inventory dictionary that contains the list of items to be processed.
+            item_search_id (str): The key in each item used to search for detailed information.
+
+        Returns:
+            None: The function updates the inventory items in place with the detailed information retrieved from the API.
+        """
+        items = inventory.get(item_key, [])
+        for item in items:
+            if type(item) not in [dict, list]:
+                item = {item}
+            detail_param_value = item[item_search_id]
+            detail_function = sub_config['detail_function']
+            detail_param = sub_config['detail_param']
+            complementary_params = extra_call_config.get('complementary_param', None)
+            # exception for s3 location
+            if service == 's3' and detail_function == 'get_bucket_location':
+                if not complementary_params:
+                    complementary_params = {'ExpectedBucketOwner': account_id}
+                else:
+                    complementary_params.update({'ExpectedBucketOwner': account_id})
+            detail_response = {}
+            try:
+                if complementary_params:
+                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
+                else:
+                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                if not with_meta:
+                    detail_response.pop('ResponseMetadata', None)
+            except botocore.exceptions.ClientError as e1:
+                exception_function_name = transform_function_name(e1.operation_name)
+                if exception_function_name != detail_function:
+                    raise e1
+
+            pass
+            if len(detail_response) > 0:
+                if type(detail_response) not in [dict, list]:
+                    detail_response = {result_key: detail_response[result_key]}
+                item.update(detail_response)
+            else:
+                if result_key != "":
+                    item.update({result_key: {}})
+
+
     try:
         if region != 'global':
             if service == 'states':
@@ -264,56 +334,14 @@ def inventory_handling(category, region, service, func, progress_callback):
                         item_key = sub_config['item_key']
                         item_search_id = sub_config['item_search_id']
 
-                        items = inventory.get(item_key, [])
-                        for item in items:
-                            if type(item) not in [dict, list]:
-                                item = {item}
-                            detail_param_value = item[item_search_id]
-                            detail_function = sub_config['detail_function']
-                            detail_param = sub_config['detail_param']
-                            complementary_params = extra_call_config.get('complementary_param', None)
-                            if complementary_params:
-                                detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
-                            else:
-                                detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                            if not with_meta:
-                                detail_response.pop('ResponseMetadata', None)
-                            if len(detail_response) > 0:
-                                item.update(detail_response[result_key])
-                            else:
-                                item.update({result_key: {}})
+                        detail_handling(client, inventory, extra_call_config, sub_config, result_key, item_key, item_search_id)
                 else:
                     # Cas où extra_call_config est une simple liste de paires clé:valeur
                     result_key = extra_call_config['result_key']
                     item_key = extra_call_config['item_key']
                     item_search_id = extra_call_config['item_search_id']
 
-                    items = inventory.get(item_key, [])
-                    for item in items:
-                        if item_search_id:
-                            detail_param_value = item[item_search_id]
-                        else:
-                            detail_param_value = item
-                        detail_function = extra_call_config['detail_function']
-                        detail_param = extra_call_config['detail_param']
-                        complementary_params = extra_call_config.get('complementary_params', None)
-                        if complementary_params:
-                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
-                        else:
-                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                        if not with_meta:
-                            detail_response.pop('ResponseMetadata', None)
-                        if len(detail_response) > 0:
-                            if type(item) not in [dict, list]:
-                                new_item = {item_key: item}
-                                new_item.update(detail_response[result_key])
-                                results[category][service][object_type][region] = new_item
-                            else:
-                                item.update(detail_response[result_key])
-                        else:
-                            item.update({result_key: {}})
-
-
+                    detail_handling(client, inventory, extra_call_config, sub_config, result_key, item_key, item_search_id)
 
         else:
             empty_services += 1
@@ -345,6 +373,8 @@ def inventory_handling(category, region, service, func, progress_callback):
     finally:
         write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
 
+
+
         
 # ------------------------------------------------------------------------------
 
@@ -366,7 +396,7 @@ def list_used_services(policy_files):
     Returns:
         dict: A dictionary of the used services.
     """
-    global results, total_tasks, progress_bar, successful_services, failed_services, filled_services, empty_services
+    global account_id, results, total_tasks, progress_bar, successful_services, failed_services, filled_services, empty_services
 
     start_time = time.time()
     
