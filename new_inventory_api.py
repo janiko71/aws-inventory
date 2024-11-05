@@ -94,6 +94,7 @@ num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
+num_threads = 1 # For test purposes
 
 # ------------------------------------------------------------------------------
 
@@ -244,6 +245,7 @@ def inventory_handling(category, region, service, func, progress_callback):
                 results[category][service][object_type][region] = {}
 
             start_time = time.time()
+            inventory.pop('NextToken', None)
             results[category][service][object_type][region] = inventory
             if with_meta and response_metadata:
                 results[category][service][object_type][region]['ResponseMetadata'] = response_metadata
@@ -253,51 +255,20 @@ def inventory_handling(category, region, service, func, progress_callback):
 
             if service in extra_service_calls:
                 extra_call_config = extra_service_calls[service]
-                if "list_function" in extra_call_config:
-                    list_function = extra_call_config['list_function']
-                    result_key = extra_call_config['result_key']
-                    item_key = extra_call_config['item_key']
+                for sub_key, sub_config in extra_call_config.items():
+                    result_key = sub_config['result_key']
+                    item_key = sub_config['item_key']
+                    item_search_id = sub_config['item_search_id']
 
-                    items = inventory.get(result_key, [])
+                    items = inventory.get(item_key, [])
                     for item in items:
-                        detail_param_value = item[item_key]
-                        if 'details' in extra_call_config:
-                            for detail in extra_call_config['details']:
-                                detail_function = detail['detail_function']
-                                detail_param = detail['detail_param']
-                                detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                                if not with_meta:
-                                    detail_response.pop('ResponseMetadata', None)
-                                item.update(detail_response)
-                        else:
-                            detail_function = extra_call_config['detail_function']
-                            detail_param = extra_call_config['detail_param']
-                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                            if not with_meta:
-                                detail_response.pop('ResponseMetadata', None)
-                            item.update(detail_response)
-
-                        if detail_param_value not in results[category][service][object_type][region]:
-                            results[category][service][object_type][region][detail_param_value] = item
-
-                else:
-                    for sub_key, sub_config in extra_call_config.items():
-                        list_function = sub_config['list_function']
-                        result_key = sub_config['result_key']
-                        item_key = sub_config['item_key']
-
-                        items = inventory.get(result_key, [])
-                        for item in items:
-                            detail_param_value = item[item_key]
-                            detail_function = sub_config['detail_function']
-                            detail_param = sub_config['detail_param']
-                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                            if not with_meta:
-                                detail_response.pop('ResponseMetadata', None)
-                            item.update(detail_response)
-
-                            if detail_param_value not in results[category][service][object_type][region]:
-                                results[category][service][object_type][region][detail_param_value] = item
+                        detail_param_value = item[item_search_id]
+                        detail_function = sub_config['detail_function']
+                        detail_param = sub_config['detail_param']
+                        detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                        if not with_meta:
+                            detail_response.pop('ResponseMetadata', None)
+                        item.update(detail_response[result_key])
 
         else:
             empty_services += 1
