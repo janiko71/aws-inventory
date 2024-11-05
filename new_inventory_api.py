@@ -255,20 +255,57 @@ def inventory_handling(category, region, service, func, progress_callback):
 
             if service in extra_service_calls:
                 extra_call_config = extra_service_calls[service]
-                for sub_key, sub_config in extra_call_config.items():
-                    result_key = sub_config['result_key']
-                    item_key = sub_config['item_key']
-                    item_search_id = sub_config['item_search_id']
+                
+                # Test pour déterminer la structure de extra_call_config
+                if all(isinstance(value, dict) for value in extra_call_config.values()):
+                    # Cas où extra_call_config est une structure JSON plus complexe
+                    for sub_key, sub_config in extra_call_config.items():
+                        result_key = sub_config['result_key']
+                        item_key = sub_config['item_key']
+                        item_search_id = sub_config['item_search_id']
+
+                        items = inventory.get(item_key, [])
+                        for item in items:
+                            if type(item) not in [dict, list]:
+                                item = {item}
+                            detail_param_value = item[item_search_id]
+                            detail_function = sub_config['detail_function']
+                            detail_param = sub_config['detail_param']
+                            complementary_params = extra_call_config.get('complementary_param', None)
+                            if complementary_params:
+                                detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
+                            else:
+                                detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                            if not with_meta:
+                                detail_response.pop('ResponseMetadata', None)
+                            item.update(detail_response[result_key])
+                else:
+                    # Cas où extra_call_config est une simple liste de paires clé:valeur
+                    result_key = extra_call_config['result_key']
+                    item_key = extra_call_config['item_key']
+                    item_search_id = extra_call_config['item_search_id']
 
                     items = inventory.get(item_key, [])
                     for item in items:
-                        detail_param_value = item[item_search_id]
-                        detail_function = sub_config['detail_function']
-                        detail_param = sub_config['detail_param']
-                        detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                        if item_search_id:
+                            detail_param_value = item[item_search_id]
+                        else:
+                            detail_param_value = item
+                        detail_function = extra_call_config['detail_function']
+                        detail_param = extra_call_config['detail_param']
+                        complementary_params = extra_call_config.get('complementary_params', None)
+                        if complementary_params:
+                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
+                        else:
+                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
                         if not with_meta:
                             detail_response.pop('ResponseMetadata', None)
-                        item.update(detail_response[result_key])
+                        if type(item) not in [dict, list]:
+                            new_item = {item_key: item}
+                            new_item.update(detail_response[result_key])
+                            results[category][service][object_type][region] = new_item
+                        else:
+                            item.update(detail_response[result_key])
 
         else:
             empty_services += 1

@@ -7,14 +7,6 @@
         "detail_param": "DomainName",
         "required_permission": "es:DescribeElasticsearchDomain"
     },
-    "lightsail": {
-        "list_function": "get_instances",
-        "result_key": "instances",
-        "item_search_id": "name",
-        "detail_function": "get_instance",
-        "detail_param": "instanceName",
-        "required_permission": "lightsail:GetInstance"
-    },
     "batch": {
         "list_function": "list_jobs",
         "result_key": "jobSummaryList",
@@ -51,26 +43,29 @@
         "topics": {
             "item_key": "Topics",
             "item_search_id": "TopicArn",
-            "result_key": "Attributes",
             "detail_function": "get_topic_attributes",
             "detail_param": "TopicArn",
+            "result_key": "Attributes",
             "required_permission": "sns:GetTopicAttributes"
         },
         "subscriptions": {
             "item_key": "Subscriptions",
             "item_search_id": "SubscriptionArn",
-            "result_key": "Attributes",
             "detail_function": "get_subscription_attributes",
             "detail_param": "SubscriptionArn",
+            "result_key": "Attributes",
             "required_permission": "sns:GetSubscriptionAttributes"
         }
     },
     "sqs": {
-        "list_function": "list_queues",
-        "result_key": "QueueUrls",
-        "item_search_id": "QueueUrl",
+        "item_key": "QueueUrls",
+        "item_search_id": "",
         "detail_function": "get_queue_attributes",
         "detail_param": "QueueUrl",
-        "required_permission": "sqs:GetQueueAttributes"
+        "complementary_params": {
+            "AttributeNames": ["All"]
+        },
+        "result_key": "Attributes",
+        "required_permission": "sns:GetSubscriptionAttributes"
     }
 }
