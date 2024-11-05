@@ -1,43 +1,11 @@
 {
-    "es": {
-        "list_function": "list_domain_names",
-        "result_key": "DomainNames",
-        "item_search_id": "DomainName",
-        "detail_function": "describe_elasticsearch_domain",
-        "detail_param": "DomainName",
-        "required_permission": "es:DescribeElasticsearchDomain"
-    },
-    "batch": {
-        "list_function": "list_jobs",
-        "result_key": "jobSummaryList",
-        "item_search_id": "jobId",
-        "detail_function": "describe_jobs",
-        "detail_param": "jobs",
-        "required_permission": "batch:DescribeJobs"
-    },
-    "simspaceweaver": {
-        "list_function": "list_simulations",
-        "result_key": "Simulations",
-        "item_search_id": "SimulationName",
-        "detail_function": "describe_simulation",
-        "detail_param": "SimulationName",
-        "required_permission": "simspaceweaver:DescribeSimulation"
-    },
-    "apprunner": {
-        "list_function": "list_services",
-        "result_key": "ServiceSummaryList",
-        "item_search_id": "ServiceArn",
-        "detail_function": "describe_service",
-        "detail_param": "ServiceArn",
-        "required_permission": "apprunner:DescribeService"
-    },
     "grafana": {
-        "list_function": "list_workspaces",
-        "result_key": "workspaces",
-        "item_search_id": "workspaceId",
+        "item_key": "workspaces",
+        "item_search_id": "id",
         "detail_function": "describe_workspace",
         "detail_param": "workspaceId",
-        "required_permission": "grafana:DescribeWorkspace"
+        "result_key": "workspace",
+        "required_permission": "sns:DescribeWorkspace"
     },
     "sns": {
         "topics": {
@@ -66,6 +34,74 @@
             "AttributeNames": ["All"]
         },
         "result_key": "Attributes",
-        "required_permission": "sns:GetSubscriptionAttributes"
+        "required_permission": "sns:GetQueuesAttributes"
+    },
+    "apprunner": {
+        "item_key": "ServiceSummaryList",
+        "item_search_id": "ServiceArn",
+        "detail_function": "describe_service",
+        "detail_param": "ServiceArn",
+        "result_key": "Service",
+        "required_permission": "apprunner:DescribeService"
+    },
+    "simspaceweaver": {
+        "item_key": "Simulations",
+        "item_search_id": "arn",
+        "detail_function": "list_apps",
+        "detail_param": "Simulation",
+        "result_key": "Apps",
+        "required_permission": "simspaceweaver:ListApps"
+    },
+    "pcs": {
+        "clusters": {
+            "item_key": "clusters",
+            "item_search_id": "id",
+            "detail_function": "list_queues",
+            "detail_param": "clusterIdentifier",
+            "result_key": "queues",
+            "required_permission": "pcs:ListQueues"
+        },
+        "compute_node_groups": {
+            "item_key": "clusters",
+            "item_search_id": "id",
+            "detail_function": "list_compute_node_groups",
+            "detail_param": "clusterIdentifier",
+            "result_key": "computeNodeGroups",
+            "required_permission": "pcs:ListComputeNodeGroups"
+        }
+    },
+    "s3": {
+        "SSEC": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_encryption",
+            "detail_param": "Bucket",
+            "result_key": "ServerSideEncryptionConfiguration",
+            "required_permission": "s3:GetBucketEncryption"
+        },
+        "AccelerateConf": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_accelerate_configuration",
+            "detail_param": "Bucket",
+            "result_key": "",
+            "required_permission": "s3:GetBucketAccelerateConfiguration"
+        },
+        "Website": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_website",
+            "detail_param": "Bucket",
+            "result_key": "",
+            "required_permission": "s3:GetBucketWebsite"
+        },
+        "Tags": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_tagging",
+            "detail_param": "Bucket",
+            "result_key": "TagSet",
+            "required_permission": "s3:GetBucketTagging"
+        }
     }
 }

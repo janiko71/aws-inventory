@@ -13,6 +13,7 @@
     "wavelength": "Compute",
     "pcs": "Compute",
     "autoscaling-plans": "Compute",
+    "simspaceweaver": "Compute",
     "s3": "Storage",
     "ebs": "Storage",
     "efs": "Storage",

@@ -4,10 +4,8 @@
         {
             "Effect": "Allow",
             "Action": [
-                "glue:ListJobs",
-                "glue:ListWorkflows",
-                "glue:ListSchemas",
-                "es:DescribeElasticsearchDomains"               
+                "sts:GetCallerIdentity",
+                "s3:ListAllMyBuckets"
             ],
             "Resource": "*"
         }

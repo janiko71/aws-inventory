@@ -35,12 +35,11 @@
                 "batch:DescribeComputeEnvironments",
                 "batch:DescribeJobDefinitions",
                 "elasticbeanstalk:DescribeApplications",
-                "elasticbeanstalk:DescribeApplicationVersions",
                 "elasticbeanstalk:DescribeEnvironments",
                 "elasticbeanstalk:DescribeEnvironmentResources",
-                "pcs:ListQueues",
                 "pcs:ListClusters",
                 "pcs:ListComputeNodeGroups",
+                "simspaceweaver:ListApps",
                 "simspaceweaver:ListSimulations",
                 "apprunner:ListServices",
                 "autoscaling:DescribeAutoScalingGroups",
@@ -48,7 +47,10 @@
                 "autoscaling:DescribeLaunchConfigurations",
                 "autoscaling:DescribePolicies",
                 "autoscaling:DescribeScalingActivities",
-                "autoscaling:DescribeScheduledActions"
+                "autoscaling:DescribeScheduledActions",
+                "outposts:ListOutposts",
+                "outposts:ListSites",
+                "outposts:ListAssets"
             ],
             "Resource": "*"
         }

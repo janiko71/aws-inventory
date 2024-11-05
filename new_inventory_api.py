@@ -94,7 +94,7 @@ num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
-num_threads = 1 # For test purposes
+# num_threads = 1 # For test purposes
 
 # ------------------------------------------------------------------------------
 
@@ -227,20 +227,19 @@ def inventory_handling(category, region, service, func, progress_callback):
         if not with_meta:
             response_metadata = inventory.pop('ResponseMetadata', None)
         
-        object_type = list(inventory.keys())[0] if inventory else 'Unknown'
-        if category not in results:
-            results[category] = {}
-        if service not in results[category]:
-            results[category][service] = {}
-        if object_type not in results[category][service]:
-            results[category][service][object_type] = {}
-        
         empty_items = True
         for key, value in inventory.items():
             if not is_empty(value) and key not in {'NextToken'}:
                 empty_items = False
                 break
         if not empty_items or with_empty:
+            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+            if category not in results:
+                results[category] = {}
+            if service not in results[category]:
+                results[category][service] = {}
+            if object_type not in results[category][service]:
+                results[category][service][object_type] = {}
             if region not in results[category][service][object_type]:
                 results[category][service][object_type][region] = {}
 
@@ -254,6 +253,7 @@ def inventory_handling(category, region, service, func, progress_callback):
             filled_services += 1
 
             if service in extra_service_calls:
+
                 extra_call_config = extra_service_calls[service]
                 
                 # Test pour déterminer la structure de extra_call_config
@@ -278,7 +278,10 @@ def inventory_handling(category, region, service, func, progress_callback):
                                 detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
                             if not with_meta:
                                 detail_response.pop('ResponseMetadata', None)
-                            item.update(detail_response[result_key])
+                            if len(detail_response) > 0:
+                                item.update(detail_response[result_key])
+                            else:
+                                item.update({result_key: {}})
                 else:
                     # Cas où extra_call_config est une simple liste de paires clé:valeur
                     result_key = extra_call_config['result_key']
@@ -300,12 +303,17 @@ def inventory_handling(category, region, service, func, progress_callback):
                             detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
                         if not with_meta:
                             detail_response.pop('ResponseMetadata', None)
-                        if type(item) not in [dict, list]:
-                            new_item = {item_key: item}
-                            new_item.update(detail_response[result_key])
-                            results[category][service][object_type][region] = new_item
+                        if len(detail_response) > 0:
+                            if type(item) not in [dict, list]:
+                                new_item = {item_key: item}
+                                new_item.update(detail_response[result_key])
+                                results[category][service][object_type][region] = new_item
+                            else:
+                                item.update(detail_response[result_key])
                         else:
-                            item.update(detail_response[result_key])
+                            item.update({result_key: {}})
+
+
 
         else:
             empty_services += 1
@@ -462,6 +470,11 @@ if __name__ == "__main__":
     extra_service_file = os.path.join(policy_dir, 'extra_service_calls.json')
     with open(extra_service_file, 'r') as file:
         extra_service_calls = json.load(file)
+        # Process extra service calls configuration
+        for service, config in extra_service_calls.items():
+            if ':' in service:
+                _, list_function = service.split(':')
+                extra_service_calls[service]['list_function'] = list_function
 
     if not policy_files:
         print("No policy files found.")
