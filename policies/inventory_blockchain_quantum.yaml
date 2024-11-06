@@ -1,0 +1,28 @@
+managedblockchain:
+    category: Blockchain
+    boto_resource_name: managedblockchain
+    region_type: local
+    # fonction inventaire
+    inventory_nodes:
+      list_networks: 
+          permissions: 
+          - ListNetworks
+          - GetNetwork
+          - ListMembers
+          - ListNodes 
+          item_key: Networks
+          item_search_id: Id
+          # fonctions détail
+          details:
+            networks:
+              detail_function: get_network
+              detail_param: NetworkId
+              result_key: Network
+            members:
+              detail_function: list_members
+              detail_param: NetworkId
+              result_key: Members
+            nodes:
+              detail_function: list_nodes
+              detail_param: NetworkId
+              result_key: Nodes

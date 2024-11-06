@@ -33,9 +33,9 @@ Functions:
     # Inventory Management Functions
     get_all_regions()
     test_region_connectivity(region)
-    create_services_structure(inventory_structure)
+    create_services_structure(policy_files)
     inventory_handling(category, region, service, func, progress_callback)
-    list_used_services(inventory_structure)
+    list_used_services(policy_files)
 
     # Main Function
     main()
@@ -44,7 +44,6 @@ Functions:
 import threading
 import boto3
 import json
-import yaml
 import os
 import sys
 from datetime import datetime
@@ -170,6 +169,64 @@ def test_region_connectivity(region):
 
         write_log(f"Could not connect to the endpoint URL for region {region}: {e}", log_file_path)
         return False
+
+# ------------------------------------------------------------------------------
+
+def create_services_structure(policy_files):
+
+    """
+    Create a structure of services based on the provided IAM policy files. In the JSON file 'service_structure.json', all inventoried resources are categorized.
+
+    Args:
+        policy_files (list): A list of paths to the IAM policy files.
+
+    Returns:
+        dict: A dictionary structure of services.
+    """
+
+    with open('service_structure.json', 'r') as file:
+        service_to_category = json.load(file)
+
+    services = {'global': {}, 'regional': {}}  # Add keys for global and regional services
+
+    for policy_file in policy_files:
+
+        # We read each policy file
+
+        with open(policy_file, 'r') as file:
+
+            policy = json.load(file)
+
+            for statement in policy.get('Statement', []):
+
+                for action in statement.get('Action', []):
+
+                    service_prefix, action_name = action.split(':')
+                    category = service_to_category.get(service_prefix, 'Unknown')
+
+                    if policy_file.endswith('inventory_policy_global.json'):
+
+                        # Global policy: 
+
+                        if service_prefix not in services['global']:
+                            services['global'][service_prefix] = []
+
+                        transformed_action_name = transform_function_name(action_name)
+                        services['global'][service_prefix].append(transformed_action_name)
+
+                    else:
+
+                        # Regional policy: 
+
+                        if category not in services['regional']:
+                            services['regional'][category] = {}
+                        if service_prefix not in services['regional'][category]:
+                            services['regional'][category][service_prefix] = []
+                        transformed_action_name = transform_function_name(action_name)
+                        if transformed_action_name not in services['regional'][category][service_prefix]:
+                            services['regional'][category][service_prefix].append(transformed_action_name)
+
+    return services
 
 # ------------------------------------------------------------------------------
 
@@ -415,10 +472,10 @@ def inventory_handling(category, region, service, func, progress_callback):
 
 # ------------------------------------------------------------------------------
 
-def list_used_services(inventory_structure):
+def list_used_services(policy_files):
 
     """
-    List used services based on the provided YAML files.
+    List used services based on the provided IAM policy files.
 
     This function performs the following steps:
     1. Retrieves all AWS regions.
@@ -429,52 +486,15 @@ def list_used_services(inventory_structure):
     6. Writes the results to a JSON file.
 
     Args:
-        inventory_structure (list): A structure of services based on the provided YAML file with all informations about the services.
+        policy_files (list): A list of paths to the IAM policy files.
 
     Returns:
         dict: A dictionary of the used services.
     """
 
-    # ------------------------------------------------------------------------------
-
     def progress_callback(amount):
-        
-        """
-        Callback function to update the progress bar.
-
-        Args:
-            amount (int): The amount by which to update the progress bar.
-        """
-
+        """Callback function to update the progress bar."""
         progress_bar.update(amount)
-
-    # ------------------------------------------------------------------------------
-
-    def resource_inventory(progress_callback, thread_list, category, service, functions, region):
-
-        """
-        Collects resource inventory for a specified AWS service and region, and updates progress.
-        Args:
-            progress_callback (function): A callback function to update progress.
-            thread_list (list): A list to store threads for concurrent execution.
-            category (str): The category of the AWS resource.
-            service (str): The AWS service to query.
-            functions (list): A list of functions to execute for the service.
-            region (dict): A dictionary containing region information, with 'RegionName' as a key.
-        Returns:
-            None
-        """
-
-        global total_tasks
-
-        for func in functions:
-            
-            write_log(f"Querying category: {category}, service: {service}, function: {func}, region: {region['RegionName']}", log_file_path)
-            total_tasks += 2  # Increment total_tasks for each sub-task
-            thread = InventoryThread(category, region['RegionName'], service, func, f"{service} in {region['RegionName']}", progress_callback)
-            thread_list.append(thread)
-
-    # ------------------------------------------------------------------------------
 
     global account_id, results, total_tasks, progress_bar, successful_services, failed_services, filled_services, empty_services
 
@@ -488,6 +508,7 @@ def list_used_services(inventory_structure):
         write_log("Unable to retrieve the list of regions.", log_file_path)
         return
 
+    services = create_services_structure(policy_files)
     thread_list = []
 
     # --- Retrieve the AWS account ID using STS
@@ -499,30 +520,33 @@ def list_used_services(inventory_structure):
 
     json_file_path = os.path.join(output_dir, f"inventory_{account_id}_{timestamp}.json")
 
-    # --- Handle all services
+    # --- Handle global services
 
-    for service_info in inventory_structure:
+    if 'global' in services:
 
-        for resource, resource_info in service_info.items():
+        for service, func_list in services['global'].items():
+            for func in func_list:
+                write_log(f"Querying global service: {service}, function: {func}", log_file_path)
+                total_tasks += 2  # Increment total_tasks for each sub-task
 
-            category = resource_info.get('category', 'unknown')
-            functions = resource_info.get('inventory_nodes', [])
-            boto_resource_name = resource_info.get('boto_resource_name', [])
-            regions_type = resource_info.get('region_type', ['local'])
+                thread = InventoryThread('global', 'global', service, func, f"{service} (global)", progress_callback)
+                thread_list.append(thread)
 
-            if 'global' in regions_type:
+    # --- Handle regional services
 
-                # For global services, we only need to query once
-                resource_inventory(progress_callback, thread_list, category, boto_resource_name, functions, {'RegionName': 'global'})
+    for region in regions:
 
-            else:
+        region_name = region['RegionName']
 
-                # For local services, we need to query each region
+        if test_region_connectivity(region_name):
 
-                for region in regions:
-
-                    if test_region_connectivity(region['RegionName']):
-                        resource_inventory(progress_callback, thread_list, category, boto_resource_name, functions, region)
+            for category, service_dict in services['regional'].items():
+                for service, func_list in service_dict.items():
+                    for func in func_list:
+                        write_log(f"Querying region: {region_name}, service: {service}, function: {func}", log_file_path)
+                        total_tasks += 2  # Increment total_tasks for each sub-task
+                        thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}", progress_callback)
+                        thread_list.append(thread)
 
     # --- Initialize progress bar with the total number of sub-tasks
 
@@ -586,24 +610,29 @@ if __name__ == "__main__":
 
     policy_files = glob.glob(os.path.join(policy_dir, 'inventory_policy_local_*.json'))
 
-    # --- Find all YAML policy files in the policy directory
+    # --- Add the global policy file
 
-    yaml_policy_files = glob.glob(os.path.join(policy_dir, '*.yaml'))
+    global_policy_file = os.path.join(policy_dir, 'inventory_policy_global.json')
+    if os.path.exists(global_policy_file):
+        policy_files.append(global_policy_file)
 
-    # --- Convert YAML policy files to JSON and keep this structure for later use
+    # --- Load extra service calls configuration
 
-    inventory_structure = []
-    for yaml_file in yaml_policy_files:
-        with open(yaml_file, 'r') as file:
-            yaml_content = yaml.safe_load(file)
-            inventory_structure.append(yaml_content)
+    extra_service_file = os.path.join(policy_dir, 'extra_service_calls.json')
+    with open(extra_service_file, 'r') as file:
+        extra_service_calls = json.load(file)
+        # Process extra service calls configuration
+        for service, config in extra_service_calls.items():
+            if ':' in service:
+                _, list_function = service.split(':')
+                extra_service_calls[service]['list_function'] = list_function
 
-    if not inventory_structure:
+    if not policy_files:
         print("No policy files found.")
         sys.exit(1)
 
     # --- Perform inventory and list used services
 
-    services_data = list_used_services(inventory_structure)
+    services_data = list_used_services(policy_files)
 
     # That's all folks!
