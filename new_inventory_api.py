@@ -41,10 +41,8 @@ Functions:
     main()
 """
 
-import pprint
 import threading
 import boto3
-import botocore
 import json
 import os
 import sys
@@ -56,7 +54,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import glob
 from utils import write_log, transform_function_name, json_serial, is_empty  # Importer les fonctions utilitaires
-from botocore.exceptions import EndpointConnectionError, ClientError # Ajout des exceptions
+from botocore.exceptions import EndpointConnectionError, ClientError  # Ajout des exceptions
 
 # Ensure log directory exists
 log_dir = "log"
@@ -101,6 +99,7 @@ num_threads = num_cores * 4  # You can adjust this multiplier based on your need
 # Multithreading Class
 
 class InventoryThread(threading.Thread):
+
     """Thread class for performing inventory tasks."""
 
     def __init__(self, category, region, service, func, key, progress_callback):
@@ -162,9 +161,12 @@ def test_region_connectivity(region):
     ec2 = boto3.client('ec2', region_name=region)
 
     try:
+
         ec2.describe_availability_zones()
         return True
+
     except Exception as e:
+
         write_log(f"Could not connect to the endpoint URL for region {region}: {e}", log_file_path)
         return False
 
@@ -196,7 +198,7 @@ def create_services_structure(policy_files):
             policy = json.load(file)
 
             for statement in policy.get('Statement', []):
-                
+
                 for action in statement.get('Action', []):
 
                     service_prefix, action_name = action.split(':')
@@ -301,7 +303,7 @@ def inventory_handling(category, region, service, func, progress_callback):
                     detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
                 if not with_meta:
                     detail_response.pop('ResponseMetadata', None)
-            except botocore.exceptions.ClientError as e1:
+            except ClientError as e1:
                 exception_function_name = transform_function_name(e1.operation_name)
                 if exception_function_name != detail_function:
                     raise e1
@@ -319,7 +321,7 @@ def inventory_handling(category, region, service, func, progress_callback):
     # --- Main body of the 'inventory_handling' function
 
     global account_id, results, successful_services, failed_services, skipped_services, empty_services, filled_services
-    
+
     write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
 
     try:
@@ -338,7 +340,7 @@ def inventory_handling(category, region, service, func, progress_callback):
                 client = boto3.client(service.lower())
 
         # --- Inventory call for the resource. Reminder: called through threading
-        
+
         start_time = time.time()
         inventory = client.__getattribute__(func)()
         progress_callback(1)
@@ -351,7 +353,7 @@ def inventory_handling(category, region, service, func, progress_callback):
             response_metadata = inventory.pop('ResponseMetadata', None)
 
         # --- Constructing the inventory
-        
+
         empty_items = True # a result is considered as 'empty' if it has no interesting value ('NextToken' or 'ResponseMetada' have no intersting value for an inventory)
 
         for key, value in inventory.items():
@@ -360,7 +362,7 @@ def inventory_handling(category, region, service, func, progress_callback):
                 break
 
         if not empty_items or with_empty:
-            
+
             # --- Here: not empty, or we want to list the empty values too (arg 'with_empty')
 
             object_type = list(inventory.keys())[0] if inventory else 'Unknown'
@@ -431,9 +433,10 @@ def inventory_handling(category, region, service, func, progress_callback):
         failed_services += 1
         progress_callback(2)
 
-    except botocore.exceptions.ClientError as e2: 
+    except ClientError as e2:
 
         if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
+
             write_log(f"Warning (2): Skipping {service} in {region} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
             skipped_services += 1
             progress_callback(2)
@@ -461,11 +464,10 @@ def inventory_handling(category, region, service, func, progress_callback):
         write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
 
 
-
-        
 # ------------------------------------------------------------------------------
 
 def list_used_services(policy_files):
+
     """
     List used services based on the provided IAM policy files.
 
@@ -483,10 +485,17 @@ def list_used_services(policy_files):
     Returns:
         dict: A dictionary of the used services.
     """
+
+    def progress_callback(amount):
+        """Callback function to update the progress bar."""
+        progress_bar.update(amount)
+
     global account_id, results, total_tasks, progress_bar, successful_services, failed_services, filled_services, empty_services
 
     start_time = time.time()
-    
+
+    # --- Get AWS regions
+
     regions = get_all_regions()
 
     if not regions:
@@ -496,19 +505,19 @@ def list_used_services(policy_files):
     services = create_services_structure(policy_files)
     thread_list = []
 
-    def progress_callback(amount):
-        """Callback function to update the progress bar."""
-        progress_bar.update(amount)
+    # --- Retrieve the AWS account ID using STS
 
-    # Retrieve the AWS account ID using STS
     sts_client = boto3.client('sts')
     account_id = sts_client.get_caller_identity()["Account"]
 
-    # Modify the JSON file path to include the account ID
+    # --- Modify the JSON file path to include the account ID
+
     json_file_path = os.path.join(output_dir, f"inventory_{account_id}_{timestamp}.json")
 
-    # Handle global services
+    # --- Handle global services
+
     if 'global' in services:
+
         for service, func_list in services['global'].items():
             for func in func_list:
                 write_log(f"Querying global service: {service}, function: {func}", log_file_path)
@@ -517,10 +526,14 @@ def list_used_services(policy_files):
                 thread = InventoryThread('global', 'global', service, func, f"{service} (global)", progress_callback)
                 thread_list.append(thread)
 
-    # Handle regional services
+    # --- Handle regional services
+
     for region in regions:
+
         region_name = region['RegionName']
+
         if test_region_connectivity(region_name):
+
             for category, service_dict in services['regional'].items():
                 for service, func_list in service_dict.items():
                     for func in func_list:
@@ -529,22 +542,27 @@ def list_used_services(policy_files):
                         thread = InventoryThread(category, region_name, service, func, f"{service} in {region_name}", progress_callback)
                         thread_list.append(thread)
 
-    # Initialize progress bar with the total number of sub-tasks
+    # --- Initialize progress bar with the total number of sub-tasks
+
     progress_bar = tqdm(total=total_tasks, desc="Inventory Progress", unit="sub-task")
 
-    # Use ThreadPoolExecutor to manage the threads
+    # --- Use ThreadPoolExecutor to manage the threads
+
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         for thread in thread_list:
             executor.submit(thread.run)
 
     progress_bar.close()
 
-   # Include the list of regions if --with-extra is specified
+    # --- Include the list of regions if --with-extra is specified
+
     if with_extra:
         results['regions'] = regions
 
     end_time = time.time()
     execution_time = end_time - start_time
+
+    # --- Display summary of the inventory process
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
     print(f"Total services called: {total_tasks // 2}")  # Divide by 2 to get the actual number of services called
@@ -552,6 +570,8 @@ def list_used_services(policy_files):
     print(f"Failed services: {failed_services}")
     print(f"Skipped services: {skipped_services}")
     
+    # --- Write the results to a JSON file
+
     with open(json_file_path, "w") as json_file:
         json.dump(results, json_file, indent=4, default=json_serial)
 
@@ -562,7 +582,12 @@ def list_used_services(policy_files):
 
 # Main Function
 
+# ------------------------------------------------------------------------------
+
 if __name__ == "__main__":
+
+    # --- Handle command-line arguments
+
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
     parser.add_argument('--policy-dir', type=str, default='policies', help='The directory containing the IAM policy files')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
@@ -575,15 +600,18 @@ if __name__ == "__main__":
     with_extra = args.with_extra
     with_empty = args.with_empty
 
-    # Find all policy files matching the pattern inventory_policy_local_X.json
+    # --- Find all policy files matching the pattern inventory_policy_local_X.json
+
     policy_files = glob.glob(os.path.join(policy_dir, 'inventory_policy_local_*.json'))
 
-    # Add the global policy file
+    # --- Add the global policy file
+
     global_policy_file = os.path.join(policy_dir, 'inventory_policy_global.json')
     if os.path.exists(global_policy_file):
         policy_files.append(global_policy_file)
 
-    # Load extra service calls configuration
+    # --- Load extra service calls configuration
+
     extra_service_file = os.path.join(policy_dir, 'extra_service_calls.json')
     with open(extra_service_file, 'r') as file:
         extra_service_calls = json.load(file)
@@ -597,4 +625,8 @@ if __name__ == "__main__":
         print("No policy files found.")
         sys.exit(1)
 
+    # --- Perform inventory and list used services
+
     services_data = list_used_services(policy_files)
+
+    # That's all folks!
