@@ -2,12 +2,13 @@ import boto3
 import botocore
 from botocore.exceptions import EndpointConnectionError
 
-res = 'glue'
-svc = 'list_tables'
-#region = 'eu-west-3'
+res = 'sqs'
+svc = 'get_queue_attributes'
+params = {'QueueUrl': "https://sqs.eu-west-3.amazonaws.com/559583391002/ma-queue-mickey", "AttributeNames": ["All"]}
+region = 'eu-west-3'
+#region = None
+#region = 'us-east-1'
 #region = 'global'
-region = None
-region = 'us-north-1'
 
 def print_exception(order, e):
     print('-'*72)
@@ -19,7 +20,7 @@ try:
     client = boto3.client(res, region_name=region)
 
     # Create the queue. This returns an SQS.Queue instance
-    res = client.__getattribute__(svc)()
+    res = client.__getattribute__(svc)(**params)
     res.pop('ResponseMetadata', None)
 
     # You can now access identifiers and attributes

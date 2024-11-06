@@ -6,7 +6,8 @@
             "Action": [
                 "glue:ListJobs",
                 "glue:ListWorkflows",
-                "glue:ListSchemas"
+                "glue:ListSchemas",
+                "es:DescribeElasticsearchDomains"               
             ],
             "Resource": "*"
         }

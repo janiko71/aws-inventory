@@ -15,7 +15,8 @@
                 "ec2:DescribeEgressOnlyInternetGateways",
                 "ec2:DescribeVpcEndpoints",
                 "ec2:DescribeVpnConnections",
-                "ec2:DescribeVpnGateways"
+                "ec2:DescribeVpnGateways",
+                "private-networks:ListNetworks"
             ],
             "Resource": "*"
         }

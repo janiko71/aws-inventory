@@ -1,0 +1,115 @@
+{
+    "grafana": {
+        "item_key": "workspaces",
+        "item_search_id": "id",
+        "detail_function": "describe_workspace",
+        "detail_param": "workspaceId",
+        "result_key": "workspace",
+        "required_permission": "sns:DescribeWorkspace"
+    },
+    "sns": {
+        "topics": {
+            "item_key": "Topics",
+            "item_search_id": "TopicArn",
+            "detail_function": "get_topic_attributes",
+            "detail_param": "TopicArn",
+            "result_key": "Attributes",
+            "required_permission": "sns:GetTopicAttributes"
+        },
+        "subscriptions": {
+            "item_key": "Subscriptions",
+            "item_search_id": "SubscriptionArn",
+            "detail_function": "get_subscription_attributes",
+            "detail_param": "SubscriptionArn",
+            "result_key": "Attributes",
+            "required_permission": "sns:GetSubscriptionAttributes"
+        }
+    },
+    "sqs": {
+        "item_key": "QueueUrls",
+        "item_search_id": "",
+        "detail_function": "get_queue_attributes",
+        "detail_param": "QueueUrl",
+        "complementary_params": {
+            "AttributeNames": ["All"]
+        },
+        "result_key": "Attributes",
+        "required_permission": "sns:GetQueuesAttributes"
+    },
+    "apprunner": {
+        "item_key": "ServiceSummaryList",
+        "item_search_id": "ServiceArn",
+        "detail_function": "describe_service",
+        "detail_param": "ServiceArn",
+        "result_key": "Service",
+        "required_permission": "apprunner:DescribeService"
+    },
+    "simspaceweaver": {
+        "item_key": "Simulations",
+        "item_search_id": "arn",
+        "detail_function": "list_apps",
+        "detail_param": "Simulation",
+        "result_key": "Apps",
+        "required_permission": "simspaceweaver:ListApps"
+    },
+    "pcs": {
+        "clusters": {
+            "item_key": "clusters",
+            "item_search_id": "id",
+            "detail_function": "list_queues",
+            "detail_param": "clusterIdentifier",
+            "result_key": "queues",
+            "required_permission": "pcs:ListQueues"
+        },
+        "compute_node_groups": {
+            "item_key": "clusters",
+            "item_search_id": "id",
+            "detail_function": "list_compute_node_groups",
+            "detail_param": "clusterIdentifier",
+            "result_key": "computeNodeGroups",
+            "required_permission": "pcs:ListComputeNodeGroups"
+        }
+    },
+    "s3": {
+        "SSEC": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_encryption",
+            "detail_param": "Bucket",
+            "result_key": "ServerSideEncryptionConfiguration",
+            "required_permission": "s3:GetBucketEncryption"
+        },
+        "AccelerateConf": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_accelerate_configuration",
+            "detail_param": "Bucket",
+            "result_key": "",
+            "required_permission": "s3:GetBucketAccelerateConfiguration"
+        },
+        "Website": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_website",
+            "detail_param": "Bucket",
+            "result_key": "",
+            "required_permission": "s3:GetBucketWebsite"
+        },
+        "Location": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_location",
+            "detail_param": "Bucket",
+            "result_key": "LocationConstraint",
+            "required_permission": "s3:GetBucketLocation"
+        },
+        "Tags": {
+            "item_key": "Buckets",
+            "item_search_id": "Name",
+            "detail_function": "get_bucket_tagging",
+            "detail_param": "Bucket",
+            "result_key": "TagSet",
+            "required_permission": "s3:GetBucketTagging"
+        }
+    }
+}

@@ -8,14 +8,11 @@
                 "managedblockchain:ListMembers",
                 "managedblockchain:ListNodes",
                 "managedblockchain:ListProposals",
-                "managedblockchain:GetNetwork",
-                "managedblockchain:GetMember",
-                "managedblockchain:GetNode",
                 "braket:GetDevice",
                 "braket:GetQuantumTask",
                 "braket:SearchDevices",
                 "braket:SearchQuantumTasks",
-                "braket:ListTagsForResource"                
+                "braket:ListTagsForResource"
             ],
             "Resource": "*"
         }
