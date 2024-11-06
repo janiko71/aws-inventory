@@ -5,7 +5,7 @@
         "detail_function": "describe_workspace",
         "detail_param": "workspaceId",
         "result_key": "workspace",
-        "required_permission": "sns:DescribeWorkspace"
+        "required_permission": "grafana:DescribeWorkspace"
     },
     "sns": {
         "topics": {
@@ -34,7 +34,7 @@
             "AttributeNames": ["All"]
         },
         "result_key": "Attributes",
-        "required_permission": "sns:GetQueuesAttributes"
+        "required_permission": "sqs:GetQueueAttributes"
     },
     "apprunner": {
         "item_key": "ServiceSummaryList",

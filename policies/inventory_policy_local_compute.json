@@ -38,8 +38,6 @@
                 "elasticbeanstalk:DescribeEnvironments",
                 "elasticbeanstalk:DescribeEnvironmentResources",
                 "pcs:ListClusters",
-                "pcs:ListComputeNodeGroups",
-                "simspaceweaver:ListApps",
                 "simspaceweaver:ListSimulations",
                 "apprunner:ListServices",
                 "autoscaling:DescribeAutoScalingGroups",
