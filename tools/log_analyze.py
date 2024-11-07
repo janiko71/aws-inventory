@@ -26,7 +26,7 @@ def analyze_log_file(log_file_path):
     with open(log_file_path, 'r') as log_file:
         for line in log_file:
             # Check if the line contains an error or exception
-            if "Error" in line or "Exception" in line:
+             
                 # Extract the resource name, service name, and error message from the error line
                 if "querying" in line:
                     resource_name = line.split("querying")[1].split()[0].strip()

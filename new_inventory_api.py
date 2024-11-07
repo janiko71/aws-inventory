@@ -503,7 +503,9 @@ def list_used_services(inventory_structure):
 
     for service_info in inventory_structure:
 
-        for resource, resource_info in service_info.items():
+        for resource in service_info:
+
+            resource_info = service_info[resource]
 
             category = resource_info.get('category', 'unknown')
             functions = resource_info.get('inventory_nodes', [])
@@ -571,24 +573,24 @@ if __name__ == "__main__":
     # --- Handle command-line arguments
 
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
-    parser.add_argument('--policy-dir', type=str, default='policies', help='The directory containing the IAM policy files')
+    parser.add_argument('--resource-dir', type=str, default='resources', help='The directory containing the resource files containing the inventory services')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
     parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
     parser.add_argument('--with-empty', action='store_true', help='Include empty values in the inventory')
     args = parser.parse_args()
 
-    policy_dir = args.policy_dir
+    resource_dir = args.resource_dir
     with_meta = args.with_meta
     with_extra = args.with_extra
     with_empty = args.with_empty
 
     # --- Find all policy files matching the pattern inventory_policy_local_X.json
 
-    policy_files = glob.glob(os.path.join(policy_dir, 'inventory_policy_local_*.json'))
+    policy_files = glob.glob(os.path.join(resource_dir, 'inventory_policy_local_*.json'))
 
     # --- Find all YAML policy files in the policy directory
 
-    yaml_policy_files = glob.glob(os.path.join(policy_dir, '*.yaml'))
+    yaml_policy_files = glob.glob(os.path.join(resource_dir, '*.yaml'))
 
     # --- Convert YAML policy files to JSON and keep this structure for later use
 
@@ -599,7 +601,7 @@ if __name__ == "__main__":
             inventory_structure.append(yaml_content)
 
     if not inventory_structure:
-        print("No policy files found.")
+        print("No resource files found.")
         sys.exit(1)
 
     # --- Perform inventory and list used services
