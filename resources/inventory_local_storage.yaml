@@ -13,6 +13,36 @@
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
 
+s3:
+    region_type: global
+    boto_resource_name: s3
+    category: Storage
+    inventory_nodes:
+        list_buckets:
+            permissions: ListBuckets
+            item_key: Buckets
+            details:
+                LocationConstraint:
+                    permissions: GetBucketLocation
+                    item_search_id: Name
+                    detail_function: get_bucket_location
+                    detail_param: Bucket
+                ServerSideEncryptionConfiguration:
+                    permissions: GetBucketEncryption
+                    item_search_id: Name
+                    detail_function: get_bucket_encryption
+                    detail_param: Bucket
+                Website:
+                    permissions: GetBucketWebsite
+                    item_search_id: Name
+                    detail_function: get_bucket_website
+                    detail_param: Bucket
+                TagSet:
+                    permissions: GetBucketTagging
+                    item_search_id: Name
+                    detail_function: get_bucket_tagging
+                    detail_param: Bucket
+
 elasticfilesystem:
     region_type: local
     boto_resource_name: elasticfilesystem
@@ -20,10 +50,7 @@ elasticfilesystem:
     inventory_nodes:
         describe_file_systems:
             permissions: DescribeFileSystems
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: 'FileSystems'
 
 fsx:
     region_type: local
@@ -32,28 +59,22 @@ fsx:
     inventory_nodes:
         describe_backups:
             permissions: DescribeBackups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: 'Backups'
+            details:
+                backups:
+                    permissions: DescribeBackup
+                    item_search_id: BackupId
+                    detail_function: describe_backup
+                    detail_param: BackupId
         describe_volumes:
             permissions: DescribeVolumes
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: 'Volumes'
         describe_storage_virtual_machines:
             permissions: DescribeStorageVirtualMachines
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: StorageVirtualMachines
         describe_file_systems:
             permissions: DescribeFileSystems
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: FileSystems
             
 glacier:
     region_type: local
@@ -62,19 +83,15 @@ glacier:
     inventory_nodes:
         list_vaults:
             permissions: ListVaults
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_parts:
-            permissions: ListParts
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: 'VaultList'
+            details:
+                vaults:
+                    permissions: DescribeVault
+                    item_search_id: VaultName
+                    detail_function: describe_vault
+                    detail_param: vaultName
         list_provisioned_capacity:
             permissions: ListProvisionedCapacity
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+            item_key: 'ProvisionedCapacityList'
+            
+

@@ -93,7 +93,7 @@ num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
-num_threads = 1 # For test purposes
+# num_threads = 1 # For test purposes
 
 # ------------------------------------------------------------------------------
 
@@ -215,6 +215,8 @@ def inventory_handling(category, region, resource, func, inventory_nodes, progre
             None: The function updates the inventory items in place with the detailed information retrieved from the API.
         """
 
+        global account_id
+
         items = inventory.get(inventory_node['item_key'], [])
 
         for item in items:
@@ -263,11 +265,11 @@ def inventory_handling(category, region, resource, func, inventory_nodes, progre
 
                 if len(detail_response) > 0:
                     if type(detail_response) not in [dict, list]:
-                        detail_response = {result_key: detail_response[result_key]}
+                        detail_response = {detail: detail_response[detail]}
                     item.update(detail_response)
                 else:
-                    if result_key != "":
-                        item.update({result_key: {}})
+                    if detail != "":
+                        item.update({detail: {}})
 
     # --- Main body of the 'inventory_handling' function
 
