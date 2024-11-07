@@ -12,31 +12,33 @@
 # - permissions: the list of permissions needed to call the function.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
+
 kms:
-- region_type: local
-- boto_resource_name: kms
-- category: IAM and Security
-- inventory_nodes:
-  - list_keys:
-    - permissions: ListKeys
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_aliases:
-    - permissions: ListAliases
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: kms
+    category: IAM and Security
+    inventory_nodes:
+        list_keys:
+            permissions: ListKeys
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_aliases:
+            permissions: ListAliases
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+            
 secretsmanager:
-- region_type: local
-- boto_resource_name: secretsmanager
-- category: IAM and Security
-- inventory_nodes:
-  - list_secrets:
-    - permissions: ListSecrets
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: secretsmanager
+    category: IAM and Security
+    inventory_nodes:
+        list_secrets:
+            permissions: ListSecrets
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''

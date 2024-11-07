@@ -12,37 +12,39 @@
 # - permissions: the list of permissions needed to call the function.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
+
 braket:
-- region_type: local
-- boto_resource_name: braket
-- category: Quantum Technologies
-- inventory_nodes:
-  - search_devices:
-    - permissions: SearchDevices
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - search_jobs:
-    - permissions: SearchJobs
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - search_quantum_tasks:
-    - permissions: SearchQuantumTasks
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: braket
+    category: Quantum Technologies
+    inventory_nodes:
+        search_devices:
+            permissions: SearchDevices
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        search_jobs:
+            permissions: SearchJobs
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        search_quantum_tasks:
+            permissions: SearchQuantumTasks
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+            
 managedblockchain:
-- region_type: local
-- boto_resource_name: managedblockchain
-- category: Blockchain
-- inventory_nodes:
-  - list_networks:
-    - permissions: ListNetworks
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: managedblockchain
+    category: Blockchain
+    inventory_nodes:
+        list_networks:
+            permissions: ListNetworks
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''

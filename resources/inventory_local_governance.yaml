@@ -1,17 +1,28 @@
-# Fichier YAML généré à partir de JSON
+# ---
 # Structure of the file
 # ---
-# Category is a nom to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
-# boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
-# region_type is the type of region where the service is available. It can be 'local' or 'global'.
 #
-# inventory_nodes is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# The first level of the file is the resource name. At next level, you have the following keys:
+#
+# - region_type is the type of region where the service is available. It can be 'local' or 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
 # Each function is a dictionary with the following keys:
-# - item_key: the key in the response where the list of items is stored.
-# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+#
 # - permissions: the list of permissions needed to call the function.
+# - item_key: the key in the response where the list of items is stored.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, you have these parameters:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
-# - result_key: the key in the response where the detailed inventory is stored.
+
 
 cloudformation:
     region_type: local
@@ -19,11 +30,14 @@ cloudformation:
     category: Management & Governance
     inventory_nodes:
         list_stacks:
-          - permissions: ListStacks
-          - item_key: StackSummaries
-          - item_search_id: StackName
-          - detail_param: StackName
-          - result_key: Stacks
+            permissions: ListStacks
+            item_key: StackSummaries
+            details:
+                stacks:
+                    permissions: DescribeStacks
+                    item_search_id: StackName
+                    detail_function: describe_stacks
+                    detail_param: StackName
           
 grafana:
     region_type: local
@@ -31,8 +45,11 @@ grafana:
     category: Management & Governance
     inventory_nodes:
         list_workspaces:
-            - permissions: ListWorkspaces
-            - item_key: workspaces
-            - item_search_id: id
-            - detail_param: workspaceId
-            - result_key: workspace
+            permissions: ListWorkspaces
+            item_key: workspaces
+            details:
+                worskpace:
+                    permissions: DescribeWorkspace
+                    item_search_id: id
+                    detail_function: describe_workspace
+                    detail_param: workspaceId

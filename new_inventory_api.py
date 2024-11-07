@@ -2,7 +2,7 @@
 """
 AWS Inventory Script
 
-This script inventories AWS services used for a given account across all available regions.
+This script inventories AWS resources used for a given account across all available regions.
 It uses multithreading to perform inventory operations concurrently.
 
 Modules:
@@ -33,9 +33,9 @@ Functions:
     # Inventory Management Functions
     get_all_regions()
     test_region_connectivity(region)
-    create_services_structure(inventory_structure)
-    inventory_handling(category, region, service, func, progress_callback)
-    list_used_services(inventory_structure)
+    create_resources_structure(inventory_structure)
+    inventory_handling(category, region, resource, func, progress_callback)
+    list_used_resources(inventory_structure)
 
     # Main Function
     main()
@@ -72,7 +72,7 @@ timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
 
 # Global variables
-boto3_clients = {}  # Dictionary to store boto3 clients for different services and regions
+boto3_clients = {}  # Dictionary to store boto3 clients for different resources and regions
 results = {}  # Dictionary to store the inventory results
 account_id = None  # AWS account ID
 
@@ -81,19 +81,19 @@ total_tasks = 0  # Counter for the total number of tasks
 completed_tasks = 0  # Counter for the number of completed tasks
 progress_bar = None  # Progress bar object
 
-# Service response counters
-successful_services = 0  # Counter for the number of successful service responses
-failed_services = 0  # Counter for the number of failed service responses
-skipped_services = 0  # Counter for skipped services
-empty_services = 0
-filled_services = 0
+# resource response counters
+successful_resources = 0  # Counter for the number of successful resource responses
+failed_resources = 0  # Counter for the number of failed resource responses
+skipped_resources = 0  # Counter for skipped resources
+empty_resources = 0
+filled_resources = 0
 
 # Determine the number of CPU cores
 num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
-# num_threads = 1 # For test purposes
+num_threads = 1 # For test purposes
 
 # ------------------------------------------------------------------------------
 
@@ -103,29 +103,30 @@ class InventoryThread(threading.Thread):
 
     """Thread class for performing inventory tasks."""
 
-    def __init__(self, category, region, service, func, key, progress_callback):
+    def __init__(self, category, region, resource, func, key, inventory_nodes, progress_callback):
         """
         Initialize the InventoryThread.
 
         Args:
-            category (str): The category of the service.
+            category (str): The category of the resource.
             region (str): The AWS region.
-            service (str): The AWS service.
-            func (str): The function to call on the service.
+            resource (str): The AWS resource.
+            func (str): The function to call on the resource.
             key (str): A unique key for the task.
             progress_callback (function): A callback function to update the progress bar.
         """
         threading.Thread.__init__(self)
         self.category = category
         self.region = region
-        self.service = service
+        self.resource = resource
         self.func = func
         self.key = key
+        self.inventory_nodes = inventory_nodes
         self.progress_callback = progress_callback
 
     def run(self):
         """Run the inventory task."""
-        inventory_handling(self.category, self.region, self.service, self.func, self.progress_callback)
+        inventory_handling(self.category, self.region, self.resource, self.func, self.inventory_nodes, self.progress_callback)
 
 # ------------------------------------------------------------------------------
 
@@ -173,16 +174,17 @@ def test_region_connectivity(region):
 
 # ------------------------------------------------------------------------------
 
-def inventory_handling(category, region, service, func, progress_callback):
+def inventory_handling(category, region, resource, func, inventory_nodes, progress_callback):
 
     """
-    This is the 'heart' of the script. Handles the inventory retrieval and processing for a specified AWS service and region.
+    This is the 'heart' of the script. Handles the inventory retrieval and processing for a specified AWS resource and region.
 
     Args:
         category (str): The category of the inventory items.
         region (str): The AWS region to query.
-        service (str): The AWS service to query.
+        resource (str): The AWS resource to query.
         func (str): The function name to call on the client to retrieve the inventory.
+        inventory_nodes (list): A list of inventory nodes to retrieve additional information.
         progress_callback (function): A callback function to report progress.
         None: The function updates global variables with the inventory results.
 
@@ -195,7 +197,7 @@ def inventory_handling(category, region, service, func, progress_callback):
 
     # --- Factorization. This code is used twice but only in 'inventory_handling'
 
-    def detail_handling(client, inventory, extra_call_config, sub_config, result_key, item_key, item_search_id):
+    def detail_handling(client, inventory, detail_function, inventory_node):
 
         """
         Handles the detailed retrieval and updating of inventory items using a specified client and configuration.
@@ -213,80 +215,86 @@ def inventory_handling(category, region, service, func, progress_callback):
             None: The function updates the inventory items in place with the detailed information retrieved from the API.
         """
 
-        items = inventory.get(item_key, [])
+        items = inventory.get(inventory_node['item_key'], [])
 
         for item in items:
 
             if type(item) not in [dict, list]:
                 item = {item}
 
-            detail_param_value = item[item_search_id]
-            detail_function = sub_config['detail_function']
-            detail_param = sub_config['detail_param']
-            complementary_params = extra_call_config.get('complementary_param', None)
+            for detail in inventory_node['details']:
 
-            # exception for s3 location: we need an additionnal arg (account id)
+                node = inventory_node['details'][detail]
 
-            if service == 's3' and detail_function == 'get_bucket_location':
-                if not complementary_params:
-                    complementary_params = {'ExpectedBucketOwner': account_id}
+                item_search_id = node['item_search_id']
+                detail_function = node['detail_function']
+                detail_param = node['detail_param']   
+                complementary_params = node.get('complementary_param', None)
+
+                detail_param_value = item[item_search_id]
+
+                # exception for s3 location: we need an additionnal arg (account id)
+
+                if resource == 's3' and detail_function == 'get_bucket_location':
+                    if not complementary_params:
+                        complementary_params = {'ExpectedBucketOwner': account_id}
+                    else:
+                        complementary_params.update({'ExpectedBucketOwner': account_id})
+
+                # General case
+
+                detail_response = {}
+
+                # Calling all the corresponding detail resources (see 'extra_resource_call.json')
+
+                try:
+                    if complementary_params:
+                        detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
+                    else:
+                        detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                    if not with_meta:
+                        detail_response.pop('ResponseMetadata', None)
+                except ClientError as e1:
+                    exception_function_name = transform_function_name(e1.operation_name)
+                    if exception_function_name != detail_function:
+                        raise e1
+
+                # The response is sometimes empty, sometimes a string, sometimes a list or a dict
+
+                if len(detail_response) > 0:
+                    if type(detail_response) not in [dict, list]:
+                        detail_response = {result_key: detail_response[result_key]}
+                    item.update(detail_response)
                 else:
-                    complementary_params.update({'ExpectedBucketOwner': account_id})
-
-            # General case
-
-            detail_response = {}
-
-            # Calling all the corresponding detail services (see 'extra_service_call.json')
-
-            try:
-                if complementary_params:
-                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
-                else:
-                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                if not with_meta:
-                    detail_response.pop('ResponseMetadata', None)
-            except ClientError as e1:
-                exception_function_name = transform_function_name(e1.operation_name)
-                if exception_function_name != detail_function:
-                    raise e1
-
-            # The response is sometimes empty, sometimes a string, sometimes a list or a dict
-
-            if len(detail_response) > 0:
-                if type(detail_response) not in [dict, list]:
-                    detail_response = {result_key: detail_response[result_key]}
-                item.update(detail_response)
-            else:
-                if result_key != "":
-                    item.update({result_key: {}})
+                    if result_key != "":
+                        item.update({result_key: {}})
 
     # --- Main body of the 'inventory_handling' function
 
-    global account_id, results, successful_services, failed_services, skipped_services, empty_services, filled_services
+    global account_id, results, successful_resources, failed_resources, skipped_resources, empty_resources, filled_resources
 
-    write_log(f"Starting inventory for {service} in {region} using {func}", log_file_path)
+    write_log(f"Starting inventory for {resource} in {region} using {func}", log_file_path)
 
     try:
 
         # --- Some exceptions for resources/services with names different from boto3 name, and some inventory for EC2 needs a region even when global (ex : DescribeRegions)
 
         if region != 'global':
-            if service == 'states':
+            if resource == 'states':
                 client = boto3.client('stepfunctions', region_name=region)
-            elif service == 'private-networks':
+            elif resource == 'private-networks':
                 client = boto3.client("privatenetworks", region_name=region)
-            elif service == 'elasticfilesystem':
+            elif resource == 'elasticfilesystem':
                 client = boto3.client("efs", region_name=region)
-            elif service == 'neptune-db':
+            elif resource == 'neptune-db':
                 client = boto3.client("neptunedata", region_name=region)
             else:
-                client = boto3.client(service.lower(), region_name=region)
+                client = boto3.client(resource.lower(), region_name=region)
         else:
-            if service == 'ec2':
-                client = boto3.client(service.lower(), region_name='us-east-1')
+            if resource == 'ec2':
+                client = boto3.client(resource.lower(), region_name='us-east-1')
             else:
-                client = boto3.client(service.lower())
+                client = boto3.client(resource.lower())
 
         # --- Inventory call for the resource. Reminder: called through threading
 
@@ -294,7 +302,7 @@ def inventory_handling(category, region, service, func, progress_callback):
         inventory = client.__getattribute__(func)()
         progress_callback(1)
         end_time = time.time()
-        write_log(f"API call for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
+        write_log(f"API call for {resource} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
 
         # --- Cmd line arg "with-meta" ('ResponseMetaData)
 
@@ -317,122 +325,100 @@ def inventory_handling(category, region, service, func, progress_callback):
             object_type = list(inventory.keys())[0] if inventory else 'Unknown'
             if category not in results:
                 results[category] = {}
-            if service not in results[category]:
-                results[category][service] = {}
-            if object_type not in results[category][service]:
-                results[category][service][object_type] = {}
-            if region not in results[category][service][object_type]:
-                results[category][service][object_type][region] = {}
+            if resource not in results[category]:
+                results[category][resource] = {}
+            if object_type not in results[category][resource]:
+                results[category][resource][object_type] = {}
+            if region not in results[category][resource][object_type]:
+                results[category][resource][object_type][region] = {}
 
             start_time = time.time()
 
             inventory.pop('NextToken', None) # no "NextToken"
-            results[category][service][object_type][region] = inventory
+            results[category][resource][object_type][region] = inventory
             if with_meta and response_metadata:
                 # MetaData only if the key is present and if we asked for it (arg 'with_meta')
-                results[category][service][object_type][region]['ResponseMetadata'] = response_metadata
+                results[category][resource][object_type][region]['ResponseMetadata'] = response_metadata
 
             end_time = time.time()
-            write_log(f"Processing results for {service} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
-            filled_services += 1
+            write_log(f"Processing results for {resource} in {region} took {end_time - start_time:.2f} seconds", log_file_path)
+            filled_resources += 1
 
             # --- In case of: we want more information about the resource
-            #     Calling all the corresponding detail services (see 'extra_service_call.json')
+            #     Calling all the corresponding detail resources 
 
-            if service in extra_service_calls:
+            for detail_function in inventory_nodes:
 
-                extra_call_config = extra_service_calls[service]
-                
-                # -- Testing extra_call_config: singleton or multiple key/value items ?
-
-                if all(isinstance(value, dict) for value in extra_call_config.values()):
-
-                    # Multiple key/value items
-
-                    for sub_key, sub_config in extra_call_config.items():
-                        result_key = sub_config['result_key']
-                        item_key = sub_config['item_key']
-                        item_search_id = sub_config['item_search_id']
-
-                        detail_handling(client, inventory, extra_call_config, sub_config, result_key, item_key, item_search_id)
-
-                else:
-
-                    # Single key/value                    
-                    result_key = extra_call_config['result_key']
-                    item_key = extra_call_config['item_key']
-                    item_search_id = extra_call_config['item_search_id']
-
-                    detail_handling(client, inventory, extra_call_config, sub_config, result_key, item_key, item_search_id)
+                 detail_handling(client, inventory, detail_function, inventory_nodes[detail_function])
 
         else:
 
             # The inventory is empty, but don't forget to count (for the progression bar)
-            empty_services += 1
-            write_log(f"Empty results for {service} in {region}", log_file_path)
+            empty_resources += 1
+            write_log(f"Empty results for {resource} in {region}", log_file_path)
 
         # Inventory successfull
 
         progress_callback(1)
-        successful_services += 1
+        successful_resources += 1
 
     except AttributeError as e1:
 
-        write_log(f"Error (1) querying {service} in {region} using {func}: {e1} ({type(e1)})", log_file_path)
-        failed_services += 1
+        write_log(f"Error (1) querying {resource} in {region} using {func}: {e1} ({type(e1)})", log_file_path)
+        failed_resources += 1
         progress_callback(2)
 
     except ClientError as e2:
 
         if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
 
-            write_log(f"Warning (2): Skipping {service} in {region} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
-            skipped_services += 1
+            write_log(f"Warning (2): Skipping {resource} in {region} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
+            skipped_resources += 1
             progress_callback(2)
 
         else:
 
-            write_log(f"Error (3) querying {service} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
-            failed_services += 1
+            write_log(f"Error (3) querying {resource} in {region} using {func}: {e2} ({type(e2)})", log_file_path)
+            failed_resources += 1
             progress_callback(2)
 
     except EndpointConnectionError as e3:
 
-        write_log(f"Warning (4): Skipping {service} in {region} due to connection error: {e3} ({type(e3)})", log_file_path)
-        skipped_services += 1
+        write_log(f"Warning (4): Skipping {resource} in {region} due to connection error: {e3} ({type(e3)})", log_file_path)
+        skipped_resources += 1
         progress_callback(2)
 
     except Exception as e:
 
-        write_log(f"Error (e) querying {service} in {region} using {func}: {e} ({type(e)})", log_file_path)
-        failed_services += 1
+        write_log(f"Error (e) querying {resource} in {region} using {func}: {e} ({type(e)})", log_file_path)
+        failed_resources += 1
         progress_callback(2)
 
     finally:
 
-        write_log(f"Completed inventory for {service} in {region} using {func}", log_file_path)
+        write_log(f"Completed inventory for {resource} in {region} using {func}", log_file_path)
 
 
 # ------------------------------------------------------------------------------
 
-def list_used_services(inventory_structure):
+def list_used_resources(inventory_structure):
 
     """
-    List used services based on the provided YAML files.
+    List used resources based on the provided YAML files.
 
     This function performs the following steps:
     1. Retrieves all AWS regions.
-    2. Creates a structure of services based on the provided IAM policy files.
-    3. Initializes and manages threads to query both global and regional services.
+    2. Creates a structure of resources based on the provided IAM policy files.
+    3. Initializes and manages threads to query both global and regional resources.
     4. Updates a progress bar to reflect the progress of the inventory process.
     5. Logs the execution time and results of the inventory process.
     6. Writes the results to a JSON file.
 
     Args:
-        inventory_structure (list): A structure of services based on the provided YAML file with all informations about the services.
+        inventory_structure (list): A structure of resources based on the provided YAML file with all informations about the resources.
 
     Returns:
-        dict: A dictionary of the used services.
+        dict: A dictionary of the used resources.
     """
 
     # ------------------------------------------------------------------------------
@@ -450,16 +436,18 @@ def list_used_services(inventory_structure):
 
     # ------------------------------------------------------------------------------
 
-    def resource_inventory(progress_callback, thread_list, category, service, functions, region):
+    def resource_inventory(progress_callback, thread_list, category, resource, functions, inventory_nodes, region):
+
 
         """
-        Collects resource inventory for a specified AWS service and region, and updates progress.
+        Collects resource inventory for a specified AWS resource and region, and updates progress.
         Args:
             progress_callback (function): A callback function to update progress.
             thread_list (list): A list to store threads for concurrent execution.
             category (str): The category of the AWS resource.
-            service (str): The AWS service to query.
-            functions (list): A list of functions to execute for the service.
+            resource (str): The AWS resource to query.
+            functions (list): A list of functions to execute for the resource.
+            inventory_nodes (list): A list to store inventory nodes.
             region (dict): A dictionary containing region information, with 'RegionName' as a key.
         Returns:
             None
@@ -469,14 +457,14 @@ def list_used_services(inventory_structure):
 
         for func in functions:
             
-            write_log(f"Querying category: {category}, service: {service}, function: {func}, region: {region['RegionName']}", log_file_path)
+            write_log(f"Querying category: {category}, resource: {resource}, function: {func}, region: {region['RegionName']}", log_file_path)
             total_tasks += 2  # Increment total_tasks for each sub-task
-            thread = InventoryThread(category, region['RegionName'], service, func, f"{service} in {region['RegionName']}", progress_callback)
+            thread = InventoryThread(category, region['RegionName'], resource, func, f"{resource} in {region['RegionName']}", inventory_nodes, progress_callback)
             thread_list.append(thread)
 
     # ------------------------------------------------------------------------------
 
-    global account_id, results, total_tasks, progress_bar, successful_services, failed_services, filled_services, empty_services
+    global account_id, results, total_tasks, progress_bar, successful_resources, failed_resources, filled_resources, empty_resources
 
     start_time = time.time()
 
@@ -499,32 +487,33 @@ def list_used_services(inventory_structure):
 
     json_file_path = os.path.join(output_dir, f"inventory_{account_id}_{timestamp}.json")
 
-    # --- Handle all services
+    # --- Handle all resources
 
-    for service_info in inventory_structure:
+    for resource_info in inventory_structure:
 
-        for resource in service_info:
+        for resource in resource_info:
 
-            resource_info = service_info[resource]
+            inventory_info = resource_info[resource]
 
-            category = resource_info.get('category', 'unknown')
-            functions = resource_info.get('inventory_nodes', [])
-            boto_resource_name = resource_info.get('boto_resource_name', [])
-            regions_type = resource_info.get('region_type', ['local'])
+            category = inventory_info.get('category', 'unknown')
+            functions = inventory_info.get('inventory_nodes', [])
+            boto_resource_name = inventory_info.get('boto_resource_name', [])
+            regions_type = inventory_info.get('region_type', ['local'])
+            inventory_nodes = inventory_info.get('inventory_nodes', [])
 
             if 'global' in regions_type:
 
-                # For global services, we only need to query once
-                resource_inventory(progress_callback, thread_list, category, boto_resource_name, functions, {'RegionName': 'global'})
+                # For global resources, we only need to query once
+                resource_inventory(progress_callback, thread_list, category, boto_resource_name, functions, inventory_nodes, {'RegionName': 'global'})
 
             else:
 
-                # For local services, we need to query each region
+                # For local resources, we need to query each region
 
                 for region in regions:
 
                     if test_region_connectivity(region['RegionName']):
-                        resource_inventory(progress_callback, thread_list, category, boto_resource_name, functions, region)
+                        resource_inventory(progress_callback, thread_list, category, boto_resource_name, functions, inventory_nodes, region)
 
     # --- Initialize progress bar with the total number of sub-tasks
 
@@ -549,10 +538,10 @@ def list_used_services(inventory_structure):
     # --- Display summary of the inventory process
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
-    print(f"Total services called: {total_tasks // 2}")  # Divide by 2 to get the actual number of services called
-    print(f"Successful services: {successful_services} ({filled_services} services with datas, {empty_services} empty services)")
-    print(f"Failed services: {failed_services}")
-    print(f"Skipped services: {skipped_services}")
+    print(f"Total resources called: {total_tasks // 2}")  # Divide by 2 to get the actual number of resources called
+    print(f"Successful resources: {successful_resources} ({filled_resources} resources with datas, {empty_resources} empty resources)")
+    print(f"Failed resources: {failed_resources}")
+    print(f"Skipped resources: {skipped_resources}")
     
     # --- Write the results to a JSON file
 
@@ -573,7 +562,7 @@ if __name__ == "__main__":
     # --- Handle command-line arguments
 
     parser = argparse.ArgumentParser(description='AWS Inventory Script')
-    parser.add_argument('--resource-dir', type=str, default='resources', help='The directory containing the resource files containing the inventory services')
+    parser.add_argument('--resource-dir', type=str, default='resources', help='The directory containing the resource files containing the inventory resources')
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
     parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
     parser.add_argument('--with-empty', action='store_true', help='Include empty values in the inventory')
@@ -604,8 +593,8 @@ if __name__ == "__main__":
         print("No resource files found.")
         sys.exit(1)
 
-    # --- Perform inventory and list used services
+    # --- Perform inventory and list used resources
 
-    services_data = list_used_services(inventory_structure)
+    resources_data = list_used_resources(inventory_structure)
 
     # That's all folks!

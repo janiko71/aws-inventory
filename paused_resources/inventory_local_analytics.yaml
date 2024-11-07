@@ -12,37 +12,39 @@
 # - permissions: the list of permissions needed to call the function.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
+
 es:
-- region_type: local
-- boto_resource_name: es
-- category: Analytics
-- inventory_nodes:
-  - describe_elasticsearch_domains:
-    - permissions: DescribeElasticsearchDomains
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: es
+    category: Analytics
+    inventory_nodes:
+        describe_elasticsearch_domains:
+            permissions: DescribeElasticsearchDomains
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+            
 glue:
-- region_type: local
-- boto_resource_name: glue
-- category: Analytics
-- inventory_nodes:
-  - list_jobs:
-    - permissions: ListJobs
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_workflows:
-    - permissions: ListWorkflows
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_schemas:
-    - permissions: ListSchemas
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: glue
+    category: Analytics
+    inventory_nodes:
+        list_jobs:
+            permissions: ListJobs
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_workflows:
+            permissions: ListWorkflows
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_schemas:
+            permissions: ListSchemas
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''

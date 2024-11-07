@@ -12,49 +12,51 @@
 # - permissions: the list of permissions needed to call the function.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
+
 cloudtrail:
-- region_type: local
-- boto_resource_name: cloudtrail
-- category: Monitoring and Management
-- inventory_nodes:
-  - describe_trails:
-    - permissions: DescribeTrails
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: cloudtrail
+    category: Monitoring and Management
+    inventory_nodes:
+        describe_trails:
+            permissions: DescribeTrails
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+            
 config:
-- region_type: local
-- boto_resource_name: config
-- category: Monitoring and Management
-- inventory_nodes:
-  - describe_config_rules:
-    - permissions: DescribeConfigRules
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_configuration_recorders:
-    - permissions: DescribeConfigurationRecorders
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_configuration_recorder_status:
-    - permissions: DescribeConfigurationRecorderStatus
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_delivery_channels:
-    - permissions: DescribeDeliveryChannels
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_delivery_channel_status:
-    - permissions: DescribeDeliveryChannelStatus
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: config
+    category: Monitoring and Management
+    inventory_nodes:
+        describe_config_rules:
+            permissions: DescribeConfigRules
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_configuration_recorders:
+            permissions: DescribeConfigurationRecorders
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_configuration_recorder_status:
+            permissions: DescribeConfigurationRecorderStatus
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_delivery_channels:
+            permissions: DescribeDeliveryChannels
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_delivery_channel_status:
+            permissions: DescribeDeliveryChannelStatus
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''

@@ -12,48 +12,51 @@
 # - permissions: the list of permissions needed to call the function.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
+
 sns:
-- region_type: local
-- boto_resource_name: sns
-- category: Application Integration
-- inventory_nodes:
-  - list_topics:
-    - permissions: ListTopics
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_subscriptions:
-    - permissions: ListSubscriptions
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: sns
+    category: Application Integration
+    inventory_nodes:
+        list_topics:
+            permissions: ListTopics
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_subscriptions:
+            permissions: ListSubscriptions
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+
 sqs:
-- region_type: local
-- boto_resource_name: sqs
-- category: Application Integration
-- inventory_nodes:
-  - list_queues:
-    - permissions: ListQueues
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: sqs
+    category: Application Integration
+    inventory_nodes:
+        list_queues:
+            permissions: ListQueues
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+            
 states:
-- region_type: local
-- boto_resource_name: states
-- category: Application Integration
-- inventory_nodes:
-  - list_state_machines:
-    - permissions: ListStateMachines
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_activities:
-    - permissions: ListActivities
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: states
+    category: Application Integration
+    inventory_nodes:
+        list_state_machines:
+            permissions: ListStateMachines
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_activities:
+            permissions: ListActivities
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''

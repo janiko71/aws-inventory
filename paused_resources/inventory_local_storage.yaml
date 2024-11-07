@@ -12,66 +12,69 @@
 # - permissions: the list of permissions needed to call the function.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 # - result_key: the key in the response where the detailed inventory is stored.
+
 elasticfilesystem:
-- region_type: local
-- boto_resource_name: elasticfilesystem
-- category: Storage
-- inventory_nodes:
-  - describe_file_systems:
-    - permissions: DescribeFileSystems
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: elasticfilesystem
+    category: Storage
+    inventory_nodes:
+        describe_file_systems:
+            permissions: DescribeFileSystems
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+
 fsx:
-- region_type: local
-- boto_resource_name: fsx
-- category: Storage
-- inventory_nodes:
-  - describe_backups:
-    - permissions: DescribeBackups
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_volumes:
-    - permissions: DescribeVolumes
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_storage_virtual_machines:
-    - permissions: DescribeStorageVirtualMachines
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - describe_file_systems:
-    - permissions: DescribeFileSystems
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: fsx
+    category: Storage
+    inventory_nodes:
+        describe_backups:
+            permissions: DescribeBackups
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_volumes:
+            permissions: DescribeVolumes
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_storage_virtual_machines:
+            permissions: DescribeStorageVirtualMachines
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        describe_file_systems:
+            permissions: DescribeFileSystems
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+            
 glacier:
-- region_type: local
-- boto_resource_name: glacier
-- category: Storage
-- inventory_nodes:
-  - list_vaults:
-    - permissions: ListVaults
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_parts:
-    - permissions: ListParts
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
-  - list_provisioned_capacity:
-    - permissions: ListProvisionedCapacity
-    - item_key: ''
-    - item_search_id: ''
-    - detail_param: ''
-    - result_key: ''
+    region_type: local
+    boto_resource_name: glacier
+    category: Storage
+    inventory_nodes:
+        list_vaults:
+            permissions: ListVaults
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_parts:
+            permissions: ListParts
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
+        list_provisioned_capacity:
+            permissions: ListProvisionedCapacity
+            item_key: ''
+            item_search_id: ''
+            detail_param: ''
+            result_key: ''
