@@ -216,6 +216,7 @@ def detail_handling(client, inventory, node_details, resource):
                 # Calling all the corresponding detail resources (see 'extra_resource_call.json')
 
                 try:
+
                     if complementary_params:
                         detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
                         write_log(f"Calling detail {detail_function} with params {detail_param}: {detail_param_value} and complementary params: {complementary_params}", log_file_path)
@@ -224,18 +225,23 @@ def detail_handling(client, inventory, node_details, resource):
                         write_log(f"Calling detail {detail_function} with params {detail_param}: {detail_param_value}", log_file_path)
                     if not with_meta:
                         detail_response.pop('ResponseMetadata', None)
+
                 except ClientError as e1:
+
                     exception_function_name = transform_function_name(e1.operation_name)
                     if exception_function_name != detail_function:
                         raise e1
+
                 except Exception as e2:
+
                     write_log(f"Error (e2) calling detail {detail_function} with params {detail_param}: {detail_param_value}: {e2} ({type(e2)})", log_file_path)
 
                 # The response is sometimes empty, sometimes a string, sometimes a list or a dict
 
                 if len(detail_response) > 0 or with_empty:
                     if detail != "":
-                        detail_response = {detail: detail_response[detail]}
+                        if detail != 'None':
+                            detail_response = {detail: detail_response[detail]}
                     else:
                         detail_response = {detail: detail_response}
                     # Now we add the detail to the inventory
@@ -310,12 +316,12 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
         # --- Some exceptions for EC2 that needs a region even when global (ex : DescribeRegions)
 
         if region_name != 'global':
-            client = boto3.client(resource.lower(), region_name=region_name)
+            client = boto3.client(boto_resource_name.lower(), region_name=region_name)
         else:
             if resource == 'ec2':
-                client = boto3.client(resource.lower(), region_name='us-east-1')
+                client = boto3.client(boto_resource_name.lower(), region_name='us-east-1')
             else:
-                client = boto3.client(resource.lower())
+                client = boto3.client(boto_resource_name.lower())
 
         # --- Inventory call for the resource. Reminder: called through threading
 
@@ -328,11 +334,42 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
             node = node_details[item]
             func = node['function']
 
-            start_time = time.time()
-            inventory = client.__getattribute__(func)()
-            progress_callback(1)
-            end_time = time.time()
-            write_log(f"API call for {resource} in {region_name} for {func} took {end_time - start_time:.2f} seconds", log_file_path)
+            try:
+
+                # --- API call for the resource 
+                start_time = time.time()
+                inventory = client.__getattribute__(func)()
+                end_time = time.time()
+                successful_resources += 1
+                write_log(f"API call for {resource} in {region_name} for {func} took {end_time - start_time:.2f} seconds", log_file_path)
+            
+            except AttributeError as e1:
+
+                write_log(f"Error (1) querying {resource} in {region_name} using {node_details['function']}: {e1} ({type(e1)})", log_file_path)
+                failed_resources += 1
+
+            except ClientError as e2:
+
+                if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
+
+                    write_log(f"Warning (2): Skipping {resource} in {region_name} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
+                    skipped_resources += 1
+
+                else:
+
+                    write_log(f"Error (3) querying {resource} in {region_name} using {node_details['function']}: {e2} ({type(e2)})", log_file_path)
+                    failed_resources += 1
+
+            except EndpointConnectionError as e3:
+
+                write_log(f"Warning (4): Skipping {resource} in {region_name} due to connection error: {e3} ({type(e3)})", log_file_path)
+                skipped_resources += 1
+
+
+            except Exception as e:
+
+                write_log(f"Error (e) querying {resource} in {region_name} using {node_details['function']}: {e} ({type(e)})", log_file_path)
+                failed_resources += 1
 
             # --- Cmd line arg "with-meta" ('ResponseMetaData)
 
@@ -385,46 +422,14 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
                 empty_resources += 1
                 write_log(f"Empty results for {resource} in {region_name}", log_file_path)
 
-            # Inventory successfull
-
-            progress_callback(1)
-            successful_resources += 1
-
-    except AttributeError as e1:
-
-        write_log(f"Error (1) querying {resource} in {region_name} using {node_details['function']}: {e1} ({type(e1)})", log_file_path)
-        failed_resources += 1
-        progress_callback(2)
-
-    except ClientError as e2:
-
-        if type(e2).__name__ == 'AWSOrganizationsNotInUseException':
-
-            write_log(f"Warning (2): Skipping {resource} in {region_name} due to organizations not in use error: {e2} ({type(e2)})", log_file_path)
-            skipped_resources += 1
-            progress_callback(2)
-
-        else:
-
-            write_log(f"Error (3) querying {resource} in {region_name} using {node_details['function']}: {e2} ({type(e2)})", log_file_path)
-            failed_resources += 1
-            progress_callback(2)
-
-    except EndpointConnectionError as e3:
-
-        write_log(f"Warning (4): Skipping {resource} in {region_name} due to connection error: {e3} ({type(e3)})", log_file_path)
-        skipped_resources += 1
-        progress_callback(2)
-
     except Exception as e:
 
         write_log(f"Error (e) querying {resource} in {region_name} using {node_details['function']}: {e} ({type(e)})", log_file_path)
-        failed_resources += 1
-        progress_callback(2)
 
     finally:
 
-        write_log(f"Completed inventory for {resource} in {region} using {node_details['function']}", log_file_path)
+        progress_callback(1)
+        write_log(f"End of inventory for {resource} in {region} using {node_details['function']}", log_file_path)
 
 # ------------------------------------------------------------------------------
 
@@ -452,10 +457,12 @@ def resource_inventory(progress_callback, thread_list, category, resource, boto_
     for node_name in node_details:
 
         write_log(f"Querying category: {category}, resource: {resource}, node_name: {node_name}, region: {region_name}", log_file_path)
-        total_tasks += 1  # Increment total_tasks for each sub-task
+        total_tasks += 1  # Increment total_tasks for each sub-task. One for each attribute in the node_details
+        # total_tasks += len(node_details) * len(node_details[node_name]['details'])  # Increment for each detail function call
         thread = InventoryThread(category, region_name, resource, boto_resource_name, node_details, f"{resource} in {region_name}", progress_callback)
         print('.', end='')
         thread_list.append(thread)
+    pass
 
 # ------------------------------------------------------------------------------
 
@@ -568,7 +575,7 @@ def list_used_resources(inventory_structure):
     # --- Display summary of the inventory process
 
     print(f"\nTotal execution time: {execution_time:.2f} seconds")
-    print(f"Total resources called: {total_tasks // 2}")  # Divide by 2 to get the actual number of resources called
+    print(f"Total resources called: {total_tasks}")  # Divide by 2 to get the actual number of resources called
     print(f"Successful resources: {successful_resources} ({filled_resources} resources with datas, {empty_resources} empty resources)")
     print(f"Failed resources: {failed_resources}")
     print(f"Skipped resources: {skipped_resources}")
