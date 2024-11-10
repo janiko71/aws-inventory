@@ -58,7 +58,7 @@ import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import glob
-from utils import write_log, transform_function_name, json_serial, is_empty  # Importer les fonctions utilitaires
+from utils import write_log, transform_function_name, json_serial, is_empty, get_all_regions, test_region_connectivity  # Importer les fonctions utilitaires
 from botocore.exceptions import EndpointConnectionError, ClientError  # Ajout des exceptions
 
 # ------------------------------------------------------------------------------
@@ -147,48 +147,6 @@ class InventoryThread(threading.Thread):
 
 # ------------------------------------------------------------------------------
 
-def get_all_regions():
-
-    """
-    Retrieve all AWS regions.
-
-    Returns:
-        list: A list of all AWS regions.
-    """
-
-    ec2 = boto3.client('ec2')
-    response = ec2.describe_regions()
-
-    return response['Regions']
-
-# ------------------------------------------------------------------------------
-
-def test_region_connectivity(region):
-
-    """
-    Test connectivity to a specific AWS region.
-
-    Args:
-        region (str): The AWS region to test.
-
-    Returns:
-        bool: True if the region is reachable, False otherwise.
-    """
-
-    ec2 = boto3.client('ec2', region_name=region)
-
-    try:
-
-        ec2.describe_availability_zones()
-        return True
-
-    except Exception as e:
-
-        write_log(f"Could not connect to the endpoint URL for region {region}: {e}", log_file_path)
-        return False
-
-# ------------------------------------------------------------------------------
-
 def detail_handling(client, inventory, node_details, resource):
 
     """
@@ -227,18 +185,19 @@ def detail_handling(client, inventory, node_details, resource):
                 detail_param = node_details['detail_param']   
                 complementary_params = node_details.get('complementary_param', None)
 
-                if type(inventory_item) == tuple:
-                    detail_param_value = inventory_item[1][0]
-                elif type(inventory_item) == dict:
-                    detail_param_value = inventory_item[item_search_id]
-                elif type(inventory_item) == list:
-                    detail_param_tmp = inventory_item[0]
-                    if type(detail_param_tmp) == str:
-                        detail_param_value = detail_param_tmp
-                    elif type(detail_param_tmp) == dict:
-                        detail_param_value = detail_param_tmp[item_search_id]
+                if isinstance(inventory_item, tuple):
+                    if inventory_item[1]:
+                        detail_param_value = inventory_item[1][0]
                     else:
+                        detail_param_value = inventory_item.get(item_search_id, None)
+                elif isinstance(inventory_item, dict):
+                    detail_param_value = inventory_item[item_search_id]
+                elif isinstance(inventory_item, list):
+                    detail_param_tmp = inventory_item[0]
+                    if isinstance(detail_param_tmp, str):
                         detail_param_value = detail_param_tmp
+                    else:
+                        detail_param_value = detail_param_tmp[detail_param]
                 else:
                     detail_param_value = inventory_item
 
@@ -281,26 +240,30 @@ def detail_handling(client, inventory, node_details, resource):
                         detail_response = {detail: detail_response}
                     # Now we add the detail to the inventory
                     try:
-                        if type(inventory_item) == tuple:
+                        if isinstance(inventory_item, tuple):
                             inventory_item[1][1].update(detail_response)
-                        elif type(inventory_item) == dict:
-                            inventory_item.update(detail_response)
-                        elif type(inventory_item) == list:
-                            tmp_inventory_item = inventory_item[0]
-                            # Tests: to check...
-                            if type(tmp_inventory_item) == str:
-                                inventory_item = [tmp_inventory_item, {detail: detail_response}]
-                            elif type(tmp_inventory_item) == dict:
-                                inventory_item[0].update({detail: detail_response})
+                        elif isinstance(inventory_item, dict):
+                            if detail in inventory_item and isinstance(inventory_item[detail], dict):
+                                inventory_item[detail].update(detail_response[detail])
                             else:
-                                inventory_item[0] = {detail: detail_response}
+                                inventory_item.update(detail_response)
+                        elif isinstance(inventory_item, list):
+                            tmp_inventory_item = inventory_item[0]
+                            if isinstance(tmp_inventory_item, str):
+                                inventory_item = [tmp_inventory_item, detail_response]
+                            elif isinstance(tmp_inventory_item, dict):
+                                if detail in tmp_inventory_item and isinstance(tmp_inventory_item[detail], dict):
+                                    tmp_inventory_item[detail].update(detail_response[detail])
+                                else:
+                                    tmp_inventory_item.update(detail_response)
+                            else:
+                                inventory_item[0] = detail_response
                         else:
-                            inventory_item.update(detail_response)
-                    except Exception as ei:
-                        write_log(f"Error (ei) updating inventory with detail {detail_response}: {ei} ({type(ei)})", log_file_path)
-                    
-                    inventory[item] = inventory_item
+                            raise TypeError(f"Unsupported inventory_item type: {type(inventory_item)}")
+                    except (TypeError, AttributeError) as ei:
+                        write_log(f"Error updating inventory with detail {detail_response}: {ei} ({type(ei)})", log_file_path)
 
+                    inventory[item] = inventory_item
 
 # ------------------------------------------------------------------------------
 
