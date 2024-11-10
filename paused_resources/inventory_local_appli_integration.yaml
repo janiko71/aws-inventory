@@ -60,8 +60,13 @@ sqs:
             details:
                 Attributes:
                     permissions: GetQueueAttributes
-                    item_search_id: QueueUrl
+                    item_search_id: QueueUrls
                     detail_function: get_queue_attributes
+                    detail_param: QueueUrl
+                Tags:
+                    permissions: ListQueueTags
+                    item_search_id: QueueUrls
+                    detail_function: list_queue_tags
                     detail_param: QueueUrl
             
 states:

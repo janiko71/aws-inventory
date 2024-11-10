@@ -232,7 +232,13 @@ def detail_handling(client, inventory, node_details, resource):
                 elif type(inventory_item) == dict:
                     detail_param_value = inventory_item[item_search_id]
                 elif type(inventory_item) == list:
-                    detail_param_value = inventory_item[0]
+                    detail_param_tmp = inventory_item[0]
+                    if type(detail_param_tmp) == str:
+                        detail_param_value = detail_param_tmp
+                    elif type(detail_param_tmp) == dict:
+                        detail_param_value = detail_param_tmp[item_search_id]
+                    else:
+                        detail_param_value = detail_param_tmp
                 else:
                     detail_param_value = inventory_item
 
@@ -263,6 +269,8 @@ def detail_handling(client, inventory, node_details, resource):
                     exception_function_name = transform_function_name(e1.operation_name)
                     if exception_function_name != detail_function:
                         raise e1
+                except Exception as e2:
+                    write_log(f"Error (e2) calling detail {detail_function} with params {detail_param}: {detail_param_value}: {e2} ({type(e2)})", log_file_path)
 
                 # The response is sometimes empty, sometimes a string, sometimes a list or a dict
 
@@ -278,7 +286,14 @@ def detail_handling(client, inventory, node_details, resource):
                         elif type(inventory_item) == dict:
                             inventory_item.update(detail_response)
                         elif type(inventory_item) == list:
-                            inventory_item = [inventory_item[0], detail_response]
+                            tmp_inventory_item = inventory_item[0]
+                            # Tests: to check...
+                            if type(tmp_inventory_item) == str:
+                                inventory_item = [tmp_inventory_item, {detail: detail_response}]
+                            elif type(tmp_inventory_item) == dict:
+                                inventory_item[0].update({detail: detail_response})
+                            else:
+                                inventory_item[0] = {detail: detail_response}
                         else:
                             inventory_item.update(detail_response)
                     except Exception as ei:
