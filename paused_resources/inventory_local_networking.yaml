@@ -1,104 +1,88 @@
-# Fichier YAML généré à partir de JSON
-# Structure of the file
-# ---
-# Category is a nom to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
-# boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
-# region_type is the type of region where the service is available. It can be 'local' or 'global'.
-#
-# inventory_nodes is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
-# Each function is a dictionary with the following keys:
-# - item_key: the key in the response where the list of items is stored.
-# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
-# - permissions: the list of permissions needed to call the function.
-# - detail_param: the parameter to use to call the detailed inventory functions.
-# - result_key: the key in the response where the detailed inventory is stored.
-
 ec2:
-    region_type: local
-    boto_resource_name: ec2
-    category: Compute
-    inventory_nodes:
-        describe_route_tables:
-            permissions: DescribeRouteTables
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_subnets:
-            permissions: DescribeSubnets
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_vpcs:
-            permissions: DescribeVpcs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_internet_gateways:
-            permissions: DescribeInternetGateways
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_ipv6_pools:
-            permissions: DescribeIpv6Pools
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_nat_gateways:
-            permissions: DescribeNatGateways
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_customer_gateways:
-            permissions: DescribeCustomerGateways
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_dhcp_options:
-            permissions: DescribeDhcpOptions
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_egress_only_internet_gateways:
-            permissions: DescribeEgressOnlyInternetGateways
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_vpc_endpoints:
-            permissions: DescribeVpcEndpoints
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_vpn_connections:
-            permissions: DescribeVpnConnections
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_vpn_gateways:
-            permissions: DescribeVpnGateways
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-            
+  boto_resource_name: ec2
+  category: Compute
+  inventory_nodes:
+    describe_customer_gateways:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeCustomerGateways
+      result_key: ''
+    describe_dhcp_options:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeDhcpOptions
+      result_key: ''
+    describe_egress_only_internet_gateways:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeEgressOnlyInternetGateways
+      result_key: ''
+    describe_internet_gateways:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeInternetGateways
+      result_key: ''
+    describe_ipv6_pools:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeIpv6Pools
+      result_key: ''
+    describe_nat_gateways:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeNatGateways
+      result_key: ''
+    describe_route_tables:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeRouteTables
+      result_key: ''
+    describe_subnets:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeSubnets
+      result_key: ''
+    describe_vpc_endpoints:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeVpcEndpoints
+      result_key: ''
+    describe_vpcs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeVpcs
+      result_key: ''
+    describe_vpn_connections:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeVpnConnections
+      result_key: ''
+    describe_vpn_gateways:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeVpnGateways
+      result_key: ''
+  region_type: local
 private-networks:
-    region_type: local
-    boto_resource_name: private-networks
-    category: Networking
-    inventory_nodes:
-        list_networks:
-            permissions: ListNetworks
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+  boto_resource_name: privatenetworks
+  category: Networking
+  inventory_nodes:
+    list_networks:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListNetworks
+      result_key: ''
+  region_type: local

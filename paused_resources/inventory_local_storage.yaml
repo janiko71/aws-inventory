@@ -1,0 +1,95 @@
+# ---
+# Structure of the file
+# ---
+#
+# The first level of the file is the resource name. At next level, you have the following keys:
+#
+# - region_type is the type of region where the service is available. It can be 'local' or 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# Each function is a dictionary with the following keys:
+#
+# The first level of the file is the resource name (ex: Topics, Attributes...). At next level, you have the following keys:
+#
+# - permissions: the list of permissions needed to call the function.
+# - function: the function to call to get the inventory of the resource.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, you have these parameters:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+
+s3:
+    region_type: global
+    boto_resource_name: s3
+    category: Storage
+    inventory_nodes:
+        Buckets:
+            permissions: ListBuckets
+            function: list_buckets
+            details:
+                LocationConstraint:
+                    permissions: GetBucketLocation
+                    item_search_id: Name
+                    detail_function: get_bucket_location
+                    detail_param: Bucket
+                ServerSideEncryptionConfiguration:
+                    permissions: GetBucketEncryption
+                    item_search_id: Name
+                    detail_function: get_bucket_encryption
+                    detail_param: Bucket
+                Website:
+                    permissions: GetBucketWebsite
+                    item_search_id: Name
+                    detail_function: get_bucket_website
+                    detail_param: Bucket
+                TagSet:
+                    permissions: GetBucketTagging
+                    item_search_id: Name
+                    detail_function: get_bucket_tagging
+                    detail_param: Bucket
+
+elasticfilesystem:
+    region_type: local
+    boto_resource_name: efs
+    category: Storage
+    inventory_nodes:
+        FileSystems:
+            permissions: DescribeFileSystems
+            function: describe_file_systems
+
+fsx:
+    region_type: local
+    boto_resource_name: fsx
+    category: Storage
+    inventory_nodes:
+        Backups:
+            permissions: DescribeBackups
+            function: describe_backups
+        Volumes:
+            permissions: DescribeVolumes
+            function: describe_volumes
+        StorageVirtualMachines:
+            permissions: DescribeStorageVirtualMachines
+            function: describe_storage_virtual_machines
+        FileSystems:
+            permissions: DescribeFileSystems
+            function: describe_file_systems
+            
+glacier:
+    region_type: local
+    boto_resource_name: glacier
+    category: Storage
+    inventory_nodes:
+        VaultList:
+            permissions: ListVaults
+            function: list_vaults
+        ProvisionedCapacityList:
+            permissions: ListProvisionedCapacity
+            function: list_provisioned_capacity

@@ -1,200 +1,180 @@
-# Fichier YAML généré à partir de JSON
-# Structure of the file
-# ---
-# Category is a nom to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
-# boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
-# region_type is the type of region where the service is available. It can be 'local' or 'global'.
-#
-# inventory_nodes is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
-# Each function is a dictionary with the following keys:
-# - item_key: the key in the response where the list of items is stored.
-# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
-# - permissions: the list of permissions needed to call the function.
-# - detail_param: the parameter to use to call the detailed inventory functions.
-# - result_key: the key in the response where the detailed inventory is stored.
-
 dynamodb:
-    region_type: local
-    boto_resource_name: dynamodb
-    category: Databases
-    inventory_nodes:
-        list_tables:
-            permissions: ListTables
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_backups:
-            permissions: ListBackups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_endpoints:
-            permissions: DescribeEndpoints
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-
+  boto_resource_name: dynamodb
+  category: Databases
+  inventory_nodes:
+    describe_endpoints:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeEndpoints
+      result_key: ''
+    list_backups:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListBackups
+      result_key: ''
+    list_tables:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListTables
+      result_key: ''
+  region_type: local
 elasticache:
-    region_type: local
-    boto_resource_name: elasticache
-    category: Databases
-    inventory_nodes:
-        describe_cache_clusters:
-            permissions: DescribeCacheClusters
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_cache_subnet_groups:
-            permissions: DescribeCacheSubnetGroups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_replication_groups:
-            permissions: DescribeReplicationGroups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_reserved_cache_nodes:
-            permissions: DescribeReservedCacheNodes
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-
+  boto_resource_name: elasticache
+  category: Databases
+  inventory_nodes:
+    describe_cache_clusters:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeCacheClusters
+      result_key: ''
+    describe_cache_subnet_groups:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeCacheSubnetGroups
+      result_key: ''
+    describe_replication_groups:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeReplicationGroups
+      result_key: ''
+    describe_reserved_cache_nodes:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeReservedCacheNodes
+      result_key: ''
+  region_type: local
 memorydb:
-    region_type: local
-    boto_resource_name: memorydb
-    category: Databases
-    inventory_nodes:
-        describe_clusters:
-            permissions: DescribeClusters
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_snapshots:
-            permissions: DescribeSnapshots
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_subnet_groups:
-            permissions: DescribeSubnetGroups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_users:
-            permissions: DescribeUsers
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-
+  boto_resource_name: memorydb
+  category: Databases
+  inventory_nodes:
+    describe_clusters:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeClusters
+      result_key: ''
+    describe_snapshots:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeSnapshots
+      result_key: ''
+    describe_subnet_groups:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeSubnetGroups
+      result_key: ''
+    describe_users:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeUsers
+      result_key: ''
+  region_type: local
 neptune-db:
-    region_type: local
-    boto_resource_name: neptune-db
-    category: Databases
-    inventory_nodes:
-        list_loader_jobs:
-            permissions: ListLoaderJobs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_ml_model_training_jobs:
-            permissions: ListMLModelTrainingJobs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_ml_endpoints:
-            permissions: ListMLEndpoints
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_ml_model_transform_jobs:
-            permissions: ListMLModelTransformJobs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_ml_data_processing_jobs:
-            permissions: ListMLDataProcessingJobs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-
+  boto_resource_name: neptunedata
+  category: Databases
+  inventory_nodes:
+    list_loader_jobs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListLoaderJobs
+      result_key: ''
+    list_ml_data_processing_jobs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListMLDataProcessingJobs
+      result_key: ''
+    list_ml_endpoints:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListMLEndpoints
+      result_key: ''
+    list_ml_model_training_jobs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListMLModelTrainingJobs
+      result_key: ''
+    list_ml_model_transform_jobs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListMLModelTransformJobs
+      result_key: ''
+  region_type: local
 neptune-graph:
-    region_type: local
-    boto_resource_name: neptune-graph
-    category: Databases
-    inventory_nodes:
-        list_graphs:
-            permissions: ListGraphs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        list_private_graph_endpoints:
-            permissions: ListPrivateGraphEndpoints
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-            
+  boto_resource_name: neptune-graph
+  category: Databases
+  inventory_nodes:
+    list_graphs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListGraphs
+      result_key: ''
+    list_private_graph_endpoints:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListPrivateGraphEndpoints
+      result_key: ''
+  region_type: local
 rds:
-    region_type: local
-    boto_resource_name: rds
-    category: Databases
-    inventory_nodes:
-        describe_db_instances:
-            permissions: DescribeDBInstances
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_db_clusters:
-            permissions: DescribeDBClusters
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_db_snapshots:
-            permissions: DescribeDBSnapshots
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_db_subnet_groups:
-            permissions: DescribeDBSubnetGroups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_event_subscriptions:
-            permissions: DescribeEventSubscriptions
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_option_groups:
-            permissions: DescribeOptionGroups
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        describe_reserved_db_instances:
-            permissions: DescribeReservedDBInstances
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+  boto_resource_name: rds
+  category: Databases
+  inventory_nodes:
+    describe_db_clusters:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeDBClusters
+      result_key: ''
+    describe_db_instances:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeDBInstances
+      result_key: ''
+    describe_db_snapshots:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeDBSnapshots
+      result_key: ''
+    describe_db_subnet_groups:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeDBSubnetGroups
+      result_key: ''
+    describe_event_subscriptions:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeEventSubscriptions
+      result_key: ''
+    describe_option_groups:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeOptionGroups
+      result_key: ''
+    describe_reserved_db_instances:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: DescribeReservedDBInstances
+      result_key: ''
+  region_type: local

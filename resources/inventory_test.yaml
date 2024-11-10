@@ -25,29 +25,6 @@
 # - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 
-sns:
-    region_type: local
-    boto_resource_name: sns
-    category: Application Integration
-    inventory_nodes:
-        Topics:
-            permissions: ListTopics
-            function: list_topics
-            details:
-                Attributes:
-                    permissions: GetTopicAttributes
-                    item_search_id: TopicArn
-                    detail_function: get_topic_attributes
-                    detail_param: TopicArn
-        Subscriptions:
-            permissions: ListSubscriptions
-            function: list_subscriptions    
-            details:
-                Subscriptions:
-                    permissions: GetSubscriptionAttributes
-                    item_search_id: SubscriptionArn
-                    detail_function: get_subscription_attributes
-                    detail_param: SubscriptionArn
 
 sqs:
     region_type: local
@@ -60,31 +37,11 @@ sqs:
             details:
                 Attributes:
                     permissions: GetQueueAttributes
-                    item_search_id: QueueUrl
+                    item_search_id: QueueUrls
                     detail_function: get_queue_attributes
                     detail_param: QueueUrl
-            
-states:
-    region_type: local
-    boto_resource_name: stepfunctions
-    other_name: SFN
-    category: Application Integration
-    inventory_nodes:
-        stateMachines:
-            permissions: ListStateMachines
-            function: list_state_machines
-            details:
-                None:
-                    permissions: DescribeStateMachine
-                    item_search_id: stateMachineArn
-                    detail_function: describe_state_machine
-                    detail_param: stateMachineArn
-        activities:
-            permissions: ListActivities
-            function: list_activities
-            details:
-                None:
-                    permissions: DescribeActivity
-                    item_search_id: activityArn
-                    detail_function: describe_activity
-                    detail_param: activityArn
+                Tags:
+                    permissions: ListQueueTags
+                    item_search_id: QueueUrls
+                    detail_function: list_queue_tags
+                    detail_param: QueueUrl

@@ -1,50 +1,34 @@
-# Fichier YAML généré à partir de JSON
-# Structure of the file
-# ---
-# Category is a nom to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
-# boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
-# region_type is the type of region where the service is available. It can be 'local' or 'global'.
-#
-# inventory_nodes is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
-# Each function is a dictionary with the following keys:
-# - item_key: the key in the response where the list of items is stored.
-# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
-# - permissions: the list of permissions needed to call the function.
-# - detail_param: the parameter to use to call the detailed inventory functions.
-# - result_key: the key in the response where the detailed inventory is stored.
-
 braket:
-    region_type: local
-    boto_resource_name: braket
-    category: Quantum Technologies
-    inventory_nodes:
-        search_devices:
-            permissions: SearchDevices
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        search_jobs:
-            permissions: SearchJobs
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-        search_quantum_tasks:
-            permissions: SearchQuantumTasks
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
-            
+  boto_resource_name: braket
+  category: Quantum Technologies
+  inventory_nodes:
+    search_devices:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: SearchDevices
+      result_key: ''
+    search_jobs:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: SearchJobs
+      result_key: ''
+    search_quantum_tasks:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: SearchQuantumTasks
+      result_key: ''
+  region_type: local
 managedblockchain:
-    region_type: local
-    boto_resource_name: managedblockchain
-    category: Blockchain
-    inventory_nodes:
-        list_networks:
-            permissions: ListNetworks
-            item_key: ''
-            item_search_id: ''
-            detail_param: ''
-            result_key: ''
+  boto_resource_name: managedblockchain
+  category: Blockchain
+  inventory_nodes:
+    list_networks:
+      detail_param: ''
+      item_key: ''
+      item_search_id: ''
+      permissions: ListNetworks
+      result_key: ''
+  region_type: local
