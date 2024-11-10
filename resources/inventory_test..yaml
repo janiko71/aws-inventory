@@ -1,10 +1,18 @@
-            
 states:
     region_type: local
     boto_resource_name: stepfunctions
     other_name: SFN
     category: Application Integration
     inventory_nodes:
+        activities:
+            permissions: ListActivities
+            function: list_activities
+            details:
+                None:
+                    permissions: DescribeActivity
+                    item_search_id: activityArn
+                    detail_function: describe_activity
+                    detail_param: activityArn
         stateMachines:
             permissions: ListStateMachines
             function: list_state_machines
