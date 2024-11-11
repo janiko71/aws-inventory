@@ -103,7 +103,7 @@ num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
-num_threads = 1 # For test purposes with no MT
+# num_threads = 1 # For test purposes with no MT
 
 # ------------------------------------------------------------------------------
 

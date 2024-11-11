@@ -55,22 +55,41 @@ s3:
                     detail_function: get_bucket_tagging
                     detail_param: Bucket
 
-sqs:
+elasticfilesystem:
     region_type: local
-    boto_resource_name: sqs
-    category: Application Integration
+    boto_resource_name: efs
+    category: Storage
     inventory_nodes:
-        QueueUrls:
-            permissions: ListQueues
-            function: list_queues
-            details:
-                Attributes:
-                    permissions: GetQueueAttributes
-                    item_search_id: QueueUrls
-                    detail_function: get_queue_attributes
-                    detail_param: QueueUrl
-                Tags:
-                    permissions: ListQueueTags
-                    item_search_id: QueueUrls
-                    detail_function: list_queue_tags
-                    detail_param: QueueUrl
+        FileSystems:
+            permissions: DescribeFileSystems
+            function: describe_file_systems
+
+fsx:
+    region_type: local
+    boto_resource_name: fsx
+    category: Storage
+    inventory_nodes:
+        Backups:
+            permissions: DescribeBackups
+            function: describe_backups
+        Volumes:
+            permissions: DescribeVolumes
+            function: describe_volumes
+        StorageVirtualMachines:
+            permissions: DescribeStorageVirtualMachines
+            function: describe_storage_virtual_machines
+        FileSystems:
+            permissions: DescribeFileSystems
+            function: describe_file_systems
+            
+glacier:
+    region_type: local
+    boto_resource_name: glacier
+    category: Storage
+    inventory_nodes:
+        VaultList:
+            permissions: ListVaults
+            function: list_vaults
+        ProvisionedCapacityList:
+            permissions: ListProvisionedCapacity
+            function: list_provisioned_capacity
