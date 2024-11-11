@@ -103,7 +103,7 @@ num_cores = multiprocessing.cpu_count()
 
 # Set the number of threads to 2 to 4 times the number of CPU cores
 num_threads = num_cores * 4  # You can adjust this multiplier based on your needs
-# num_threads = 1 # For test purposes
+num_threads = 1 # For test purposes with no MT
 
 # ------------------------------------------------------------------------------
 
@@ -147,7 +147,7 @@ class InventoryThread(threading.Thread):
 
 # ------------------------------------------------------------------------------
 
-def detail_handling(client, inventory, node_details, resource):
+def detail_handling(client, inventory, node_details, resource, key):
 
     """
     Handles the details of inventory items by calling specified detail functions on the client.
@@ -168,116 +168,115 @@ def detail_handling(client, inventory, node_details, resource):
 
     global account_id, with_empty
 
-    for item_name in inventory:
+    inventory_item = inventory[key]
 
-        inventory_item = inventory[item_name]
+    for index, item in enumerate(inventory_item):
 
-        for item in inventory_item:
+        the_node_details = node_details[key]['details']
 
-            the_node_details = node_details[item_name]['details']
+        for detail in the_node_details:
 
-            for detail in the_node_details:
+            the_details = the_node_details[detail]
 
-                the_details = the_node_details[detail]
+            item_search_id = the_details['item_search_id']
+            detail_function = the_details['detail_function']
+            detail_param = the_details['detail_param']   
+            complementary_params = the_details.get('complementary_param', None)
 
-                item_search_id = the_details['item_search_id']
-                detail_function = the_details['detail_function']
-                detail_param = the_details['detail_param']   
-                complementary_params = the_details.get('complementary_param', None)
+            # Loop over the inventory items to retrieve the detail
 
-                # Loop over the inventory items to retrieve the detail
+            if isinstance(item, tuple):
+                if item[1]:
+                    detail_param_value = item[1]
+                else:
+                    detail_param_value = item.get(item_search_id, None)
+            elif isinstance(item, dict):
+                detail_param_value = item[item_search_id]
+            elif isinstance(item, list):
+                detail_param_tmp = item[0]
+                if isinstance(detail_param_tmp, str):
+                    detail_param_value = detail_param_tmp
+                else:
+                    detail_param_value = detail_param_tmp[detail_param]
+            else:
+                detail_param_value = item
 
-                for the_item in inventory:
+            # exception for s3 location: we need an additionnal arg (account id)
 
-                    the_inventory_item = inventory[the_item]
+            if resource == 's3' and detail_function == 'get_bucket_location':
+                if not complementary_params:
+                    complementary_params = {'ExpectedBucketOwner': account_id}
+                else:
+                    complementary_params.update({'ExpectedBucketOwner': account_id})
 
-                    if isinstance(the_inventory_item, tuple):
-                        if the_inventory_item[1]:
-                            detail_param_value = the_inventory_item[1]
+            # General case
+
+            detail_response = {}
+
+            # Calling all the corresponding detail resources (see 'extra_resource_call.json')
+
+            try:
+
+                if complementary_params:
+                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
+                    write_log(f"Calling detail {detail_function} with params {detail_param}: {detail_param_value} and complementary params: {complementary_params}", log_file_path)
+                else:
+                    detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
+                    write_log(f"Calling detail {detail_function} with params {detail_param}: {detail_param_value}", log_file_path)
+                if not with_meta:
+                    detail_response.pop('ResponseMetadata', None)
+
+            except ClientError as e1:
+
+                exception_function_name = transform_function_name(e1.operation_name)
+                if exception_function_name != detail_function:
+                    raise e1
+
+            except Exception as e2:
+
+                write_log(f"Error (e2) calling detail {detail_function} with params {detail_param}: {detail_param_value}: {e2} ({type(e2)})", log_file_path)
+
+            # The response is sometimes empty, sometimes a string, sometimes a list or a dict
+
+            if len(detail_response) > 0 or with_empty:
+
+                if detail != "":
+                    if detail != 'None':
+                        detail_response = {detail: detail_response[detail]}
+                else:
+                    detail_response = {detail: detail_response}
+
+                # Now we add the detail to the inventory
+
+                try:
+                    if isinstance(item, tuple):
+                        item[1][1].update(detail_response)
+                    elif isinstance(item, dict):
+                        if detail in item and isinstance(item[detail], dict):
+                            item[detail].update(detail_response[detail])
                         else:
-                            detail_param_value = the_inventory_item.get(item_search_id, None)
-                    elif isinstance(the_inventory_item, dict):
-                        detail_param_value = the_inventory_item[item_search_id]
-                    elif isinstance(the_inventory_item, list):
-                        detail_param_tmp = the_inventory_item[0]
-                        if isinstance(detail_param_tmp, str):
-                            detail_param_value = detail_param_tmp
-                        else:
-                            detail_param_value = detail_param_tmp[detail_param]
-                    else:
-                        detail_param_value = the_inventory_item
-
-                    # exception for s3 location: we need an additionnal arg (account id)
-
-                    if resource == 's3' and detail_function == 'get_bucket_location':
-                        if not complementary_params:
-                            complementary_params = {'ExpectedBucketOwner': account_id}
-                        else:
-                            complementary_params.update({'ExpectedBucketOwner': account_id})
-
-                    # General case
-
-                    detail_response = {}
-
-                    # Calling all the corresponding detail resources (see 'extra_resource_call.json')
-
-                    try:
-
-                        if complementary_params:
-                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value, **complementary_params})
-                            write_log(f"Calling detail {detail_function} with params {detail_param}: {detail_param_value} and complementary params: {complementary_params}", log_file_path)
-                        else:
-                            detail_response = client.__getattribute__(detail_function)(**{detail_param: detail_param_value})
-                            write_log(f"Calling detail {detail_function} with params {detail_param}: {detail_param_value}", log_file_path)
-                        if not with_meta:
-                            detail_response.pop('ResponseMetadata', None)
-
-                    except ClientError as e1:
-
-                        exception_function_name = transform_function_name(e1.operation_name)
-                        if exception_function_name != detail_function:
-                            raise e1
-
-                    except Exception as e2:
-
-                        write_log(f"Error (e2) calling detail {detail_function} with params {detail_param}: {detail_param_value}: {e2} ({type(e2)})", log_file_path)
-
-                    # The response is sometimes empty, sometimes a string, sometimes a list or a dict
-
-                    if len(detail_response) > 0 or with_empty:
-                        if detail != "":
-                            if detail != 'None':
-                                detail_response = {detail: detail_response[detail]}
-                        else:
-                            detail_response = {detail: detail_response}
-                        # Now we add the detail to the inventory
-                        try:
-                            if isinstance(inventory_item, tuple):
-                                inventory_item[1][1].update(detail_response)
-                            elif isinstance(inventory_item, dict):
-                                if detail in inventory_item and isinstance(inventory_item[detail], dict):
-                                    inventory_item[detail].update(detail_response[detail])
-                                else:
-                                    inventory_item.update(detail_response)
-                            elif isinstance(inventory_item, list):
-                                tmp_inventory_item = inventory_item[0]
-                                if isinstance(tmp_inventory_item, str):
-                                    inventory_item = [tmp_inventory_item, detail_response]
-                                elif isinstance(tmp_inventory_item, dict):
-                                    if detail in tmp_inventory_item and isinstance(tmp_inventory_item[detail], dict):
-                                        tmp_inventory_item[detail].update(detail_response[detail])
-                                    else:
-                                        tmp_inventory_item.update(detail_response)
-                                else:
-                                    inventory_item[0] = detail_response
+                            item.update(detail_response)
+                    elif isinstance(item, list):
+                        tmp_item = item[0]
+                        if isinstance(tmp_item, str):
+                            item = [tmp_item, detail_response]
+                        elif isinstance(tmp_item, dict):
+                            if detail in tmp_item and isinstance(tmp_item[detail], dict):
+                                tmp_item[detail].update(detail_response[detail])
                             else:
-                                raise TypeError(f"Unsupported inventory_item type: {type(inventory_item)}")
-                        except (TypeError, AttributeError) as ei:
-                            write_log(f"Error updating inventory with detail {detail_response}: {ei} ({type(ei)})", log_file_path)
-
-                        inventory[item] = inventory_item
+                                tmp_item.update(detail_response)
+                        else:
+                            item[0] = detail_response
+                    elif isinstance(item, str):
+                        inventory[key][index] = [item, detail_response]
+                    else:
+                        raise TypeError(f"Unsupported item type: {type(item)}")
+                except (TypeError, AttributeError) as ei:
+                    write_log(f"Error updating inventory with detail {detail_response}: {ei} ({type(ei)})", log_file_path)
+            pass
 
 # ------------------------------------------------------------------------------
+
 
 def inventory_handling(category, region_name, resource, boto_resource_name, node_details, key, progress_callback):
 
@@ -393,7 +392,7 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
 
             if not empty_items or with_empty:
 
-                # --- Here: not empty, or we want to list the empty values too (arg 'with_empty')
+				# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')
 
                 object_type = list(inventory.keys())[0] if inventory else 'Unknown'
                 if category not in results:
@@ -408,7 +407,7 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
                 start_time = time.time()
 
                 inventory.pop('NextToken', None) # no "NextToken"
-                results[category][resource][object_type][region_name] = inventory
+                results[category][resource][object_type][region_name] = inventory[object_type]
                 if with_meta and response_metadata:
                     # MetaData only if the key is present and if we asked for it (arg 'with_meta')
                     results[category][resource][object_type][region_name]['ResponseMetadata'] = response_metadata
@@ -420,7 +419,7 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
                 # --- In case of: we want more information about the resource
                 #     Calling all the corresponding detail resources 
 
-                detail_handling(client, inventory, node_details, resource)
+                detail_handling(client, inventory, node_details, resource, key)
 
             else:
 
@@ -435,7 +434,7 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
     finally:
 
         progress_callback(1)
-        write_log(f"End of inventory for {resource} in {region} using {node_details['function']}", log_file_path)
+        write_log(f"End of inventory for {resource} in {region_name} using {node_details['function']}", log_file_path)
 
 # ------------------------------------------------------------------------------
 
