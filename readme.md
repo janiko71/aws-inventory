@@ -33,7 +33,7 @@ The ```new_inventory_api.py``` file is a Python script designed for inventorying
 * **Classes**: 
   * ```InventoryThread```: A thread class for performing inventory tasks.
 * **Functions**:
-  * Utility Functions: ```write_log```, ```transform_function_name```, ```json_serial```, is_empty```.
+  * Utility Functions: ```write_log```, ```transform_function_name```, ```json_serial```, ```is_empty```.
   * *Inventory Management Functions: ```get_all_regions```, ```test_region_connectivity```, ```create_services_structure```, ```inventory_handling```, ```list_used_services```.
 * The ```main``` function initiates the script execution, parses arguments, and manages the inventory process.
 
