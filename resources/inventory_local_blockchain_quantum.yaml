@@ -1,34 +1,81 @@
+# ---
+# Structure of the file YAML (using 4 spaces for indentation)
+# ---
+#
+# The first level of the file is the resource name. At next level, you have the following keys:
+#
+# - region_type is the type of region where the service is available. It can be 'local' or 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# The first level of the node is the resource name (ex: Buckets, Topics, Attributes...). At next level, you have the following keys:
+#
+# - permissions: the list of permissions needed to call the function.
+# - function: the function to call to get the inventory of the resource.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, you have these parameters:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+
 braket:
-  boto_resource_name: braket
-  category: Quantum Technologies
-  inventory_nodes:
-    search_devices:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: SearchDevices
-      result_key: ''
-    search_jobs:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: SearchJobs
-      result_key: ''
-    search_quantum_tasks:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: SearchQuantumTasks
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: braket
+    category: Quantum Computing
+    inventory_nodes:
+        QuantumTasks:
+            permissions: SearchQuantumTasks
+            function: search_quantum_tasks
+            details:
+                QuantumTask:
+                    permissions: GetQuantumTask
+                    item_search_id: QuantumTaskArn
+                    detail_function: get_quantum_task
+                    detail_param: QuantumTaskArn
+        Devices:
+            permissions: SearchDevices
+            function: search_devices
+            details:
+                Device:
+                    permissions: GetDevice
+                    item_search_id: DeviceArn
+                    detail_function: get_device
+                    detail_param: DeviceArn
+
 managedblockchain:
-  boto_resource_name: managedblockchain
-  category: Blockchain
-  inventory_nodes:
-    list_networks:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListNetworks
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: managedblockchain
+    category: Blockchain
+    inventory_nodes:
+        Networks:
+            permissions: ListNetworks
+            function: list_networks
+            details:
+                Network:
+                    permissions: GetNetwork
+                    item_search_id: NetworkId
+                    detail_function: get_network
+                    detail_param: NetworkId
+        Members:
+            permissions: ListMembers
+            function: list_members
+            details:
+                Member:
+                    permissions: GetMember
+                    item_search_id: MemberId
+                    detail_function: get_member
+                    detail_param: MemberId
+        Proposals:
+            permissions: ListProposals
+            function: list_proposals
+            details:
+                Proposal:
+                    permissions: GetProposal
+                    item_search_id: ProposalId
+                    detail_function: get_proposal
+                    detail_param: ProposalId

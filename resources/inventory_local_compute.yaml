@@ -1,320 +1,244 @@
+# ---
+# Structure of the file YAML (using 4 spaces for indentation)
+# ---
+#
+# The first level of the file is the resource name. At next level, you have the following keys:
+#
+# - region_type is the type of region where the service is available. It can be 'local' or 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# The first level of the node is the resource name (ex: Buckets, Topics, Attributes...). At next level, you have the following keys:
+#
+# - permissions: the list of permissions needed to call the function.
+# - function: the function to call to get the inventory of the resource.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, you have these parameters:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+# ---
+# Structure of the file YAML (using 4 spaces for indentation)
+# ---
+#
+# The first level of the file is the resource name. At next level, vous avez les clés suivantes:
+#
+# - region_type is the type of region where the service is available. It can be 'local' ou 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# The first level of the node is the resource name (ex: Buckets, Topics, Attributes...). At next level, vous avez les clés suivantes:
+#
+# - permissions: the list of permissions needed to call the function.
+# - function: the function to call to get the inventory of the resource.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, vous avez ces paramètres:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+
 apprunner:
-  boto_resource_name: apprunner
-  category: Compute
-  inventory_nodes:
-    list_services:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListServices
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: apprunner
+    category: Compute
+    inventory_nodes:
+        Services:
+            permissions: ListServices
+            function: list_services
+            details:
+                Service:
+                    permissions: DescribeService
+                    item_search_id: ServiceArn
+                    detail_function: describe_service
+                    detail_param: ServiceArn
+
 autoscaling:
-  boto_resource_name: autoscaling
-  category: Compute
-  inventory_nodes:
-    describe_auto_scaling_groups:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeAutoScalingGroups
-      result_key: ''
-    describe_auto_scaling_instances:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeAutoScalingInstances
-      result_key: ''
-    describe_launch_configurations:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeLaunchConfigurations
-      result_key: ''
-    describe_policies:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribePolicies
-      result_key: ''
-    describe_scaling_activities:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeScalingActivities
-      result_key: ''
-    describe_scheduled_actions:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeScheduledActions
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: autoscaling
+    category: Compute
+    inventory_nodes:
+        AutoScalingGroups:
+            permissions: DescribeAutoScalingGroups
+            function: describe_auto_scaling_groups
+        LaunchConfigurations:
+            permissions: DescribeLaunchConfigurations
+            function: describe_launch_configurations
+
 batch:
-  boto_resource_name: batch
-  category: Compute
-  inventory_nodes:
-    describe_compute_environments:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeComputeEnvironments
-      result_key: ''
-    describe_job_definitions:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeJobDefinitions
-      result_key: ''
-    describe_job_queues:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeJobQueues
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: batch
+    category: Compute
+    inventory_nodes:
+        JobQueues:
+            permissions: DescribeJobQueues
+            function: describe_job_queues
+        JobDefinitions:
+            permissions: DescribeJobDefinitions
+            function: describe_job_definitions
+
 ec2:
-  boto_resource_name: ec2
-  category: Compute
-  inventory_nodes:
-    describe_addresses:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeAddresses
-      result_key: ''
-    describe_fleets:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeFleets
-      result_key: ''
-    describe_flow_logs:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeFlowLogs
-      result_key: ''
-    describe_host_reservations:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeHostReservations
-      result_key: ''
-    describe_hosts:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeHosts
-      result_key: ''
-    describe_iam_instance_profile_associations:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeIamInstanceProfileAssociations
-      result_key: ''
-    describe_instances:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeInstances
-      result_key: ''
-    describe_key_pairs:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeKeyPairs
-      result_key: ''
-    describe_launch_templates:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeLaunchTemplates
-      result_key: ''
-    describe_network_interfaces:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeNetworkInterfaces
-      result_key: ''
-    describe_placement_groups:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribePlacementGroups
-      result_key: ''
-    describe_reserved_instances:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeReservedInstances
-      result_key: ''
-    describe_route_tables:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeRouteTables
-      result_key: ''
-    describe_security_groups:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeSecurityGroups
-      result_key: ''
-    describe_volumes:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeVolumes
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: ec2
+    category: Compute
+    inventory_nodes:
+        Instances:
+            permissions: DescribeInstances
+            function: describe_instances
+            details:
+                Volume:
+                    permissions: DescribeVolumes
+                    item_search_id: VolumeId
+                    detail_function: describe_volume
+                    detail_param: VolumeId
+                Snapshot:
+                    permissions: DescribeSnapshots
+                    item_search_id: SnapshotId
+                    detail_function: describe_snapshot
+                    detail_param: SnapshotId
+                KeyPair:
+                    permissions: DescribeKeyPairs
+                    item_search_id: KeyName
+                    detail_function: describe_key_pair
+                    detail_param: KeyName
+                SecurityGroup:
+                    permissions: DescribeSecurityGroups
+                    item_search_id: GroupId
+                    detail_function: describe_security_group
+                    detail_param: GroupId
+                NetworkInterface:
+                    permissions: DescribeNetworkInterfaces
+                    item_search_id: NetworkInterfaceId
+                    detail_function: describe_network_interface
+                    detail_param: NetworkInterfaceId
+                CustomerGateway:
+                    permissions: DescribeCustomerGateways
+                    item_search_id: CustomerGatewayId
+                    detail_function: describe_customer_gateway
+                    detail_param: CustomerGatewayId
+
 elasticbeanstalk:
-  boto_resource_name: elasticbeanstalk
-  category: Compute
-  inventory_nodes:
-    describe_applications:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeApplications
-      result_key: ''
-    describe_environment_resources:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeEnvironmentResources
-      result_key: ''
-    describe_environments:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: DescribeEnvironments
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: elasticbeanstalk
+    category: Compute
+    inventory_nodes:
+        Applications:
+            permissions: DescribeApplications
+            function: describe_applications
+            details:
+                Application:
+                    permissions: DescribeApplication
+                    item_search_id: ApplicationName
+                    detail_function: describe_application
+                    detail_param: ApplicationName
+        Environments:
+            permissions: DescribeEnvironments
+            function: describe_environments
+            details:
+                Environment:
+                    permissions: DescribeEnvironment
+                    item_search_id: EnvironmentId
+                    detail_function: describe_environment
+                    detail_param: EnvironmentId
+
 lambda:
-  boto_resource_name: lambda
-  category: Compute
-  inventory_nodes:
-    list_event_source_mappings:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListEventSourceMappings
-      result_key: ''
-    list_functions:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListFunctions
-      result_key: ''
-    list_layers:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListLayers
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: lambda
+    category: Compute
+    inventory_nodes:
+        Functions:
+            permissions: ListFunctions
+            function: list_functions
+            details:
+                Function:
+                    permissions: GetFunction
+                    item_search_id: FunctionArn
+                    detail_function: get_function
+                    detail_param: FunctionArn
+
 lightsail:
-  boto_resource_name: lightsail
-  category: Compute
-  inventory_nodes:
-    get_buckets:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetBuckets
-      result_key: ''
-    get_disks:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetDisks
-      result_key: ''
-    get_domains:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetDomains
-      result_key: ''
-    get_instances:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetInstances
-      result_key: ''
-    get_key_pairs:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetKeyPairs
-      result_key: ''
-    get_load_balancers:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetLoadBalancers
-      result_key: ''
-    get_operations:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetOperations
-      result_key: ''
-    get_relational_databases:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetRelationalDatabases
-      result_key: ''
-    get_static_ips:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: GetStaticIps
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: lightsail
+    category: Compute
+    inventory_nodes:
+        Instances:
+            permissions: GetInstances
+            function: get_instances
+            details:
+                Instance:
+                    permissions: GetInstance
+                    item_search_id: InstanceName
+                    detail_function: get_instance
+                    detail_param: InstanceName
+        Databases:
+            permissions: GetRelationalDatabases
+            function: get_relational_databases
+            details:
+                Database:
+                    permissions: GetRelationalDatabase
+                    item_search_id: RelationalDatabaseName
+                    detail_function: get_relational_database
+                    detail_param: RelationalDatabaseName
+
 outposts:
-  boto_resource_name: outposts
-  category: Compute
-  inventory_nodes:
-    list_assets:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListAssets
-      result_key: ''
-    list_outposts:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListOutposts
-      result_key: ''
-    list_sites:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListSites
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: outposts
+    category: Compute
+    inventory_nodes:
+        Outposts:
+            permissions: ListOutposts
+            function: list_outposts
+            details:
+                Outpost:
+                    permissions: GetOutpost
+                    item_search_id: OutpostId
+                    detail_function: get_outpost
+                    detail_param: OutpostId
+        Sites:
+            permissions: ListSites
+            function: list_sites
+            details:
+                Site:
+                    permissions: GetSite
+                    item_search_id: SiteId
+                    detail_function: get_site
+                    detail_param: SiteId
+
 pcs:
-  boto_resource_name: pcs
-  category: Compute
-  inventory_nodes:
-    list_clusters:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListClusters
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: pcs
+    category: Compute
+    inventory_nodes:
+        Clusters:
+            permissions: ListClusters
+            function: list_clusters
+            details:
+                Cluster:
+                    permissions: DescribeCluster
+                    item_search_id: ClusterId
+                    detail_function: describe_cluster
+                    detail_param: ClusterId
+
 simspaceweaver:
-  boto_resource_name: simspaceweaver
-  category: Compute
-  inventory_nodes:
-    list_simulations:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListSimulations
-      result_key: ''
-  region_type: local
+    region_type: local
+    boto_resource_name: simspaceweaver
+    category: Compute
+    inventory_nodes:
+        Simulations:
+            permissions: ListSimulations
+            function: list_simulations
+            details:
+                Simulation:
+                    permissions: DescribeSimulation
+                    item_search_id: SimulationId
+                    detail_function: describe_simulation
+                    detail_param: SimulationId
