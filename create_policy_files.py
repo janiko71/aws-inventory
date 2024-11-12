@@ -19,7 +19,8 @@ def extract_permissions(yaml_file):
             for key, value in data.items():
                 if key == 'permissions':
                     if isinstance(value, str):
-                        permissions.add(f"{resource}:{value}")
+                        perms = [perm.strip() for perm in value.split(',')]
+                        permissions.update(f"{resource}:{perm}" for perm in perms)
                     elif isinstance(value, list):
                         permissions.update(f"{resource}:{perm}" for perm in value)
                 else:
