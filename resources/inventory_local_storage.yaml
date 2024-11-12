@@ -31,7 +31,7 @@ s3:
     category: Storage
     inventory_nodes:
         Buckets:
-            permissions: ListBuckets
+            permissions: ListBucket, ListAllMyBuckets
             function: list_buckets
             details:
                 LocationConstraint:
@@ -40,7 +40,7 @@ s3:
                     detail_function: get_bucket_location
                     detail_param: Bucket
                 ServerSideEncryptionConfiguration:
-                    permissions: GetBucketEncryption
+                    permissions: GetEncryptionConfiguration
                     item_search_id: Name
                     detail_function: get_bucket_encryption
                     detail_param: Bucket
