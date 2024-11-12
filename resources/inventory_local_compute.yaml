@@ -134,21 +134,9 @@ elasticbeanstalk:
         Applications:
             permissions: DescribeApplications
             function: describe_applications
-            details:
-                Application:
-                    permissions: DescribeApplication
-                    item_search_id: ApplicationName
-                    detail_function: describe_application
-                    detail_param: ApplicationName
         Environments:
             permissions: DescribeEnvironments
             function: describe_environments
-            details:
-                Environment:
-                    permissions: DescribeEnvironment
-                    item_search_id: EnvironmentId
-                    detail_function: describe_environment
-                    detail_param: EnvironmentId
 
 lambda:
     region_type: local
@@ -217,16 +205,17 @@ pcs:
     region_type: local
     boto_resource_name: pcs
     category: Compute
+    other_name: ParallelComputingService
     inventory_nodes:
         Clusters:
             permissions: ListClusters
             function: list_clusters
             details:
                 Cluster:
-                    permissions: DescribeCluster
-                    item_search_id: ClusterId
-                    detail_function: describe_cluster
-                    detail_param: ClusterId
+                    permissions: GetCluster
+                    item_search_id: id
+                    detail_function: get_cluster
+                    detail_param: id
 
 simspaceweaver:
     region_type: local

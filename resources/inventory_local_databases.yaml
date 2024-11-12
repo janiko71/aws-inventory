@@ -25,27 +25,19 @@
 
 neptune-graph:
     region_type: local
-    boto_resource_name: neptune
+    boto_resource_name: neptune-graph
     category: Databases
+    other_name: Neptune Analytics
     inventory_nodes:
-        Clusters:
-            permissions: DescribeDBClusters
-            function: describe_db_clusters
+        graphs:
+            permissions: ListGraphs
+            function: list_graphs
             details:
-                Cluster:
-                    permissions: DescribeDBCluster
-                    item_search_id: DBClusterIdentifier
-                    detail_function: describe_db_cluster
-                    detail_param: DBClusterIdentifier
-        Instances:
-            permissions: DescribeDBInstances
-            function: describe_db_instances
-            details:
-                Instance:
-                    permissions: DescribeDBInstance
-                    item_search_id: DBInstanceIdentifier
-                    detail_function: describe_db_instance
-                    detail_param: DBInstanceIdentifier
+                tags:
+                    permissions: ListTagsForResource
+                    item_search_id: arn
+                    detail_function: list_tags_for_resource
+                    detail_param: resourceArn
 
 rds:
     region_type: local
@@ -58,12 +50,6 @@ rds:
         DBClusters:
             permissions: DescribeDBClusters
             function: describe_db_clusters
-            details:
-                DBCluster:
-                    permissions: DescribeDBCluster
-                    item_search_id: DBClusterIdentifier
-                    detail_function: describe_db_cluster
-                    detail_param: DBClusterIdentifier
         DBSnapshots:
             permissions: DescribeDBSnapshots
             function: describe_db_snapshots
