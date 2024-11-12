@@ -1,0 +1,283 @@
+# Fichier YAML généré à partir de JSON
+# Structure of the file
+# ---
+# Category is a nom to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+# boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# region_type is the type of region where the service is available. It can be 'local' or 'global'.
+#
+# inventory_nodes is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# Each function is a dictionary with the following keys:
+# - item_key: the key in the response where the list of items is stored.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - permissions: the list of permissions needed to call the function.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+# - result_key: the key in the response where the detailed inventory is stored.
+cloudfront:
+- region_type: global
+- boto_resource_name: cloudfront
+- category: Networking
+- inventory_nodes:
+  - list_distributions:
+    - permissions: ListDistributions
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_streaming_distributions:
+    - permissions: ListStreamingDistributions
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_distributions:
+    - permissions: ListDistributions
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_streaming_distributions:
+    - permissions: ListStreamingDistributions
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+directconnect:
+- region_type: global
+- boto_resource_name: directconnect
+- category: Global
+- inventory_nodes:
+  - describe_connections:
+    - permissions: DescribeConnections
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_virtual_interfaces:
+    - permissions: DescribeVirtualInterfaces
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_interconnects:
+    - permissions: DescribeInterconnects
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+ec2:
+- region_type: global
+- boto_resource_name: ec2
+- category: Compute
+- inventory_nodes:
+  - describe_regions:
+    - permissions: DescribeRegions
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_availability_zones:
+    - permissions: DescribeAvailabilityZones
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_account_attributes:
+    - permissions: DescribeAccountAttributes
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+freetier:
+- region_type: global
+- boto_resource_name: freetier
+- category: {}
+- inventory_nodes:
+  - get_free_tier_usage:
+    - permissions: GetFreeTierUsage
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+iam:
+- region_type: global
+- boto_resource_name: iam
+- category: IAM and Security
+- inventory_nodes:
+  - list_users:
+    - permissions: ListUsers
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_groups:
+    - permissions: ListGroups
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_policies:
+    - permissions: ListPolicies
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_instance_profiles:
+    - permissions: ListInstanceProfiles
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_access_keys:
+    - permissions: ListAccessKeys
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_mfa_devices:
+    - permissions: ListMFADevices
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_ssh_public_keys:
+    - permissions: ListSSHPublicKeys
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_service_specific_credentials:
+    - permissions: ListServiceSpecificCredentials
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_signing_certificates:
+    - permissions: ListSigningCertificates
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_server_certificates:
+    - permissions: ListServerCertificates
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_virtual_mfa_devices:
+    - permissions: ListVirtualMFADevices
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+organizations:
+- region_type: global
+- boto_resource_name: organizations
+- category: Management & Governance
+- inventory_nodes:
+  - list_accounts:
+    - permissions: ListAccounts
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_roots:
+    - permissions: ListRoots
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+outposts:
+- region_type: global
+- boto_resource_name: outposts
+- category: Compute
+- inventory_nodes:
+  - list_outposts:
+    - permissions: ListOutposts
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_sites:
+    - permissions: ListSites
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+route53:
+- region_type: global
+- boto_resource_name: route53
+- category: Networking
+- inventory_nodes:
+  - list_hosted_zones:
+    - permissions: ListHostedZones
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+route53domains:
+- region_type: global
+- boto_resource_name: route53domains
+- category: {}
+- inventory_nodes:
+  - list_domains:
+    - permissions: ListDomains
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+route53resolver:
+- region_type: global
+- boto_resource_name: route53resolver
+- category: {}
+- inventory_nodes:
+  - list_resolver_endpoints:
+    - permissions: ListResolverEndpoints
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+s3:
+- region_type: global
+- boto_resource_name: s3
+- category: Storage
+- inventory_nodes:
+  - list_buckets:
+    - permissions: ListAllMyBuckets
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+sts:
+- region_type: global
+- boto_resource_name: sts
+- category: Global
+- inventory_nodes:
+  - get_caller_identity:
+    - permissions: GetCallerIdentity
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+waf:
+- region_type: global
+- boto_resource_name: waf
+- category: Global
+- inventory_nodes:
+  - list_rules:
+    - permissions: ListRules
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_byte_match_sets:
+    - permissions: ListByteMatchSets
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_ip_sets:
+    - permissions: ListIPSets
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''

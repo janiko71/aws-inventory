@@ -5,7 +5,15 @@
         "detail_function": "describe_workspace",
         "detail_param": "workspaceId",
         "result_key": "workspace",
-        "required_permission": "sns:DescribeWorkspace"
+        "required_permission": "grafana:DescribeWorkspace"
+    },
+    "cloudformation": {
+        "item_key": "StackSummaries",
+        "item_search_id": "StackName",
+        "detail_function": "describe_stacks",
+        "detail_param": "StackName",
+        "result_key": "Stacks",
+        "required_permission": "cloudformation:DescribeStacks"
     },
     "sns": {
         "topics": {
@@ -34,7 +42,7 @@
             "AttributeNames": ["All"]
         },
         "result_key": "Attributes",
-        "required_permission": "sns:GetQueuesAttributes"
+        "required_permission": "sqs:GetQueueAttributes"
     },
     "apprunner": {
         "item_key": "ServiceSummaryList",
@@ -77,7 +85,7 @@
             "detail_function": "get_bucket_encryption",
             "detail_param": "Bucket",
             "result_key": "ServerSideEncryptionConfiguration",
-            "required_permission": "s3:GetBucketEncryption"
+            "required_permission": "s3:GetEncryptionConfiguration"
         },
         "AccelerateConf": {
             "item_key": "Buckets",
@@ -85,7 +93,7 @@
             "detail_function": "get_bucket_accelerate_configuration",
             "detail_param": "Bucket",
             "result_key": "",
-            "required_permission": "s3:GetBucketAccelerateConfiguration"
+            "required_permission": "s3:GetAccelerateConfiguration"
         },
         "Website": {
             "item_key": "Buckets",

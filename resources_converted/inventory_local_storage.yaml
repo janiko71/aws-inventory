@@ -1,0 +1,77 @@
+# Fichier YAML généré à partir de JSON
+# Structure of the file
+# ---
+# Category is a nom to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+# boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# region_type is the type of region where the service is available. It can be 'local' or 'global'.
+#
+# inventory_nodes is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# Each function is a dictionary with the following keys:
+# - item_key: the key in the response where the list of items is stored.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - permissions: the list of permissions needed to call the function.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+# - result_key: the key in the response where the detailed inventory is stored.
+elasticfilesystem:
+- region_type: local
+- boto_resource_name: elasticfilesystem
+- category: Storage
+- inventory_nodes:
+  - describe_file_systems:
+    - permissions: DescribeFileSystems
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+fsx:
+- region_type: local
+- boto_resource_name: fsx
+- category: Storage
+- inventory_nodes:
+  - describe_backups:
+    - permissions: DescribeBackups
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_volumes:
+    - permissions: DescribeVolumes
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_storage_virtual_machines:
+    - permissions: DescribeStorageVirtualMachines
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - describe_file_systems:
+    - permissions: DescribeFileSystems
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+glacier:
+- region_type: local
+- boto_resource_name: glacier
+- category: Storage
+- inventory_nodes:
+  - list_vaults:
+    - permissions: ListVaults
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_parts:
+    - permissions: ListParts
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''
+  - list_provisioned_capacity:
+    - permissions: ListProvisionedCapacity
+    - item_key: ''
+    - item_search_id: ''
+    - detail_param: ''
+    - result_key: ''

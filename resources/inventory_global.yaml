@@ -1,0 +1,171 @@
+# ---
+# Structure of the file YAML (using 4 spaces for indentation)
+# ---
+#
+# The first level of the file is the resource name. At next level, you have the following keys:
+#
+# - region_type is the type of region where the service is available. It can be 'local' or 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# The first level of the node is the resource name (ex: Buckets, Topics, Attributes...). At next level, you have the following keys:
+#
+# - permissions: the list of permissions needed to call the function.
+# - function: the function to call to get the inventory of the resource.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, you have these parameters:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+
+cloudfront:
+    region_type: global
+    boto_resource_name: cloudfront
+    category: Networking
+    inventory_nodes:
+        Distributions:
+            permissions: ListDistributions
+            function: list_distributions
+            details:
+                Distribution:
+                    permissions: GetDistribution
+                    item_search_id: Id
+                    detail_function: get_distribution
+                    detail_param: Id
+        StreamingDistributions:
+            permissions: ListStreamingDistributions
+            function: list_streaming_distributions
+            details:
+                StreamingDistribution:
+                    permissions: GetStreamingDistribution
+                    item_search_id: Id
+                    detail_function: get_streaming_distribution
+                    detail_param: Id
+
+directconnect:
+    region_type: global
+    boto_resource_name: directconnect
+    category: Networking
+    inventory_nodes:
+        Connections:
+            permissions: DescribeConnections
+            function: describe_connections
+        Interconnects:
+            permissions: DescribeInterconnects
+            function: describe_interconnects
+        VirtualInterfaces:
+            permissions: DescribeVirtualInterfaces
+            function: describe_virtual_interfaces
+
+ec2:
+    region_type: global
+    boto_resource_name: ec2
+    category: Compute
+    inventory_nodes:
+        AccountAttributes:
+            permissions: DescribeAccountAttributes
+            function: describe_account_attributes
+        AvailabilityZones:
+            permissions: DescribeAvailabilityZones
+            function: describe_availability_zones
+        Regions:
+            permissions: DescribeRegions
+            function: describe_regions
+
+freetier:
+    region_type: global
+    boto_resource_name: freetier
+    category: Billing
+    inventory_nodes:
+        FreeTierUsage:
+            permissions: GetFreeTierUsage
+            function: get_free_tier_usage
+
+iam:
+    region_type: global
+    boto_resource_name: iam
+    category: IAM and Security
+    inventory_nodes:
+        Users:
+            permissions: ListUsers
+            function: list_users
+            details:
+                User:
+                    permissions: GetUser
+                    item_search_id: UserName
+                    detail_function: get_user
+                    detail_param: UserName
+        Groups:
+            permissions: ListGroups
+            function: list_groups
+            details:
+                Group:
+                    permissions: GetGroup
+                    item_search_id: GroupName
+                    detail_function: get_group
+                    detail_param: GroupName
+        Roles:
+            permissions: ListRoles
+            function: list_roles
+            details:
+                Role:
+                    permissions: GetRole
+                    item_search_id: RoleName
+                    detail_function: get_role
+                    detail_param: RoleName
+        Policies:
+            permissions: ListPolicies
+            function: list_policies
+            details:
+                Policy:
+                    permissions: GetPolicy
+                    item_search_id: PolicyArn
+                    detail_function: get_policy
+                    detail_param: PolicyArn
+
+sts:
+    region_type: global
+    boto_resource_name: sts
+    category: IAM and Security
+    inventory_nodes:
+        CallerIdentity:
+            permissions: GetCallerIdentity
+            function: get_caller_identity
+
+waf:
+    region_type: global
+    boto_resource_name: waf
+    category: Security
+    inventory_nodes:
+        ByteMatchSets:
+            permissions: ListByteMatchSets
+            function: list_byte_match_sets
+            details:
+                ByteMatchSet:
+                    permissions: GetByteMatchSet
+                    item_search_id: ByteMatchSetId
+                    detail_function: get_byte_match_set
+                    detail_param: ByteMatchSetId
+        IPSets:
+            permissions: ListIPSets
+            function: list_ip_sets
+            details:
+                IPSet:
+                    permissions: GetIPSet
+                    item_search_id: IPSetId
+                    detail_function: get_ip_set
+                    detail_param: IPSetId
+        Rules:
+            permissions: ListRules
+            function: list_rules
+            details:
+                Rule:
+                    permissions: GetRule
+                    item_search_id: RuleId
+                    detail_function: get_rule
+                    detail_param: RuleId

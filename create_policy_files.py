@@ -1,87 +1,92 @@
+"""
+This script extracts permissions from YAML files in a specified directory.
+
+Functions:
+    extract_permissions(file_path):
+        Extracts permissions from a given YAML file.
+            file_path (str): The path to the YAML file.
+            set: A set of permissions extracted from the file.
+    write_permissions_to_files(permissions, output_dir):
+        Writes the set of permissions to multiple output files if the size exceeds 6144 characters.
+            permissions (set): The set of permissions to write.
+            output_dir (str): The directory to save the output files.
+Usage:
+    1. Set the `input_dir` variable to the path of the directory containing the YAML files.
+    2. Set the `output_dir` variable to the path of the directory for output files.
+    3. Run the script to collect and print permissions from all YAML files in the specified directory.
+    4. The script also prints the total execution time.
+Example:
+    input_dir = 'path/to/input/dir'
+    output_dir = 'path/to/output/dir'
+    # Run the script to collect permissions
+    python create_policy_files.py
+    # Output
+    {'resource1:permission1', 'resource2:permission2', ...}
+"""
 import os
-import glob
+import yaml
 import json
+import time
 
-# Constants
-POLICY_DIR = 'policies'  # Directory containing the policy files
-OUTPUT_DIR = 'output_policies'  # Directory to save the output policy files
-CHAR_LIMIT = 6144  # Character limit for each JSON file
-EXTRA_SERVICE_CALLS_FILE = os.path.join(POLICY_DIR, 'extra_service_calls.json')  # File containing extra service calls
-
-# Ensure output directory exists
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
-
-def remove_old_files(output_dir):
+def extract_permissions(file_path):
     """
-    Remove old JSON files in the output directory.
+    Extrait les permissions d'un fichier YAML donné.
 
     Args:
-        output_dir (str): The directory where old files are located.
-    """
-    old_files = glob.glob(os.path.join(output_dir, 'inventory_policy_part_*.json'))
-    for old_file in old_files:
-        os.remove(old_file)
-        print(f'Removed old file: {old_file}')
-
-def read_policy_files(policy_dir):
-    """
-    Read all inventory_policy* files and merge their actions.
-
-    Args:
-        policy_dir (str): The directory containing the policy files.
+        file_path (str): Le chemin du fichier YAML.
 
     Returns:
-        list: A list of all unique actions from the policy files.
+        set: Un ensemble de permissions extraites du fichier.
     """
-    policy_files = glob.glob(os.path.join(policy_dir, 'inventory_policy*.json'))
-    all_actions = set()  # Use a set to remove duplicates
-
-    for policy_file in policy_files:
-        with open(policy_file, 'r') as f:
-            policy = json.load(f)
-            for statement in policy.get('Statement', []):
-                all_actions.update(statement.get('Action', []))
-
-    return list(all_actions)
-
-def read_extra_permissions(extra_service_calls_file):
-    """
-    Read extra permissions from the extra_service_calls.json file.
-
-    Args:
-        extra_service_calls_file (str): The path to the extra_service_calls.json file.
-
-    Returns:
-        list: A list of extra permissions required by the services.
-    """
-    with open(extra_service_calls_file, 'r') as f:
-        extra_service_calls = json.load(f)
+    with open(file_path, 'r') as file:
+        data = yaml.safe_load(file)
     
-    extra_permissions = set()
-    for service, config in extra_service_calls.items():
-        if 'required_permission' in config:
-            extra_permissions.add(config['required_permission'])
-        else:
-            for sub_key, sub_config in config.items():
-                if isinstance(sub_config, dict) and 'required_permission' in sub_config:
-                    extra_permissions.add(sub_config['required_permission'])
-    
-    return list(extra_permissions)
+    permissions = set()
 
-def split_actions_into_policies(actions, char_limit):
+    def recursive_extract(data, resource):
+        """
+        Extrait récursivement les permissions des données YAML.
+
+        Args:
+            data (dict or list): Les données YAML.
+            resource (str): Le nom de la ressource actuelle.
+        """
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if key == 'permissions':
+                    if isinstance(value, str):
+                        perms = [perm.strip() for perm in value.split(',')]
+                        permissions.update(f"{resource}:{perm}" for perm in perms)
+                    elif isinstance(value, list):
+                        permissions.update(f"{resource}:{perm}" for perm in value)
+                else:
+                    recursive_extract(value, resource)
+        elif isinstance(data, list):
+            for item in data:
+                recursive_extract(item, resource)
+    
+    # Parcourt chaque ressource dans les données YAML
+    for resource, details in data.items():
+        recursive_extract(details, resource)
+    
+    return permissions
+
+def write_permissions_to_files(permissions, output_dir):
     """
-    Split actions into multiple policies based on character limit.
+    Écrit les permissions dans des fichiers de sortie en respectant la limite de 6144 caractères.
 
     Args:
-        actions (list): A list of actions to be included in the policies.
-        char_limit (int): The character limit for each JSON policy file.
-
-    Returns:
-        list: A list of policies, each within the character limit.
+        permissions (set): Un ensemble de permissions à écrire.
+        output_dir (str): Le répertoire pour enregistrer les fichiers de sortie.
     """
-    policies = []
-    current_policy = {
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    # Trier les permissions par ordre alphabétique et supprimer les doublons
+    sorted_permissions = sorted(permissions)
+
+    file_index = 1
+    current_file_content = {
         "Version": "2012-10-17",
         "Statement": [
             {
@@ -91,71 +96,50 @@ def split_actions_into_policies(actions, char_limit):
             }
         ]
     }
-    current_length = len(json.dumps(current_policy))
+    current_file_size = len(json.dumps(current_file_content))
+    max_size = 6144
 
-    for action in actions:
-        action_length = len(json.dumps(action)) + 2  # Adding 2 for the comma and quotes
-        if current_length + action_length > char_limit:
-            policies.append(current_policy)
-            current_policy = {
+    for perm in sorted_permissions:
+        action = perm
+        action_json = json.dumps(action) + "\n"
+        if current_file_size + len(action_json) > max_size:
+            with open(os.path.join(output_dir, f"permissions_output_{file_index}.json"), 'w') as file:
+                json.dump(current_file_content, file, indent=4)
+            file_index += 1
+            current_file_content = {
                 "Version": "2012-10-17",
                 "Statement": [
                     {
                         "Effect": "Allow",
-                        "Action": [],
+                        "Action": [action],
                         "Resource": "*"
                     }
                 ]
             }
-            current_length = len(json.dumps(current_policy))
-
-        current_policy["Statement"][0]["Action"].append(action)
-        current_length += action_length
-
-    if current_policy["Statement"][0]["Action"]:
-        policies.append(current_policy)
-
-    return policies
-
-def save_policies(policies, output_dir):
-    """
-    Save each policy to a separate JSON file.
-
-    Args:
-        policies (list): A list of policies to be saved.
-        output_dir (str): The directory where the policy files will be saved.
-    """
-    for i, policy in enumerate(policies):
-        output_file = os.path.join(output_dir, f'inventory_policy_part_{i+1}.json')
-        with open(output_file, 'w') as f:
-            json.dump(policy, f, indent=4)
-        print(f'Saved {output_file}')
-
-def main():
-    """
-    Main function to read policy files, merge actions, read extra permissions,
-    split actions into policies, and save the policies to JSON files.
-    """
-    # Remove old policy files
-    remove_old_files(OUTPUT_DIR)
+            current_file_size = len(json.dumps(current_file_content))
+        else:
+            current_file_content["Statement"][0]["Action"].append(action)
+            current_file_size += len(action_json)
     
-    # Read actions from policy files
-    all_actions = read_policy_files(POLICY_DIR)
-    
-    # Read extra permissions from extra_service_calls.json
-    extra_permissions = read_extra_permissions(EXTRA_SERVICE_CALLS_FILE)
-    
-    # Combine all actions and extra permissions
-    all_actions.extend(extra_permissions)
-    
-    # Sort actions alphabetically
-    all_actions = sorted(all_actions)
-    
-    # Split actions into multiple policies based on character limit
-    policies = split_actions_into_policies(all_actions, CHAR_LIMIT)
-    
-    # Save the policies to JSON files
-    save_policies(policies, OUTPUT_DIR)
+    if current_file_content["Statement"][0]["Action"]:
+        with open(os.path.join(output_dir, f"permissions_output_{file_index}.json"), 'w') as file:
+            json.dump(current_file_content, file, indent=4)
 
-if __name__ == "__main__":
-    main()
+# Démarrer le chronomètre
+start_time = time.time()
+
+# Collecter les permissions de tous les fichiers YAML dans le répertoire d'entrée
+input_dir = 'resources'  # Remplacer par le chemin réel du répertoire d'entrée
+output_dir = 'output_policies'  # Remplacer par le chemin réel du répertoire de sortie
+all_permissions = set()
+for file_name in os.listdir(input_dir):
+    if file_name.endswith('.yaml'):
+        file_path = os.path.join(input_dir, file_name)
+        all_permissions.update(extract_permissions(file_path))
+
+# Écrire les permissions dans des fichiers de sortie
+write_permissions_to_files(all_permissions, output_dir)
+
+# Afficher le temps d'exécution total
+end_time = time.time()
+print(f"Temps d'exécution total: {end_time - start_time:.2f} secondes")

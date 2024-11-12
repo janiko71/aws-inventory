@@ -1,0 +1,92 @@
+# ---
+# Structure of the file YAML (using 4 spaces for indentation)
+# ---
+#
+# The first level of the file is the resource name. At next level, you have the following keys:
+#
+# - region_type is the type of region where the service is available. It can be 'local' or 'global'.
+# - boto_resource_name is the name of the boto3 resource to use to interact with the service. Generally, it is the name of the service in the AWS SDK, but sometime it may differ.
+# - category is a name to group resource in the final inventory. Ex: 'Compute' for 'ec2', 'Storage' for 'efs', 'fsx', 'glacier', etc.
+#
+# 'inventory_nodes' is a list of functions to call to get the inventory of the service. Most of the time, you will have only one function to call, but you can have more if needed.
+# The first level of the node is the resource name (ex: Buckets, Topics, Attributes...). At next level, you have the following keys:
+#
+# - permissions: the list of permissions needed to call the function.
+# - function: the function to call to get the inventory of the resource.
+#
+# Then you can have one or more detail functions to call to get more details about the items returned by the inventory function.
+# Each detail function is a dictionary with the following keys, the first node is the object type (the key used to access the object in the response).
+# After that, you have these parameters:
+#
+# - permissions: the list of permissions needed to call the function.
+# - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
+# - detail_function: the function to call to get the detailed inventory.
+# - detail_param: the parameter to use to call the detailed inventory functions.
+sns:
+    region_type: local
+    boto_resource_name: sns
+    category: Application Integration
+    inventory_nodes:
+        Topics:
+            permissions: ListTopics
+            function: list_topics
+            details:
+                Attributes:
+                    permissions: GetTopicAttributes
+                    item_search_id: TopicArn
+                    detail_function: get_topic_attributes
+                    detail_param: TopicArn
+        Subscriptions:
+            permissions: ListSubscriptions
+            function: list_subscriptions    
+            details:
+                Attributes:
+                    permissions: GetSubscriptionAttributes
+                    item_search_id: SubscriptionArn
+                    detail_function: get_subscription_attributes
+                    detail_param: SubscriptionArn
+
+sqs:
+    region_type: local
+    boto_resource_name: sqs
+    category: Application Integration
+    inventory_nodes:
+        QueueUrls:
+            permissions: ListQueues
+            function: list_queues
+            details:
+                Attributes:
+                    permissions: GetQueueAttributes
+                    item_search_id: QueueUrls
+                    detail_function: get_queue_attributes
+                    detail_param: QueueUrl
+                Tags:
+                    permissions: ListQueueTags
+                    item_search_id: QueueUrls
+                    detail_function: list_queue_tags
+                    detail_param: QueueUrl
+            
+states:
+    region_type: local
+    boto_resource_name: stepfunctions
+    other_name: SFN
+    category: Application Integration
+    inventory_nodes:
+        stateMachines:
+            permissions: ListStateMachines
+            function: list_state_machines
+            details:
+                None:
+                    permissions: DescribeStateMachine
+                    item_search_id: stateMachineArn
+                    detail_function: describe_state_machine
+                    detail_param: stateMachineArn
+        activities:
+            permissions: ListActivities
+            function: list_activities
+            details:
+                None:
+                    permissions: DescribeActivity
+                    item_search_id: activityArn
+                    detail_function: describe_activity
+                    detail_param: activityArn
