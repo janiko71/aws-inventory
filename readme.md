@@ -25,19 +25,6 @@ This project is *[donateware](#if-you-like-it)*.
 
 The script functionally processes AWS service inventory with detailed logging, multi-threading, and customizable options via command-line arguments.
 
-## Project Structure and key Components
-The ```new_inventory_api.py``` file is a Python script designed for inventorying AWS services for a specified account across all available regions. It uses multi-threading to perform inventory operations concurrently. The key components are:
-
-* **Global Variables**: Manages inventory results, progress counters, and threading configurations.
-* **Modules Imported**: threading, boto3, json, os, sys, re, datetime, time, argparse, multiprocessing, concurrent.futures, tqdm, glob, utils (custom utility functions).
-* **Classes**: 
-  * ```InventoryThread```: A thread class for performing inventory tasks.
-* **Functions**:
-  * Utility Functions: ```write_log```, ```transform_function_name```, ```json_serial```, ```is_empty```.
-  * *Inventory Management Functions: ```get_all_regions```, ```test_region_connectivity```, ```create_services_structure```, ```inventory_handling```, ```list_used_services```.
-* The ```main``` function initiates the script execution, parses arguments, and manages the inventory process.
-
-
 ## Getting Started
 
 ### Prerequisites
