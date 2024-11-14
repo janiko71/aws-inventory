@@ -5,10 +5,13 @@
 ## Overview
 Did your never forget to stop an EC2 instance? Or to delete some unusued AWS resource? I'm sure you did. And only remembering it when getting the bill. I know, [AWS Config](https://aws.amazon.com/config) may help you, but did you ever try? It's prohibitive! This python script **lists all the main resources** owned within your AWS account. This inventory may be uncomplete, but it should help you to find what I call _main_ resources that are, in my mind, resources that should affect billing and/or security.
 
-
 Intended for _personal_ and _non-professional_ use (even if I added some professional features like logging), and for only one account. For more information on multiple accounts, read the [wiki](https://github.com/janiko71/aws-inventory/wiki). This script provides a comprehensive inventory of AWS services used within a **single account** across all available regions. It leverages multithreading to perform inventory operations concurrently, ensuring efficient and timely data collection.
 
-This project is *[donateware](#if-you-like-it)*. 
+## Support Me
+
+This project is *[donateware](https://github.com/sponsors/janiko71)*. If you like my work, consider supporting me via GitHub Sponsors!
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ff69b4?logo=github)](https://github.com/sponsors/janiko71)
 
 ## Main features
 
@@ -42,7 +45,6 @@ Please see **[wiki](https://github.com/janiko71/aws-inventory/wiki)**.
 
 ### Testing
 [**TESTERS WANTED! If you test this code, please send me feedback**](https://github.com/janiko71/aws-inventory/discussions/39): I can't test every configuration (especially when there are a lot of items in inventories), so either if it works or not, let me know what is fine and what needs to be corrected (use [issues](https://github.com/janiko71/aws-inventory/issues)).
-
 
 ### Writing some stuff
 Contributions are welcome! Please fork the repository and submit a pull request.
