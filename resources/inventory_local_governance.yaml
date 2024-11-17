@@ -91,3 +91,19 @@ organizations:
                     item_search_id: OrganizationalUnitId
                     detail_function: describe_organizational_unit
                     detail_param: OrganizationalUnitId
+
+resource-groups:
+    region_type: local
+    boto_resource_name: resource-groups
+    category: Governance
+    inventory_nodes:
+        Groups:
+            permissions: ListGroups
+            function: list_groups
+            details:
+                Group:
+                    permissions: GetGroup
+                    item_search_id: GroupName
+                    detail_function: get_group
+                    detail_param: GroupName
+                    

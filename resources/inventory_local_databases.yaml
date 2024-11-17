@@ -56,3 +56,100 @@ rds:
         DBSubnetGroups:
             permissions: DescribeDBSubnetGroups
             function: describe_db_subnet_groups
+
+redshift:
+    region_type: local
+    boto_resource_name: redshift
+    category: Databases
+    inventory_nodes:
+        Clusters:
+            permissions: DescribeClusters
+            function: describe_clusters
+        ClusterSnapshots:
+            permissions: DescribeClusterSnapshots
+            function: describe_cluster_snapshots
+        ClusterSubnetGroups:
+            permissions: DescribeClusterSubnetGroups
+            function: describe_cluster_subnet_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+        ClusterParameterGroups:
+            permissions: DescribeClusterParameterGroups
+            function: describe_cluster_parameter_groups
+        ClusterSecurityGroups:
+            permissions: DescribeClusterSecurityGroups
+            function: describe_cluster_security_groups
+
+route53:
+    region_type: local
+    boto_resource_name: route53
+    category: Networking
+    inventory_nodes:
+        HostedZones:
+            permissions: ListHostedZones
+            function: list_hosted_zones
+        HealthChecks:
+            permissions: ListHealthChecks
+            function: list_health_checks
+        TrafficPolicies:
+            permissions: ListTrafficPolicies
+            function: list_traffic_policies
+        TrafficPolicyInstances:
+            permissions: ListTrafficPolicyInstances
+            function: list_traffic_policy_instances
+        TrafficPolicyVersions:
+            permissions: ListTrafficPolicyVersions
+            function: list_traffic_policy_versions
+

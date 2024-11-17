@@ -24,30 +24,36 @@
 # - detail_param: the parameter to use to call the detailed inventory functions.
 
 kms:
-  boto_resource_name: kms
-  category: IAM and Security
-  inventory_nodes:
-    list_aliases:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListAliases
-      result_key: ''
-    list_keys:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListKeys
-      result_key: ''
-  region_type: local
+    boto_resource_name: kms
+    category: IAM and Security
+    inventory_nodes:
+        keys:
+            permissions: ListKeys
+            function: list_keys
+            key_policies:
+                permissions: GetKeyPolicy
+                function: get_key_policy
+                detail_functions:
+                    KeyPolicy:
+                        permissions: GetKeyPolicy
+                        item_search_id: KeyId
+                        detail_function: get_key_policy
+                        detail_param: KeyId
+
 secretsmanager:
-  boto_resource_name: secretsmanager
-  category: IAM and Security
-  inventory_nodes:
-    list_secrets:
-      detail_param: ''
-      item_key: ''
-      item_search_id: ''
-      permissions: ListSecrets
-      result_key: ''
-  region_type: local
+    boto_resource_name: secretsmanager
+    category: IAM and Security 
+    inventory_nodes:
+        secrets:
+            permissions: ListSecrets
+            function: list_secrets
+        secret_values:
+            permissions: GetSecretValue
+            function: get_secret_value
+            detail_functions:
+                SecretValue:
+                    permissions: GetSecretValue
+                    item_search_id: ARN
+                    detail_function: get_secret_value
+                    detail_param: SecretId
+
