@@ -390,17 +390,18 @@ def inventory_handling(category, region_name, resource, boto_resource_name, node
                     empty_items = False
                     break
 
+            object_type = list(inventory.keys())[0] if inventory else 'Unknown'
+            if category not in results:
+                results[category] = {}
+            if resource not in results[category]:
+                results[category][resource] = {}
+            if object_type not in results[category][resource]:
+                results[category][resource][object_type] = {}
+
             if not empty_items or with_empty:
 
 				# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')# --- Here: not empty, or we want to list the empty values too (arg 'with_empty')
 
-                object_type = list(inventory.keys())[0] if inventory else 'Unknown'
-                if category not in results:
-                    results[category] = {}
-                if resource not in results[category]:
-                    results[category][resource] = {}
-                if object_type not in results[category][resource]:
-                    results[category][resource][object_type] = {}
                 if region_name not in results[category][resource][object_type]:
                     results[category][resource][object_type][region_name] = {}
 
@@ -467,7 +468,7 @@ def resource_inventory(progress_callback, thread_list, category, resource, boto_
         thread = InventoryThread(category, region_name, resource, boto_resource_name, node_details, f"{resource} in {region_name}", progress_callback)
         print('.', end='')
         thread_list.append(thread)
-    pass
+
 
 # ------------------------------------------------------------------------------
 
