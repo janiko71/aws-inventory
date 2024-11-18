@@ -57,3 +57,11 @@ secretsmanager:
                     detail_function: get_secret_value
                     detail_param: SecretId
 
+cloudHSM:
+    boto_resource_name: cloudhsmv2
+    category: IAM and Security
+    inventory_nodes:
+        clusters:
+            permissions: DescribeClusters
+            function: describe_clusters
+

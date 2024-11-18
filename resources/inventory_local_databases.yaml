@@ -23,6 +23,11 @@
 # - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 
+# Not included: 
+# ----------------------#
+# File date: 2024-11-18 #
+# ----------------------#
+
 neptune-graph:
     region_type: local
     boto_resource_name: neptune-graph
@@ -132,24 +137,202 @@ redshift:
             permissions: DescribeClusterSecurityGroups
             function: describe_cluster_security_groups
 
-route53:
+elasticache:
     region_type: local
-    boto_resource_name: route53
-    category: Networking
+    boto_resource_name: elasticache
+    category: Databases
     inventory_nodes:
-        HostedZones:
-            permissions: ListHostedZones
-            function: list_hosted_zones
-        HealthChecks:
-            permissions: ListHealthChecks
-            function: list_health_checks
-        TrafficPolicies:
-            permissions: ListTrafficPolicies
-            function: list_traffic_policies
-        TrafficPolicyInstances:
-            permissions: ListTrafficPolicyInstances
-            function: list_traffic_policy_instances
-        TrafficPolicyVersions:
-            permissions: ListTrafficPolicyVersions
-            function: list_traffic_policy_versions
+        CacheClusters:
+            permissions: DescribeCacheClusters
+            function: describe_cache_clusters
+        ReplicationGroups:
+            permissions: DescribeReplicationGroups
+            function: describe_replication_groups
+        SecurityGroups:
+            permissions: DescribeCacheSecurityGroups
+            function: describe_cache_security_groups
+        Tags:
+            permissions: ListTagsForResource
+            function: list_tags_for_resource
 
+
+docdb:
+    region_type: local
+    boto_resource_name: docdb
+    category: Databases
+    inventory_nodes:
+        DBClusters:
+            permissions: DescribeDBClusters
+            function: describe_db_clusters
+        DBClusterSnapshots:
+            permissions: DescribeDBClusterSnapshots
+            function: describe_db_cluster_snapshots
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+            function: describe_db_cluster_security_groups
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+            function: describe_db_cluster_security_groups
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+            function: describe_db_cluster_security_groups
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+
+docdb-elastic:
+    region_type: local
+    boto_resource_name: docdb
+    category: Databases
+    inventory_nodes:
+        DBClusters:
+            permissions: DescribeDBClusters
+            function: describe_db_clusters
+        DBClusterSnapshots:
+            permissions: DescribeDBClusterSnapshots
+            function: describe_db_cluster_snapshots
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+            function: describe_db_cluster_security_groups
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+            function: describe_db_cluster_security_groups
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+            function: describe_db_cluster_security_groups
+        DBClusterParameterGroups:
+            permissions: DescribeDBClusterParameterGroups
+            function: describe_db_cluster_parameter_groups
+        DBClusterSecurityGroups:
+            permissions: DescribeDBClusterSecurityGroups
+
+keyspaces:
+    region_type: local
+    boto_resource_name: cassandra
+    category: Databases
+    inventory_nodes:
+        Keyspaces:
+            permissions: DescribeKeyspaces
+            function: describe_keyspaces
+        Tables:
+            permissions: DescribeTables
+            function: describe_tables
+        Table:
+            permissions: DescribeTable
+            item_search_id: TableName
+            detail_function: describe_table
+            detail_param: TableName   
+
+timestream:
+    region_type: local
+    boto_resource_name: timestream-query
+    category: Databases
+    inventory_nodes:
+        Databases:
+            permissions: ListDatabases
+            function: list_databases
+        Tables:
+            permissions: ListTables
+            function: list_tables
+        Table:
+            permissions: DescribeTable
+            item_search_id: TableName
+            detail_function: describe_table
+            detail_param: TableName
+        Tags:
+            permissions: ListTagsForResource
+            item_search_id: arn
+            detail_function: list_tags_for_resource
+            detail_param: resourceArn
+
+dynamodb:
+    region_type: local
+    boto_resource_name: dynamodb
+    category: Databases
+    inventory_nodes:
+        Tables:
+            permissions: ListTables
+            function: list_tables
+            details:
+                Table:
+                    permissions: DescribeTable
+                    item_search_id: TableName
+                    detail_function: describe_table
+                    detail_param: TableName
+        GlobalTables:
+            permissions: ListGlobalTables
+            function: list_global_tables
+            details:
+                GlobalTable:
+                    permissions: DescribeGlobalTable
+                    item_search_id: GlobalTableName
+                    detail_function: describe_global_table
+                    detail_param: GlobalTableName
+        Backup:
+            permissions: ListBackups
+            function: list_backups
+            details:
+                Backup:
+                    permissions: DescribeBackup
+                    item_search_id: BackupArn
+                    detail_function: describe_backup
+                    detail_param: BackupArn
+        Restore:
+            permissions: ListRestores
+            function: list_restores
+            details:
+                Restore:
+                    permissions: DescribeContinuousBackups
+                    item_search_id: RestoreArn
+                    detail_function: describe_continuous_backups
+                    detail_param: RestoreArn
+
+memorydb:
+    region_type: local
+    boto_resource_name: memorydb
+    category: Databases
+    inventory_nodes:
+        Clusters:
+            permissions: DescribeClusters
+            function: describe_clusters
+        ClusterSnapshots:
+            permissions: DescribeSnapshots
+            function: describe_snapshots
+        ParameterGroups:
+            permissions: DescribeParameterGroups
+            function: describe_parameter_groups
+        SecurityGroups:
+            permissions: DescribeSecurityGroups
+            function: describe_security_groups
+        SubnetGroups:
+            permissions: DescribeSubnetGroups
+            function: describe_subnet_groups
+        Users:
+            permissions: DescribeUsers
+            function: describe_users
+        ACLs:
+            permissions: DescribeACLs
+            function: describe_acls
+        Tags:
+            permissions: ListTagsForResource
+            function: list_tags_for_resource

@@ -23,6 +23,11 @@
 # - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 
+# Not included: None
+# ----------------------#
+# File date: 2024-11-18 #
+# ----------------------#
+
 braket:
     region_type: local
     boto_resource_name: braket
@@ -79,3 +84,28 @@ managedblockchain:
                     item_search_id: ProposalId
                     detail_function: get_proposal
                     detail_param: ProposalId
+
+qldb:
+    region_type: local
+    boto_resource_name: qldb
+    category: Databases
+    inventory_nodes:
+        Ledgers:
+            permissions: ListLedgers
+            function: list_ledgers
+            details:
+                Ledger:
+                    permissions: DescribeLedger
+                    item_search_id: Name
+                    detail_function: describe_ledger
+                    detail_param: Name
+        Tables:
+            permissions: ListTables
+            function: list_tables
+            details:
+                Table:
+                    permissions: DescribeTable
+                    item_search_id: TableName
+                    detail_function: describe_table
+                    detail_param: TableName
+         

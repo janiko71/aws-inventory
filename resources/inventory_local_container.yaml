@@ -23,6 +23,11 @@
 # - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 
+# Not included: Red Hat OpenShift Service on AWS, Elastic Container Registry
+# ----------------------#
+# File date: 2024-11-18 #
+# ----------------------#
+
 ecs:
     region_type: local
     boto_resource_name: ecs
