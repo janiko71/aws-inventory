@@ -22,6 +22,7 @@
 # - item_search_id: the key in the item to use as an identifier for the detailed inventory functions.
 # - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
+
 sns:
     region_type: local
     boto_resource_name: sns

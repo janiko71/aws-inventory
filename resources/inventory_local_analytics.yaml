@@ -23,10 +23,144 @@
 # - detail_function: the function to call to get the detailed inventory.
 # - detail_param: the parameter to use to call the detailed inventory functions.
 
+# Not included: Data Exchange, Lake Formation, MSK, Glue DataBrew, Amazon FinSpace, Firehose, EMR, Clean Rooms, DataZone, Entity Resolution, Managed Apache Flink
+# Issue: opensearch (https://github.com/janiko71/aws-inventory/issues/67)
+# ----------------------#
+# File date: 2024-11-18 #
+# ----------------------#
+
+
+athena:
+    region_type: local
+    boto_resource_name: athena
+    category: Analytics
+    inventory_nodes:
+        WorkGroups:
+            permissions: ListWorkGroups
+            function: list_work_groups
+            details:
+                WorkGroup:
+                    permissions: GetWorkGroup
+                    item_search_id: Name
+                    detail_function: get_work_group
+                    detail_param: Name
+                Tags:
+                    permissions: ListTagsForResource
+                    item_search_id: WorkGroupArn
+                    detail_function: list_tags_for_resource
+                    detail_param: ResourceARN
+        DataCatalogs:
+            permissions: ListDataCatalogs
+            function: list_data_catalogs
+            details:
+                DataCatalog:
+                    permissions: GetDataCatalog
+                    item_search_id: Name
+                    detail_function: get_data_catalog
+                    detail_param: Name
+                Tags:
+                    permissions: ListTagsForResource
+                    item_search_id: CatalogArn
+                    detail_function: list_tags_for_resource
+                    detail_param: ResourceARN
+        DataBases:
+            permissions: ListDatabases
+            function: list_databases
+            details:
+                Database:
+                    permissions: GetDatabase
+                    item_search_id: Name
+                    detail_function: get_database
+                    detail_param: Name
+                Tags:
+                    permissions: ListTagsForResource
+                    item_search_id: DatabaseArn
+                    detail_function: list_tags_for_resource
+                    detail_param: ResourceARN
+
+cloudsearch:
+    region_type: local
+    boto_resource_name: cloudsearch
+    category: Analytics
+    inventory_nodes:
+        Domains:
+            permissions: DescribeDomains
+            function: describe_domains
+
+
+kinesis:
+    region_type: local
+    boto_resource_name: kinesis
+    category: Analytics
+    inventory_nodes:
+        Streams:
+            permissions: ListStreams
+            function: list_streams
+            details:
+                Stream:
+                    permissions: DescribeStream
+                    item_search_id: StreamName
+                    detail_function: describe_stream
+                    detail_param: StreamName
+
+
+quickSight:
+    region_type: local
+    boto_resource_name: quicksight
+    category: Analytics
+    inventory_nodes:
+        Dashboards:
+            permissions: ListDashboards
+            function: list_dashboards
+            details:
+                Dashboard:
+                    permissions: DescribeDashboard
+                    item_search_id: DashboardId
+                    detail_function: describe_dashboard
+                    detail_param: DashboardId
+        DataSets:
+            permissions: ListDataSets
+            function: list_data_sets
+            details:
+                DataSet:
+                    permissions: DescribeDataSet
+                    item_search_id: DataSetId
+                    detail_function: describe_data_set
+                    detail_param: DataSetId
+        DataSources:
+            permissions: ListDataSources
+            function: list_data_sources
+            details:
+                DataSource:
+                    permissions: DescribeDataSource
+                    item_search_id: DataSourceId
+                    detail_function: describe_data_source
+                    detail_param: DataSourceId
+        Analyses:
+            permissions: ListAnalyses
+            function: list_analyses
+            details:
+                Analysis:
+                    permissions: DescribeAnalysis
+                    item_search_id: AnalysisId
+                    detail_function: describe_analysis
+                    detail_param: AnalysisId
+        Themes:
+            permissions: ListThemes
+            function: list_themes
+            details:
+                Theme:
+                    permissions: DescribeTheme
+                    item_search_id: ThemeId
+                    detail_function: describe_theme
+                    detail_param: ThemeId                    
+
+
 es:
     region_type: local
     boto_resource_name: es
     category: Analytics
+    other_name: ElasticsearchService, Opensearch Service
     inventory_nodes:
         Domains:
             permissions: DescribeElasticsearchDomains
@@ -79,3 +213,167 @@ glue:
                     item_search_id: Name
                     detail_function: get_job
                     detail_param: Name
+
+
+lakeformation:
+    region_type: local
+    boto_resource_name: lakeformation
+    category: Analytics
+    inventory_nodes:
+        DataLakes:
+            permissions: ListResources
+            function: list_resources
+            details:
+                DataLake:
+                    permissions: DescribeResource
+                    item_search_id: ResourceArn
+                    detail_function: describe_resource
+                    detail_param: ResourceArn   
+
+quicksight:
+    region_type: local
+    boto_resource_name: quicksight
+    category: Analytics
+    inventory_nodes:
+        Dashboards:
+            permissions: ListDashboards
+            function: list_dashboards
+            details:
+                Dashboard:
+                    permissions: DescribeDashboard
+                    item_search_id: DashboardId
+                    detail_function: describe_dashboard
+                    detail_param: DashboardId
+        DataSets:
+            permissions: ListDataSets
+            function: list_data_sets
+            details:
+                DataSet:
+                    permissions: DescribeDataSet
+                    item_search_id: DataSetId
+                    detail_function: describe_data_set
+                    detail_param: DataSetId
+        DataSources:
+            permissions: ListDataSources
+            function: list_data_sources
+            details:
+                DataSource:
+                    permissions: DescribeDataSource
+                    item_search_id: DataSourceId
+                    detail_function: describe_data_source
+                    detail_param: DataSourceId
+        Analyses:
+            permissions: ListAnalyses
+            function: list_analyses
+            details:
+                Analysis:
+                    permissions: DescribeAnalysis
+                    item_search_id: AnalysisId
+                    detail_function: describe_analysis
+                    detail_param: AnalysisId
+        Themes:
+            permissions: ListThemes
+            function: list_themes
+            details:
+                Theme:
+                    permissions: DescribeTheme
+                    item_search_id: ThemeId
+                    detail_function: describe_theme
+                    detail_param: ThemeId
+
+
+sagemaker:
+    region_type: local
+    boto_resource_name: sagemaker
+    category: Analytics
+    inventory_nodes:
+        Notebooks:
+            permissions: ListNotebookInstances
+            function: list_notebook_instances
+            details:
+                Notebook:
+                    permissions: DescribeNotebookInstance
+                    item_search_id: NotebookInstanceName
+                    detail_function: describe_notebook_instance
+                    detail_param: NotebookInstanceName
+        TrainingJobs:
+            permissions: ListTrainingJobs
+            function: list_training_jobs
+            details:
+                TrainingJob:
+                    permissions: DescribeTrainingJob
+                    item_search_id: TrainingJobName
+                    detail_function: describe_training_job
+                    detail_param: TrainingJobName
+        HyperParameterTuningJobs:
+            permissions: ListHyperParameterTuningJobs
+            function: list_hyper_parameter_tuning_jobs
+            details:
+                HyperParameterTuningJob:
+                    permissions: DescribeHyperParameterTuningJob
+                    item_search_id: HyperParameterTuningJobName
+                    detail_function: describe_hyper_parameter_tuning_job
+                    detail_param: HyperParameterTuningJobName
+        BatchTransformJobs:
+            permissions: ListTransformJobs
+            function: list_transform_jobs
+            details:
+                TransformJob:
+                    permissions: DescribeTransformJob
+                    item_search_id: TransformJobName
+                    detail_function: describe_transform_job
+                    detail_param: TransformJobName
+        Models:
+            permissions: ListModels
+            function: list_models
+            details:
+                Model:
+                    permissions: DescribeModel
+                    item_search_id: ModelName
+                    detail_function: describe_model
+                    detail_param: ModelName
+        Endpoints:
+            permissions: ListEndpoints
+            function: list_endpoints
+            details:
+                Endpoint:
+                    permissions: DescribeEndpoint
+                    item_search_id: EndpointName
+                    detail_function: describe_endpoint
+                    detail_param: EndpointName
+        EndpointConfigurations:
+            permissions: ListEndpointConfigs
+            function: list_endpoint_configs
+            details:
+                EndpointConfig:
+                    permissions: DescribeEndpointConfig
+                    item_search_id: EndpointConfigName
+                    detail_function: describe_endpoint_config
+                    detail_param: EndpointConfigName
+        LabelingJobs:
+            permissions: ListLabelingJobs
+            function: list_labeling_jobs
+            details:
+                LabelingJob:
+                    permissions: DescribeLabelingJob
+                    item_search_id: LabelingJobName
+                    detail_function: describe_labeling_job
+                    detail_param: Label
+
+redshift:
+    region_type: local
+    boto_resource_name: redshift
+    category: Analytics
+    inventory_nodes:
+        Clusters:
+            permissions: DescribeClusters
+            function: describe_clusters
+        DataShares:
+            permissions: DescribeDataShares
+            function: describe_data_shares
+        Storage:
+            permissions: DescribeStorage
+            function: describe_storage
+        Tags:
+            permissions: DescribeTags
+            function: describe_tags

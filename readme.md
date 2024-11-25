@@ -17,7 +17,7 @@ This project is *[donateware](https://github.com/sponsors/janiko71)*. If you lik
 
 - **Multithreading**: Concurrently performs inventory operations to speed up data collection.
 - **Service Coverage**: Supports a wide range of AWS services, including EC2, S3, RDS, Lambda, and more.
-- **Extendability**: All ressources and details inventory services are in JSON files. No need to write code to add new ressources!
+- **Extendability**: All resources and details inventory services are in JSON files. No need to write code to add new ressources!
 - **Policy Management**: Reads and merges IAM policy files to determine the necessary permissions for inventory operations directly from JSON files used in the project.
 - **Logging**: Detailed logging of operations and errors for troubleshooting and auditing purposes. Ensures the existence of log and output directories, and creates a timestamped log file.
 - **Inventory Processes**:

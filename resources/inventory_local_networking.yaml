@@ -79,3 +79,25 @@ private-networks:
                     item_search_id: NetworkArn
                     detail_function: get_network
                     detail_param: NetworkArn
+
+
+route53:
+    region_type: local
+    boto_resource_name: route53
+    category: Networking
+    inventory_nodes:
+        HostedZones:
+            permissions: ListHostedZones
+            function: list_hosted_zones
+        HealthChecks:
+            permissions: ListHealthChecks
+            function: list_health_checks
+        TrafficPolicies:
+            permissions: ListTrafficPolicies
+            function: list_traffic_policies
+        TrafficPolicyInstances:
+            permissions: ListTrafficPolicyInstances
+            function: list_traffic_policy_instances
+        TrafficPolicyVersions:
+            permissions: ListTrafficPolicyVersions
+            function: list_traffic_policy_versions
