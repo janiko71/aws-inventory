@@ -67,13 +67,16 @@ from botocore.exceptions import EndpointConnectionError, ClientError  # Ajout de
 
 # ------------------------------------------------------------------------------
 
+# Base directory for all output
+base_dir = os.getenv('AWS_INVENTORY_BASE_DIR', 'aws-inventory-output')
+
 # Ensure log directory exists
-log_dir = "log"
+log_dir = os.path.join(base_dir, "log")
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
 # Ensure output directory exists
-output_dir = "output"
+output_dir = os.path.join(base_dir, "output")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -609,7 +612,33 @@ if __name__ == "__main__":
     parser.add_argument('--with-meta', action='store_true', help='Include metadata in the inventory')
     parser.add_argument('--with-extra', action='store_true', help='Include Availability Zones, Regions and Account Attributes in the inventory')
     parser.add_argument('--with-empty', action='store_true', help='Include empty values in the inventory')
+    parser.add_argument('--base-dir', type=str, help='Base directory for output files (overrides AWS_INVENTORY_BASE_DIR environment variable)')
     args = parser.parse_args()
+
+    # Update base directory if specified in command line
+    if args.base_dir:
+        base_dir = args.base_dir
+        # Validate base directory path
+        if not os.path.exists(base_dir):
+            try:
+                os.makedirs(base_dir)
+                write_log(f"Created base directory: {base_dir}", log_file_path)
+            except Exception as e:
+                write_log(f"Error creating base directory {base_dir}: {e}", log_file_path)
+                print(f"Error: Could not create base directory {base_dir}")
+                sys.exit(1)
+        elif not os.path.isdir(base_dir):
+            write_log(f"Error: {base_dir} exists but is not a directory", log_file_path)
+            print(f"Error: {base_dir} exists but is not a directory")
+            sys.exit(1)
+        # Recreate directories with new base path
+        log_dir = os.path.join(base_dir, "log")
+        output_dir = os.path.join(base_dir, "output")
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        log_file_path = os.path.join(log_dir, f"log_{timestamp}.log")
 
     resource_dir = args.resource_dir
     with_meta = args.with_meta
